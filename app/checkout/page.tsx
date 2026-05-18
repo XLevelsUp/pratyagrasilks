@@ -112,7 +112,7 @@ export default function CheckoutPage() {
                         </div>
                         <Link
                             href="/cart"
-                            className="flex items-center gap-2 text-accent hover:text-accent-hover font-medium"
+                            className="flex items-center gap-2 text-accent-700 hover:text-accent-hover font-medium"
                         >
                             <ArrowLeft className="w-5 h-5" />
                             Back to Cart

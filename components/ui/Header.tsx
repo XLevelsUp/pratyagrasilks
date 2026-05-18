@@ -243,7 +243,7 @@ export default function Header() {
                                     ))}
                                     <Link
                                         href="/collection"
-                                        className="block text-sm text-accent hover:text-accent-hover transition-colors py-1 font-medium"
+                                        className="block text-sm text-accent-700 hover:text-accent-hover transition-colors py-1 font-medium"
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >
                                         View All →

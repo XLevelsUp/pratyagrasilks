@@ -30,7 +30,7 @@ export default function Footer() {
 
                     {/* Quick Links */}
                     <div>
-                        <h4 className="font-semibold text-lg mb-4">Quick Links</h4>
+                        <h3 className="font-semibold text-lg mb-4">Quick Links</h3>
                         <ul className="space-y-2">
                             <li>
                                 <Link
@@ -69,7 +69,7 @@ export default function Footer() {
 
                     {/* Social Media & Policies */}
                     <div>
-                        <h4 className="font-semibold text-lg mb-4">Connect With Us</h4>
+                        <h3 className="font-semibold text-lg mb-4">Connect With Us</h3>
                         <div className="flex space-x-4 mb-6">
                             <a
                                 href="https://instagram.com/pratyagra_silks"
