@@ -4,7 +4,7 @@ import Script from 'next/script';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 
-const GA_MEASUREMENT_ID = 'G-6RD8G1FJZ2';
+const GA_MEASUREMENT_ID = 'G-9F4DH6D09E';
 
 // Declare gtag function for TypeScript
 declare global {
