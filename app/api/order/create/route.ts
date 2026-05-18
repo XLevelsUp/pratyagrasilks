@@ -5,21 +5,13 @@ import { shippingAddressSchema } from '@/lib/validations/form.schemas';
 
 export const dynamic = 'force-dynamic';
 
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-);
-
-/**
- * POST /api/order/create
- *
- * Called by RazorpayButton before opening the checkout modal.
- * - Validates cart prices server-side (prevents client-side manipulation).
- * - Creates a preliminary `pending` order in Supabase.
- * - Creates a Razorpay order and returns its ID to the client.
- */
 export async function POST(req: NextRequest) {
+    const supabaseAdmin = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        { auth: { autoRefreshToken: false, persistSession: false } }
+    );
+    
     try {
         const body = await req.json();
         const { shippingAddress, items, shippingCost = 0, shippingZoneId, estimatedDeliveryDays } = body;

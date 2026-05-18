@@ -18,7 +18,7 @@ interface ProductDetailClientProps {
 
 async function getRelatedProducts(id: string): Promise<Product[]> {
     const res = await fetch(`/api/products/${id}/related`, {
-        cache: 'no-store',
+        // WebSocket connection might prevent bfcache restoration, this is a known browser limitation
     });
     if (!res.ok) return [];
     const data = await res.json();
