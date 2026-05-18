@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { trackBeginCheckout } from '@/lib/analytics/gtag';
+import EmailVerificationForm from '@/components/Auth/EmailVerificationForm';
 
 interface ShippingZone {
     id: string;
@@ -24,6 +25,11 @@ export default function CheckoutPage() {
     const [estimatedDays, setEstimatedDays] = useState('');
     const [shippingZoneId, setShippingZoneId] = useState<string | undefined>();
     const [isProcessing, setIsProcessing] = useState(false);
+    
+    // Email verification state
+    const [isEmailVerified, setIsEmailVerified] = useState(false);
+    const [verifiedEmail, setVerifiedEmail] = useState('');
+
     // Once the shipping form is submitted, show the payment button
     const [confirmedShipping, setConfirmedShipping] = useState<ShippingAddress | null>(null);
     const paymentRef = useRef<HTMLDivElement>(null);
@@ -120,32 +126,44 @@ export default function CheckoutPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Left — Shipping Form + Payment */}
                     <div className="lg:col-span-2 space-y-6">
-                        <ShippingForm onSubmit={handleShippingSubmit} />
+                        {!isEmailVerified ? (
+                            <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                                <h2 className="text-lg font-semibold text-gray-900 mb-6">Contact Information</h2>
+                                <EmailVerificationForm onSuccess={(email) => {
+                                    setIsEmailVerified(true);
+                                    setVerifiedEmail(email);
+                                }} />
+                            </div>
+                        ) : (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
+                                <ShippingForm onSubmit={handleShippingSubmit} initialEmail={verifiedEmail} />
 
-                        {/* Payment section — revealed after shipping is confirmed */}
-                        {confirmedShipping && (
-                            <div ref={paymentRef} className="bg-white rounded-xl border border-primary-100 p-6 shadow-sm">
-                                <h2 className="text-lg font-semibold text-gray-900 mb-1">
-                                    Payment
-                                </h2>
-                                <p className="text-sm text-textSecondary mb-5">
-                                    Address confirmed. Complete your purchase securely via Razorpay.
-                                </p>
-                                <RazorpayButton
-                                    shippingAddress={confirmedShipping}
-                                    cartItems={items.map((i) => ({
-                                        productId: i.product.id,
-                                        product: {
-                                            name: i.product.name,
-                                            price: i.product.price,
-                                            sku: i.product.sku,
-                                        },
-                                    }))}
-                                    shippingCost={shippingCost}
-                                    shippingZoneId={shippingZoneId}
-                                    estimatedDeliveryDays={estimatedDays}
-                                    onSuccess={clearCart}
-                                />
+                                {/* Payment section — revealed after shipping is confirmed */}
+                                {confirmedShipping && (
+                                    <div ref={paymentRef} className="bg-white rounded-xl border border-primary-100 p-6 shadow-sm">
+                                        <h2 className="text-lg font-semibold text-gray-900 mb-1">
+                                            Payment
+                                        </h2>
+                                        <p className="text-sm text-textSecondary mb-5">
+                                            Address confirmed. Complete your purchase securely via Razorpay.
+                                        </p>
+                                        <RazorpayButton
+                                            shippingAddress={confirmedShipping}
+                                            cartItems={items.map((i) => ({
+                                                productId: i.product.id,
+                                                product: {
+                                                    name: i.product.name,
+                                                    price: i.product.price,
+                                                    sku: i.product.sku,
+                                                },
+                                            }))}
+                                            shippingCost={shippingCost}
+                                            shippingZoneId={shippingZoneId}
+                                            estimatedDeliveryDays={estimatedDays}
+                                            onSuccess={clearCart}
+                                        />
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>

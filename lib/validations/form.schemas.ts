@@ -9,10 +9,37 @@ const fullNameField = z
     .max(100, 'Name is too long')
     .regex(/^[a-zA-Z\s'-]+$/, 'Name should only contain letters and spaces');
 
-const emailField = z
+export const emailField = z
     .string()
     .trim()
-    .email('Please enter a valid email address');
+    .min(1, 'Email is required')
+    .refine((val) => {
+        // Block invalid formats like example@gmail.comm, @gmail.com, maha@
+        const regex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+        const parts = val.split('@');
+        if (parts.length !== 2) return false;
+        
+        const [local, domain] = parts;
+        if (!local || !domain) return false; // Blocks @gmail.com, maha@
+        
+        const domainParts = domain.split('.');
+        if (domainParts.length < 2) return false;
+        
+        const tld = domainParts[domainParts.length - 1];
+        
+        // Block common typos like .commm, .con, .comm
+        if (tld === 'comm' || tld === 'commm' || tld === 'con') return false;
+
+        return (
+            regex.test(val) &&
+            !local.startsWith('.') &&
+            !local.endsWith('.') &&
+            !local.includes('..') &&
+            tld.length >= 2 && tld.length <= 6
+        );
+    }, {
+        message: 'Please enter a valid email address',
+    });
 
 // E.164 format: + followed by 8–15 digits, first digit of country code non-zero
 const phoneField = z

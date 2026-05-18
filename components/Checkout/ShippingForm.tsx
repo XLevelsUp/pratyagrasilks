@@ -8,9 +8,10 @@ import Input from '@/components/ui/Input';
 
 interface Props {
     onSubmit: (data: ShippingAddress) => Promise<void>;
+    initialEmail?: string;
 }
 
-export default function ShippingForm({ onSubmit }: Props) {
+export default function ShippingForm({ onSubmit, initialEmail }: Props) {
     const [country, setCountry] = useState('India');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -21,7 +22,7 @@ export default function ShippingForm({ onSubmit }: Props) {
         formState: { errors },
     } = useForm<ShippingAddress>({
         resolver: zodResolver(shippingAddressSchema),
-        defaultValues: { country: 'India' },
+        defaultValues: { country: 'India', email: initialEmail || '' },
     });
 
     const handleFormSubmit = async (data: ShippingAddress) => {
@@ -61,6 +62,7 @@ export default function ShippingForm({ onSubmit }: Props) {
                         placeholder="priya@example.com"
                         autoComplete="email"
                         error={errors.email?.message}
+                        readOnly={!!initialEmail}
                         {...register('email')}
                     />
                     <Input
