@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
-import { sendOrderConfirmation } from '@/lib/mail/sender';
-import type { OrderEmailData } from '@/lib/mail/templates';
+// import { sendOrderConfirmation } from '@/lib/mail/sender';
+// import type { OrderEmailData } from '@/lib/mail/templates';
 
 export const dynamic = 'force-dynamic';
 
@@ -80,58 +80,58 @@ export async function POST(req: NextRequest) {
 
         console.log(`[/api/order/verify] Payment verified — order ${order.order_number}`);
 
-        // ── 5. Send confirmation email (non-blocking) ────────────────────────────
-        void (async () => {
-            try {
-                const { data: customer } = await supabaseAdmin
-                    .from('customers')
-                    .select('full_name, email')
-                    .eq('id', order.customer_id)
-                    .single();
-
-                if (!customer?.email) return;
-
-                const { data: items } = await supabaseAdmin
-                    .from('order_items')
-                    .select('product_name, product_sku, quantity, unit_price, total_price')
-                    .eq('order_id', order.id);
-
-                const { data: address } = await supabaseAdmin
-                    .from('addresses')
-                    .select('full_name, address_line1, address_line2, city, state, postal_code')
-                    .eq('id', order.shipping_address_id)
-                    .single();
-
-                const emailData: OrderEmailData = {
-                    orderNumber: order.order_number,
-                    customerName: address?.full_name || customer.full_name || 'Valued Customer',
-                    customerEmail: customer.email,
-                    items: (items ?? []).map((i) => ({
-                        name: i.product_name,
-                        sku: i.product_sku,
-                        quantity: i.quantity,
-                        unitPrice: i.unit_price,
-                        totalPrice: i.total_price,
-                    })),
-                    subtotal: order.subtotal ?? order.total_amount,
-                    shippingCharge: order.shipping_cost ?? 0,
-                    totalAmount: order.total_amount,
-                    shippingAddress: address ? {
-                        line1: address.address_line1,
-                        line2: address.address_line2,
-                        city: address.city,
-                        state: address.state,
-                        pincode: address.postal_code,
-                    } : { line1: '', city: '', state: '', pincode: '' },
-                    estimatedDelivery: order.estimated_delivery_days ?? null,
-                };
-
-                await sendOrderConfirmation(customer.email, emailData);
-                console.log(`[/api/order/verify] Confirmation email sent → ${customer.email}`);
-            } catch (emailErr) {
-                console.error('[/api/order/verify] Email send failed (non-fatal):', emailErr);
-            }
-        })();
+        // ── 5. Send confirmation email (non-blocking) — DISABLED ────────────────
+        // void (async () => {
+        //     try {
+        //         const { data: customer } = await supabaseAdmin
+        //             .from('customers')
+        //             .select('full_name, email')
+        //             .eq('id', order.customer_id)
+        //             .single();
+        //
+        //         if (!customer?.email) return;
+        //
+        //         const { data: items } = await supabaseAdmin
+        //             .from('order_items')
+        //             .select('product_name, product_sku, quantity, unit_price, total_price')
+        //             .eq('order_id', order.id);
+        //
+        //         const { data: address } = await supabaseAdmin
+        //             .from('addresses')
+        //             .select('full_name, address_line1, address_line2, city, state, postal_code')
+        //             .eq('id', order.shipping_address_id)
+        //             .single();
+        //
+        //         const emailData: OrderEmailData = {
+        //             orderNumber: order.order_number,
+        //             customerName: address?.full_name || customer.full_name || 'Valued Customer',
+        //             customerEmail: customer.email,
+        //             items: (items ?? []).map((i) => ({
+        //                 name: i.product_name,
+        //                 sku: i.product_sku,
+        //                 quantity: i.quantity,
+        //                 unitPrice: i.unit_price,
+        //                 totalPrice: i.total_price,
+        //             })),
+        //             subtotal: order.subtotal ?? order.total_amount,
+        //             shippingCharge: order.shipping_cost ?? 0,
+        //             totalAmount: order.total_amount,
+        //             shippingAddress: address ? {
+        //                 line1: address.address_line1,
+        //                 line2: address.address_line2,
+        //                 city: address.city,
+        //                 state: address.state,
+        //                 pincode: address.postal_code,
+        //             } : { line1: '', city: '', state: '', pincode: '' },
+        //             estimatedDelivery: order.estimated_delivery_days ?? null,
+        //         };
+        //
+        //         await sendOrderConfirmation(customer.email, emailData);
+        //         console.log(`[/api/order/verify] Confirmation email sent → ${customer.email}`);
+        //     } catch (emailErr) {
+        //         console.error('[/api/order/verify] Email send failed (non-fatal):', emailErr);
+        //     }
+        // })();
 
         return NextResponse.json({
             success: true,
