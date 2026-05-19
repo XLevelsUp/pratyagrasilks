@@ -88,8 +88,8 @@ export default function PosReceipt({ data, forBulkPrint }: PosReceiptProps) {
                 id={forBulkPrint ? undefined : 'pos-receipt-print'}
                 style={{
                     ...(forBulkPrint
-                        ? { fontFamily: font, fontSize: '18px', color: '#000', lineHeight: 1.5, width: '100%', background: '#fff', display: 'flex', flexDirection: 'column', minHeight: '100vh' }
-                        : { position: 'fixed', left: '-9999px', top: 0, fontFamily: font, fontSize: '18px', color: '#000', lineHeight: 1.5, width: '520px', margin: '0 auto', background: '#fff', display: 'flex', flexDirection: 'column', minHeight: '100vh' }
+                        ? { fontFamily: font, fontSize: '18px', color: '#444', lineHeight: 1.5, width: '100%', background: '#fff', display: 'flex', flexDirection: 'column', minHeight: '100vh' }
+                        : { position: 'fixed', left: '-9999px', top: 0, fontFamily: font, fontSize: '18px', color: '#444', lineHeight: 1.5, width: '520px', margin: '0 auto', background: '#fff', display: 'flex', flexDirection: 'column', minHeight: '100vh' }
                     ),
                 }}
             >
@@ -143,7 +143,7 @@ export default function PosReceipt({ data, forBulkPrint }: PosReceiptProps) {
                                 <span style={{
                                     display: 'inline-block',
                                     background: '#550c72',
-                                    color: '#000000',
+                                    color: '#444',
                                     fontSize: '18px',
                                     fontWeight: 700,
                                     padding: '2px 8px',
