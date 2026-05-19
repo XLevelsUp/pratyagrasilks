@@ -24,7 +24,13 @@ export default function Footer() {
                             Reviving Tradition with a New Touch
                         </p>
                         <p className="text-white/80">
-                            <strong>Contact:</strong> info@pratyagrasilks.com
+                            <strong>Contact:</strong>{' '}
+                            <a
+                                href="mailto:info@pratyagrasilks.com"
+                                className="text-white/80 hover:text-secondary underline underline-offset-2 transition-colors"
+                            >
+                                info@pratyagrasilks.com
+                            </a>
                         </p>
                     </div>
 

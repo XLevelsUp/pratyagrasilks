@@ -3,6 +3,7 @@
 import { useState } from "react";
 import toast from 'react-hot-toast';
 import Input from '@/components/ui/Input';
+import EmailInput from '@/components/ui/EmailInput';
 import { contactFormSchema } from '@/lib/validations/form.schemas';
 
 export default function ContactPage() {
@@ -14,6 +15,7 @@ export default function ContactPage() {
     });
     const [submitted, setSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [emailValid, setEmailValid] = useState(false);
     const [fieldErrors, setFieldErrors] = useState<Partial<Record<'name' | 'email' | 'subject' | 'message', string>>>({});
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -159,19 +161,23 @@ export default function ContactPage() {
                                     value={formData.name}
                                     onChange={handleChange}
                                     placeholder="Your name"
-                                    maxLength={34}
+                                    maxLength={100}
                                     error={fieldErrors.name}
                                 />
 
-                                <Input
+                                <EmailInput
                                     id="email"
                                     name="email"
                                     label="Email Address *"
-                                    type="email"
                                     value={formData.email}
-                                    onChange={handleChange}
-                                    placeholder="your@email.com"
-                                    error={fieldErrors.email}
+                                    onChange={(val) => {
+                                        setFormData(prev => ({ ...prev, email: val }));
+                                        if (fieldErrors.email) setFieldErrors(prev => ({ ...prev, email: undefined }));
+                                    }}
+                                    onValidChange={setEmailValid}
+                                    externalError={fieldErrors.email}
+                                    required
+                                    autoComplete="email"
                                 />
 
                                 <div>
@@ -205,6 +211,7 @@ export default function ContactPage() {
                                         value={formData.message}
                                         onChange={handleChange}
                                         rows={5}
+                                        maxLength={2000}
                                         className={`w-full px-4 py-2 border rounded-md outline-none transition-colors focus:ring-2 ${fieldErrors.message ? 'border-red-400 focus:ring-red-400' : 'border-gray-300 focus:ring-primary focus:border-primary'}`}
                                         placeholder="Tell us more about your inquiry..."
                                     />

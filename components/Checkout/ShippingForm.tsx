@@ -22,6 +22,7 @@ export default function ShippingForm({ onSubmit, initialEmail }: Props) {
         formState: { errors },
     } = useForm<ShippingAddress>({
         resolver: zodResolver(shippingAddressSchema),
+        mode: 'onTouched',
         defaultValues: { country: 'India', email: initialEmail || '' },
     });
 

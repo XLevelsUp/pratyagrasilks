@@ -6,37 +6,29 @@ const fullNameField = z
     .string()
     .trim()
     .min(2, 'Name must be at least 2 characters')
-    .max(100, 'Name is too long')
+    .max(100, 'Name must not exceed 100 characters')
     .regex(/^[a-zA-Z\s'-]+$/, 'Name should only contain letters and spaces');
+
+// Strict email regex — enforces a valid TLD (alphabetic, min 2 chars, max 3 chars to reject .comm)
+const STRICT_EMAIL_REGEX = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,3}$/;
 
 export const emailField = z
     .string()
     .trim()
     .min(1, 'Email is required')
     .refine((val) => {
-        // Block invalid formats like example@gmail.comm, @gmail.com, maha@
-        const regex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+        if (!STRICT_EMAIL_REGEX.test(val)) return false;
+
         const parts = val.split('@');
         if (parts.length !== 2) return false;
-        
-        const [local, domain] = parts;
-        if (!local || !domain) return false; // Blocks @gmail.com, maha@
-        
-        const domainParts = domain.split('.');
-        if (domainParts.length < 2) return false;
-        
-        const tld = domainParts[domainParts.length - 1];
-        
-        // Block common typos like .commm, .con, .comm
-        if (tld === 'comm' || tld === 'commm' || tld === 'con') return false;
 
-        return (
-            regex.test(val) &&
-            !local.startsWith('.') &&
-            !local.endsWith('.') &&
-            !local.includes('..') &&
-            tld.length >= 2 && tld.length <= 6
-        );
+        const [local, domain] = parts;
+        if (!local || !domain) return false;
+
+        // Block leading/trailing/consecutive dots in local part
+        if (local.startsWith('.') || local.endsWith('.') || local.includes('..')) return false;
+
+        return true;
     }, {
         message: 'Please enter a valid email address',
     });
@@ -55,8 +47,8 @@ const phoneField = z
 export const contactFormSchema = z.object({
     name: fullNameField,
     email: emailField,
-    subject: z.string().trim().min(1, 'Please select a subject'),
-    message: z.string().trim().min(10, 'Message must be at least 10 characters').max(2000, 'Message is too long'),
+    subject: z.string().trim().min(1, 'Please select a subject').max(150, 'Subject must not exceed 150 characters'),
+    message: z.string().trim().min(10, 'Message must be at least 10 characters').max(2000, 'Message must not exceed 2000 characters'),
 });
 
 export type ContactFormData = z.infer<typeof contactFormSchema>;

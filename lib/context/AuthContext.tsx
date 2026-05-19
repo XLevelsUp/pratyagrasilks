@@ -43,6 +43,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const signUp = async (email: string, password: string, fullName: string) => {
+        if (password.length > 20) {
+            return { error: new Error('Password must not exceed 20 characters.') };
+        }
         const { error } = await supabase.auth.signUp({
             email,
             password,
@@ -56,6 +59,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const signIn = async (email: string, password: string) => {
+        if (password.length > 20) {
+            return { error: new Error('Password must not exceed 20 characters.') };
+        }
         const { error } = await supabase.auth.signInWithPassword({
             email,
             password,
