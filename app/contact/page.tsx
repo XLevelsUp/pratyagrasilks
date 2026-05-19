@@ -163,6 +163,7 @@ export default function ContactPage() {
                                     placeholder="Your name"
                                     maxLength={100}
                                     error={fieldErrors.name}
+                                    autoComplete="name"
                                 />
 
                                 <EmailInput
@@ -189,6 +190,7 @@ export default function ContactPage() {
                                         name="subject"
                                         value={formData.subject}
                                         onChange={handleChange}
+                                        autoComplete="off"
                                         className="w-full px-4 py-2 border border-gray-300 rounded-md outline-none transition-colors focus:ring-2 focus:ring-primary focus:border-primary bg-white"
                                     >
                                         <option value="">Select a subject</option>
@@ -212,6 +214,7 @@ export default function ContactPage() {
                                         onChange={handleChange}
                                         rows={5}
                                         maxLength={2000}
+                                        autoComplete="off"
                                         className={`w-full px-4 py-2 border rounded-md outline-none transition-colors focus:ring-2 ${fieldErrors.message ? 'border-red-400 focus:ring-red-400' : 'border-gray-300 focus:ring-primary focus:border-primary'}`}
                                         placeholder="Tell us more about your inquiry..."
                                     />

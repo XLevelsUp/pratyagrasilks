@@ -99,7 +99,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
-            <body className="antialiased hide-scrollbar">
+            <body className="antialiased"> {/* fixed: vertical scroll restored — removed hide-scrollbar from body */}
                 <OrganizationSchema />
 
                 <AuthProvider>
