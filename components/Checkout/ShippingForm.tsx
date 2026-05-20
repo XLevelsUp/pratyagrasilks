@@ -125,6 +125,7 @@ export default function ShippingForm({ onSubmit, initialEmail }: Props) {
                     <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">Country *</label>
                     <select
                         id="country"
+                        autoComplete="country"
                         className={selectClass}
                         {...register('country')}
                         onChange={(e) => {
@@ -149,7 +150,7 @@ export default function ShippingForm({ onSubmit, initialEmail }: Props) {
                 {country === 'India' && (
                     <div>
                         <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">State *</label>
-                        <select id="state" className={selectClass} {...register('state')}>
+                        <select id="state" autoComplete="address-level1" className={selectClass} {...register('state')}>
                             <option value="">Select state</option>
                             {INDIAN_STATES.map((s) => (
                                 <option key={s} value={s}>{s}</option>
