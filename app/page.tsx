@@ -171,7 +171,7 @@ export default function Home() {
                             <strong>Kandangi Sarees</strong> was built for women who know what they want in a saree — but don&apos;t always have the time or the right guide to find it. We handpick every weave directly from artisan communities across Tamil Nadu, Andhra Pradesh, Telangana, and Gujarat. No middlemen. No compromise.
                         </p>
                         <p>
-                            From the bold checks of a Chettinad cotton to the precise double-ikat of a Patola, every saree in our collection has been chosen for its <strong>authenticity, wearability, and honest craft</strong>.
+                            From the bold checks of a Chettinad cotton to the vibrant ikat of a Rajkot Patola, every saree in our collection has been chosen for its <strong>authenticity, wearability, and honest craft</strong>.
                         </p>
                         <p>
                             When you buy from Kandangi Sarees, you&apos;re supporting the weaver behind the loom, the family behind the craft, and a tradition that has survived for generations because women like you chose to keep it alive.

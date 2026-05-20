@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Playfair_Display, Inter, Jost } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/ui/Header";
 import ConditionalFooter from "@/components/ui/ConditionalFooter";
@@ -27,6 +27,12 @@ const inter = Inter({
     display: "swap",
 });
 
+const jost = Jost({
+    subsets: ["latin"],
+    variable: "--font-jost",
+    display: "swap",
+});
+
 export const metadata: Metadata = {
     title: "Kandangi Sarees — Handpicked Sarees, Rooted in Tradition",
     description: "Discover authentic handloom sarees — Kanjivaram, Gadwal, Chettinad, and more — curated directly from weavers across India. Shop silks and cottons at Kandangi Sarees.",
@@ -43,7 +49,7 @@ export const metadata: Metadata = {
         "cotton sarees online",
         "Venkatagiri sarees",
         "Mangalgiri sarees",
-        "Patola silk",
+        "Rajkot Patola silk",
         "traditional sarees",
         "weaver-direct sarees",
     ],
@@ -94,7 +100,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
+        <html lang="en" className={`${playfair.variable} ${inter.variable} ${jost.variable}`}>
             <body className="antialiased hide-scrollbar">
                 <script
                     type="application/ld+json"

@@ -42,9 +42,9 @@ function NewProductForm() {
         color_families: [] as string[],
         vendorId: prefillVendorId,
         purchase_price: '',
-        purchase_tax_percent: '5',
-        profit_margin_percent: '35',
-        selling_tax_percent: '5',
+        purchase_tax_percent: '0',
+        profit_margin_percent: '30',
+        selling_tax_percent: '0',
         is_price_overridden: false,
     });
     const [ytLinkError, setYtLinkError] = useState('');

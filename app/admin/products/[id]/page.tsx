@@ -47,7 +47,7 @@ export default function EditProductPage() {
         vendorId: '',
         purchase_price: '',
         purchase_tax_percent: '5',
-        profit_margin_percent: '35',
+        profit_margin_percent: '30',
         selling_tax_percent: '5',
         is_price_overridden: false,
     });
@@ -98,9 +98,9 @@ export default function EditProductPage() {
                 color_families: data.color_families ?? [],
                 vendorId: data.vendor_id || '',
                 purchase_price: data.purchase_price?.toString() || '',
-                purchase_tax_percent: data.purchase_tax_percent?.toString() ?? '5',
-                profit_margin_percent: data.profit_margin_percent?.toString() ?? '35',
-                selling_tax_percent: data.selling_tax_percent?.toString() ?? '5',
+                purchase_tax_percent: data.purchase_tax_percent?.toString() ?? '0',
+                profit_margin_percent: data.profit_margin_percent?.toString() ?? '30',
+                selling_tax_percent: data.selling_tax_percent?.toString() ?? '0',
                 is_price_overridden: data.is_price_overridden ?? false,
             });
             // Set product images separately

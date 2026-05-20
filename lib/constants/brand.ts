@@ -4,7 +4,7 @@
  * Import from here instead of hardcoding brand text in components.
  */
 
-export const BRAND_NAME = 'Kandangi Sarees' as const;
+export const BRAND_NAME = 'KANDANGI SAREES' as const;
 export const BRAND_FULL_NAME = 'Kandangi Sarees — Handpicked Sarees' as const;
 export const BRAND_TAGLINE = 'Handpicked for You, Rooted in Tradition.' as const;
 export const BRAND_PROMISE = 'Handpicked Weaves. Trusted Guidance. Real Wardrobes.' as const;

@@ -4,7 +4,7 @@ import { silkCategories, generateFAQSchema } from '@/lib/seo-config';
 
 export const metadata: Metadata = {
     title: 'Indian Saree Weave Guide — Kanjivaram to Chettinad | Kandangi Sarees',
-    description: 'Your complete guide to Indian handloom saree weaves — Kanjivaram, Gadwal, Chettinad, Patola & more. Learn origins, care tips & how to choose.',
+    description: 'Your complete guide to Indian handloom saree weaves — Kanjivaram, Gadwal, Chettinad, Rajkot Patola & more. Learn origins, care tips & how to choose.',
     keywords: [
         'weave guide indian sarees',
         'types of indian sarees',
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     ],
     openGraph: {
         title: 'Indian Saree Weave Guide — Kanjivaram to Chettinad | Kandangi Sarees',
-        description: 'Your complete guide to Indian handloom saree weaves — Kanjivaram, Gadwal, Chettinad, Patola & more.',
+        description: 'Your complete guide to Indian handloom saree weaves — Kanjivaram, Gadwal, Chettinad, Rajkot Patola & more.',
         url: 'https://kandangisarees.com/weave-guide',
         siteName: 'Kandangi Sarees',
         locale: 'en_IN',

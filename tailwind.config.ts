@@ -42,6 +42,7 @@ const config: Config = {
             fontFamily: {
                 playfair: ['"Playfair Display"', 'serif'],
                 sans: ['Inter', 'system-ui', 'sans-serif'],
+                jost: ['Jost', 'system-ui', 'sans-serif'],
             },
         },
     },

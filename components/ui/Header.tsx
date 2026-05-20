@@ -43,7 +43,7 @@ export default function Header() {
                 <div className="flex justify-between items-center h-16 md:h-20">
                     {/* Logo/Brand — text fallback until logo asset is provided */}
                     <Link href="/" className="flex items-center">
-                        <span className="font-playfair text-2xl md:text-3xl font-bold text-primary tracking-tight">
+                        <span className="font-playfair text-xl sm:text-3xl font-bold text-primary tracking-tight">
                             {BRAND_NAME}
                         </span>
                     </Link>

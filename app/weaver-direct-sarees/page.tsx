@@ -60,9 +60,9 @@ const weavingRegions = [
     },
     {
         region: 'Gujarat',
-        weaves: ['Patola Silk'],
+        weaves: ['Rajkot Patola Silk'],
         slugs: ['patola-silk'],
-        note: 'Patan Patola is one of India\'s most technically demanding weaves — double ikat, months per saree, and among the rarest textiles on earth.',
+        note: 'Rajkot Patola is one of India\'s most vibrant ikat traditions — geometric single ikat patterns in bold colours, handwoven in Gujarat.',
     },
     {
         region: 'Jharkhand & West Bengal',
