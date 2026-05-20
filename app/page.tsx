@@ -1,5 +1,40 @@
 import Link from "next/link";
+import Image from "next/image";
+import { Suspense } from "react";
 import NewArrivals from "@/components/home/NewArrivals";
+
+// Shimmer skeleton matching the NewArrivals grid layout (4 cards × approx 400px section)
+function NewArrivalsSkeleton() {
+    return (
+        <section className="py-16 md:py-24 px-4 bg-primary-50">
+            <div className="max-w-7xl mx-auto">
+                {/* Header skeleton */}
+                <div className="text-center mb-10">
+                    <div className="inline-block h-6 w-36 rounded-full bg-accent-300/40 animate-pulse mb-4" />
+                    <div className="h-10 w-2/3 mx-auto rounded-lg bg-primary/10 animate-pulse mb-4" />
+                    <div className="h-4 w-1/2 mx-auto rounded bg-gray-200 animate-pulse" />
+                </div>
+                {/* 4-column card skeleton grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                        <div key={i} className="rounded-2xl overflow-hidden shadow-md bg-white">
+                            {/* Image placeholder */}
+                            <div className="aspect-[3/4] bg-gradient-to-br from-primary-100 to-primary-200 animate-pulse relative">
+                                <div className="absolute inset-0 bg-shimmer" />
+                            </div>
+                            {/* Text lines */}
+                            <div className="p-4 space-y-2">
+                                <div className="h-4 w-3/4 rounded bg-gray-200 animate-pulse" />
+                                <div className="h-4 w-1/2 rounded bg-gray-200 animate-pulse" />
+                                <div className="h-6 w-1/3 rounded bg-accent-300/40 animate-pulse mt-2" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+}
 
 // Server Component - Optimized for performance and SEO
 export default function Home() {
@@ -27,7 +62,16 @@ export default function Home() {
             {/* Hero Section - Mobile-first, high-impact, SEO optimized */}
             <section className="relative py-20 md:py-32 px-4 text-white overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-primary-light opacity-90"></div>
-                <div className="absolute inset-0 bg-[url('https://images.pixieset.com/859010601/ab207e7a5cbdc26b65405f930546fb35-large.jpg')] bg-no-repeat bg-cover opacity-15"></div>
+                <div className="absolute inset-0 opacity-15">
+                    <Image
+                        src="https://images.pixieset.com/859010601/ab207e7a5cbdc26b65405f930546fb35-large.jpg"
+                        alt="Hero Background"
+                        fill
+                        priority
+                        fetchPriority="high"
+                        className="object-cover"
+                    />
+                </div>
                 <div className="max-w-7xl mx-auto text-center relative z-10">
                     <h1 className="font-playfair text-4xl md:text-6xl lg:text-7xl font-bold mb-6 text-balance leading-tight drop-shadow-lg">
                         Reviving Tradition with a New Touch
@@ -47,8 +91,10 @@ export default function Home() {
                 <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent z-10"></div>
             </section>
             
-            {/* New Arrivals — "The New Heritage" */}
-            <NewArrivals />
+            {/* New Arrivals — streaming SSR with Suspense skeleton */}
+            <Suspense fallback={<NewArrivalsSkeleton />}>
+                <NewArrivals />
+            </Suspense>
 
             {/* Why Choose PratyagraSilks - Trust & Credibility Section */}
             <section className="py-16 md:py-24 px-4">

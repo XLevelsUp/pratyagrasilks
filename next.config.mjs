@@ -20,6 +20,7 @@ const nextConfig = {
             }
         ],
         minimumCacheTTL: 31536000, // 1 year cache for extreme performance
+        formats: ['image/avif', 'image/webp'],
     },
     // Enable React strict mode for better development experience
     reactStrictMode: true,

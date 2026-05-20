@@ -4,13 +4,13 @@ import { createClient as createServerClient } from '@/lib/supabase/server';
 import { contactFormSchema } from '@/lib/validations/form.schemas';
 
 // Service-role client — bypasses RLS for public contact form submissions
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-);
 
 export async function POST(request: NextRequest) {
+    const supabaseAdmin = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        { auth: { autoRefreshToken: false, persistSession: false } }
+    );
     try {
         const body = await request.json();
         const parsed = contactFormSchema.safeParse({

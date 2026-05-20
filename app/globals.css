@@ -43,10 +43,16 @@
   }
 }
 
+/* fixed: vertical scroll restored — html always scrollable, no layout shift from scrollbar */
+html {
+  overflow-y: scroll;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: 'Inter', system-ui, sans-serif;
+  overflow-y: auto; /* fixed: vertical scroll restored */
 }
 
 @layer utilities {
@@ -55,8 +61,14 @@ body {
   }
 }
 
+/* .hide-scrollbar only applied to specific inner scroll containers, NOT body/html */
+/* fixed: removed global scrollbar hide that was suppressing native page scrollbar */
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE/Edge */
+  scrollbar-width: none;     /* Firefox */
 }
 
 /* ── Silk shimmer utility ── */

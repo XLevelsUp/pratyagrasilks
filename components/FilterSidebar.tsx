@@ -100,7 +100,7 @@ export default function FilterSidebar({ onFilterChange, currentFilters }: Filter
                 <h2 className="text-xl font-bold text-gray-900">Filters</h2>
                 <button
                     onClick={clearFilters}
-                    className="text-sm text-accent hover:text-accent-hover font-medium"
+                    className="text-sm text-accent-700 hover:text-accent-hover font-medium"
                 >
                     Clear All
                 </button>

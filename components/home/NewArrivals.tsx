@@ -16,7 +16,7 @@ export default async function NewArrivals() {
                 {/* Section Header */}
                 <div className="text-center mb-4">
                     {/* Scarcity / curation label */}
-                    <span className="inline-block text-xs font-semibold tracking-[0.2em] uppercase text-accent border border-accent-300 bg-accent-light px-4 py-1 rounded-full mb-4">
+                    <span className="inline-block text-xs font-semibold tracking-[0.2em] uppercase text-accent-700 border border-accent-300 bg-accent-light px-4 py-1 rounded-full mb-4">
                         Curated for 2026
                     </span>
                     <h2 className="font-playfair text-3xl md:text-5xl font-bold text-primary mb-4">
@@ -30,7 +30,7 @@ export default async function NewArrivals() {
                 </div>
 
                 {/* Subtle scarcity copy */}
-                <p className="text-center text-sm text-accent font-medium mb-10">
+                <p className="text-center text-sm text-accent-700 font-medium mb-10">
                     Each piece handpicked — limited quantities available
                 </p>
 

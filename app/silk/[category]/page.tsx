@@ -51,18 +51,62 @@ export async function generateStaticParams() {
     }));
 }
 
-// Fetch products for this category
+import { createClient } from '@supabase/supabase-js';
+
+// Fetch products for this category directly from DB for SSG
 async function getCategoryProducts(categorySlug: string): Promise<Product[]> {
     try {
-        const res = await fetch(
-            `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/products?category=${categorySlug}`,
-            { next: { revalidate: 86400 } } // Revalidate once per day (86400 seconds)
+        const supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
         );
 
-        if (!res.ok) return [];
+        // Fetch available products
+        const { data: available, error: availError } = await supabase
+            .from('products')
+            .select('*')
+            .eq('is_online', true)
+            .eq('in_stock', true)
+            .eq('category', categorySlug)
+            .order('created_at', { ascending: false })
+            .limit(50);
 
-        const data = await res.json();
-        return data.products || [];
+        // Fetch up to 9 most recently sold products for the category
+        const { data: sold, error: soldError } = await supabase
+            .from('products')
+            .select('*')
+            .eq('is_online', true)
+            .eq('in_stock', false)
+            .eq('category', categorySlug)
+            .order('updated_at', { ascending: false })
+            .limit(9);
+
+        if (availError || soldError) {
+            console.error('Error fetching category products directly:', availError || soldError);
+            return [];
+        }
+
+        const products = [...(available ?? []), ...(sold ?? [])];
+
+        // Transform snake_case to camelCase
+        return products.map(product => ({
+            id: product.id,
+            name: product.name,
+            description: product.description,
+            price: product.price,
+            category: product.category,
+            images: product.images || [],
+            inStock: product.in_stock,
+            isOnline: product.is_online ?? true,
+            sku: product.sku,
+            material: product.material,
+            dimensions: product.dimensions,
+            weight: product.weight,
+            yt_link: product.yt_link,
+            colorFamilies: product.color_families ?? [],
+            createdAt: product.created_at,
+            updatedAt: product.updated_at,
+        })) as Product[];
     } catch (error) {
         console.error('Error fetching category products:', error);
         return [];

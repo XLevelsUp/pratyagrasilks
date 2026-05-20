@@ -10,8 +10,9 @@ interface AuthContextType {
     loading: boolean;
     signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
     signIn: (email: string, password: string) => Promise<{ error: any }>;
-    signInWithGoogle: () => Promise<{ error: any }>;
+    signInWithGoogle: (redirectPath?: string) => Promise<{ error: any }>;
     signOut: () => Promise<void>;
+    refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -43,6 +44,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const signUp = async (email: string, password: string, fullName: string) => {
+        if (password.length > 20) {
+            return { error: new Error('Password must not exceed 20 characters.') };
+        }
         const { error } = await supabase.auth.signUp({
             email,
             password,
@@ -56,6 +60,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const signIn = async (email: string, password: string) => {
+        if (password.length > 20) {
+            return { error: new Error('Password must not exceed 20 characters.') };
+        }
         const { error } = await supabase.auth.signInWithPassword({
             email,
             password,
@@ -63,11 +70,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error };
     };
 
-    const signInWithGoogle = async () => {
+    const signInWithGoogle = async (redirectPath?: string) => {
+        const next = redirectPath || '/';
         const { error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: `${window.location.origin}/auth/callback`,
+                redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
             },
         });
         return { error };
@@ -75,6 +83,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const signOut = async () => {
         await supabase.auth.signOut();
+    };
+
+    const refreshUser = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
     };
 
     const value = {
@@ -85,6 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signIn,
         signInWithGoogle,
         signOut,
+        refreshUser,
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
