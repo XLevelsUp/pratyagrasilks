@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Package, Calendar, CreditCard } from 'lucide-react';
+import { Package, Calendar, CreditCard, ArrowLeft } from 'lucide-react';
 import { getMyOrders } from '@/lib/actions/order.actions';
 
 const fmt = (n: number) =>
@@ -24,6 +24,13 @@ export default async function OrdersPage() {
             {/* Header */}
             <div className="bg-white border-b">
                 <div className="container mx-auto px-4 py-6">
+                    <Link
+                        href="/profile"
+                        className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-primary transition-colors mb-4"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        Back to My Account
+                    </Link>
                     <h1 className="text-3xl font-bold text-gray-900">Order History</h1>
                     <p className="text-textSecondary mt-1">View and track your orders</p>
                 </div>

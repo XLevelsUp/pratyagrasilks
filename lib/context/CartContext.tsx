@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Product } from '@/lib/types';
+import { useAuth } from './AuthContext';
 
 export interface CartItem {
     id: string;
@@ -24,8 +25,10 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
+    const { user } = useAuth();
     const [items, setItems] = useState<CartItem[]>([]);
     const [isOpen, setIsOpen] = useState(false);
+    const [isInitialized, setIsInitialized] = useState(false);
 
     // Load cart from localStorage on mount
     useEffect(() => {
@@ -37,12 +40,29 @@ export function CartProvider({ children }: { children: ReactNode }) {
                 console.error('Failed to load cart:', error);
             }
         }
+        setIsInitialized(true);
     }, []);
 
-    // Save cart to localStorage whenever it changes
+    // Save cart to localStorage whenever it changes (only after initial load)
     useEffect(() => {
-        localStorage.setItem('cart', JSON.stringify(items));
-    }, [items]);
+        if (isInitialized) {
+            localStorage.setItem('cart', JSON.stringify(items));
+        }
+    }, [items, isInitialized]);
+
+    // Clear cart on logout to prevent cart leak across different user accounts
+    useEffect(() => {
+        const wasLoggedIn = localStorage.getItem('was_logged_in') === 'true';
+        if (isInitialized) {
+            if (user) {
+                localStorage.setItem('was_logged_in', 'true');
+            } else if (wasLoggedIn && !user) {
+                setItems([]);
+                localStorage.removeItem('cart');
+                localStorage.removeItem('was_logged_in');
+            }
+        }
+    }, [user, isInitialized]);
 
     const addItem = (product: Product): boolean => {
         const existingItem = items.find((item) => item.product.id === product.id);

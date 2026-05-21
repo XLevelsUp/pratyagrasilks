@@ -101,7 +101,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" className={`${playfair.variable} ${inter.variable} ${jost.variable}`}>
-            <body className="antialiased hide-scrollbar">
+            <body className="antialiased"> {/* fixed: vertical scroll restored — removed hide-scrollbar from body */}
                 <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(generateOrganizationSchema()) }}

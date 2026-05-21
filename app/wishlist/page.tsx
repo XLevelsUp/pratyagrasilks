@@ -61,6 +61,13 @@ export default function WishlistPage() {
             {/* Header */}
             <div className="bg-white border-b">
                 <div className="container mx-auto px-4 py-8">
+                    <Link
+                        href="/profile"
+                        className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-primary transition-colors mb-4"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        Back to My Account
+                    </Link>
                     <div className="flex flex-wrap items-center justify-between">
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900">My Wishlist</h1>

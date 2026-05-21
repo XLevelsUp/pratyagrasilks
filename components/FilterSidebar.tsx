@@ -65,7 +65,7 @@ export default function FilterSidebar({ onFilterChange, currentFilters }: Filter
                 {hasActiveFilters && (
                     <button
                         onClick={clearFilters}
-                        className="text-sm text-accent hover:text-accent-hover transition-colors"
+                        className="text-sm text-accent-700 hover:text-accent-hover transition-colors"
                     >
                         Clear all
                     </button>
