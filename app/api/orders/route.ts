@@ -9,6 +9,10 @@ export async function POST(request: NextRequest) {
     try {
         const { shippingAddress, items, shippingCost, shippingZoneId, estimatedDeliveryDays } = await request.json();
 
+        // Detect authenticated user (nullable — guest checkout sets this to null)
+        const serverSupabase = createServerClient();
+        const { data: { user: authUser } } = await serverSupabase.auth.getUser();
+
         if (!shippingAddress || !items || items.length === 0) {
             return NextResponse.json(
                 { error: 'Missing required fields' },
@@ -100,6 +104,7 @@ export async function POST(request: NextRequest) {
             .from('orders')
             .insert({
                 customer_id: customerId,
+                placed_by_user_id: authUser?.id ?? null,
                 order_number: orderNumber,
                 total_amount: total,
                 shipping_cost: shippingCost || 0,

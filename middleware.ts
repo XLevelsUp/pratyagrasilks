@@ -75,7 +75,7 @@ export async function middleware(request: NextRequest) {
             pathname.startsWith('/admin/users');
 
         if (!CASHIER_ALLOWED || CASHIER_BLOCKED) {
-            return NextResponse.redirect(new URL('/admin/pos', request.url));
+            return NextResponse.redirect(new URL('/admin/products', request.url));
         }
     }
 

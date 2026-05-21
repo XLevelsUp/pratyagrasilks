@@ -10,8 +10,8 @@ import {
     Users,
     Settings,
     LogOut,
-    ShoppingCart,
-    ReceiptText,
+    // ShoppingCart, // POS — disabled
+    // ReceiptText,  // POS Settlement — disabled
     Building2,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -27,17 +27,17 @@ type NavItem = {
 const ADMIN_NAV: NavItem[] = [
     { name: 'Dashboard',  href: '/admin',              icon: LayoutDashboard },
     { name: 'Orders',     href: '/admin/orders',        icon: ShoppingBag    },
-    { name: 'POS',        href: '/admin/pos',           icon: ShoppingCart   },
+    // { name: 'POS',     href: '/admin/pos',           icon: ShoppingCart   }, // disabled
     { name: 'Products',   href: '/admin/products',      icon: Package        },
     { name: 'Vendors',    href: '/admin/vendors',        icon: Building2      },
     { name: 'Customers',  href: '/admin/customers',     icon: Users          },
 ];
 
 const CASHIER_NAV: NavItem[] = [
-    { name: 'POS',        href: '/admin/pos',            icon: ShoppingCart },
-    { name: 'Settlement', href: '/admin/pos/settlement', icon: ReceiptText  },
-    { name: 'Products',   href: '/admin/products',        icon: Package      },
-    { name: 'Vendors',    href: '/admin/vendors',         icon: Building2    },
+    // { name: 'POS',        href: '/admin/pos',            icon: ShoppingCart }, // disabled
+    // { name: 'Settlement', href: '/admin/pos/settlement', icon: ReceiptText  }, // disabled
+    { name: 'Products',   href: '/admin/products',      icon: Package      },
+    { name: 'Vendors',    href: '/admin/vendors',        icon: Building2    },
 ];
 
 function navForRole(role: UserRole | null): NavItem[] {

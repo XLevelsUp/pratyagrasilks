@@ -35,17 +35,17 @@ export default function AdminOrdersPage() {
         let query = supabase
             .from('orders')
             .select(`
-        id,
-        order_number,
-        total_amount,
-        status,
-        payment_status,
-        created_at,
-        customers (
-          full_name,
-          email
-        )
-      `)
+                id,
+                order_number,
+                total_amount,
+                status,
+                payment_status,
+                created_at,
+                customers!customer_id (
+                    full_name,
+                    email
+                )
+            `)
             .order('created_at', { ascending: false });
 
         if (statusFilter !== 'all') {
@@ -60,6 +60,7 @@ export default function AdminOrdersPage() {
 
         if (error) {
             console.error('Error fetching orders:', error);
+            toast.error('Failed to load orders: ' + error.message);
         } else {
             setOrders(
                 data.map((order: any) => ({

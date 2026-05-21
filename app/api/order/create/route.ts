@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
 import { createClient } from '@supabase/supabase-js';
+import { createClient as createServerClient } from '@/lib/supabase/server';
 import { shippingAddressSchema } from '@/lib/validations/form.schemas';
 
 export const dynamic = 'force-dynamic';
@@ -28,6 +29,10 @@ export async function POST(req: NextRequest) {
         if (!shippingAddress || !items || items.length === 0) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
+
+        // Detect authenticated user (nullable — guest checkout sets this to null)
+        const serverClient = createServerClient();
+        const { data: { user: authUser } } = await serverClient.auth.getUser();
 
         // ── 1b. Sanitize + validate shipping address with Zod ────────────────────
         const sanitizedPhone = (shippingAddress.phone ?? '').replace(/[^\d+]/g, '');
@@ -130,6 +135,7 @@ export async function POST(req: NextRequest) {
             .from('orders')
             .insert({
                 customer_id: customerId,
+                placed_by_user_id: authUser?.id ?? null,
                 order_number: orderNumber,
                 total_amount: totalAmount,
                 shipping_cost: shippingCost,
