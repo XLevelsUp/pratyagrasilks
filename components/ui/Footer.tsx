@@ -24,13 +24,19 @@ export default function Footer() {
                             Reviving Tradition with a New Touch
                         </p>
                         <p className="text-white/80">
-                            <strong>Contact:</strong> info@pratyagrasilks.com
+                            <strong>Contact:</strong>{' '}
+                            <a
+                                href="mailto:info@pratyagrasilks.com"
+                                className="text-white/80 hover:text-secondary underline underline-offset-2 transition-colors"
+                            >
+                                info@pratyagrasilks.com
+                            </a>
                         </p>
                     </div>
 
                     {/* Quick Links */}
                     <div>
-                        <h4 className="font-semibold text-lg mb-4">Quick Links</h4>
+                        <h3 className="font-semibold text-lg mb-4">Quick Links</h3>
                         <ul className="space-y-2">
                             <li>
                                 <Link
@@ -69,7 +75,7 @@ export default function Footer() {
 
                     {/* Social Media & Policies */}
                     <div>
-                        <h4 className="font-semibold text-lg mb-4">Connect With Us</h4>
+                        <h3 className="font-semibold text-lg mb-4">Connect With Us</h3>
                         <div className="flex space-x-4 mb-6">
                             <a
                                 href="https://instagram.com/pratyagra_silks"

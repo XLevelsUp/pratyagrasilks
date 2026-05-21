@@ -112,3 +112,34 @@ export async function deleteVendorDoc(path: string): Promise<void> {
     const { error } = await supabase.storage.from('vendor-docs').remove([path]);
     if (error) throw new Error(`Vendor doc delete failed: ${error.message}`);
 }
+
+// ─── Avatar / Profile Photos ──────────────────────────────────────────────────
+
+/**
+ * Upload a user profile avatar to saree-images bucket under avatars/{userId}/
+ * @param file     - The image file (jpg / png / webp)
+ * @param userId   - Supabase auth user id (used as folder name)
+ * @returns Public URL of the uploaded avatar
+ */
+export async function uploadAvatarImage(file: File, userId: string): Promise<string> {
+    const supabase = createClient();
+
+    const ext = file.name.split('.').pop() ?? 'jpg';
+    const filePath = `avatars/${userId}/avatar.${ext}`;
+
+    const { error } = await supabase.storage
+        .from('saree-images')
+        .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: true, // overwrite existing avatar
+        });
+
+    if (error) throw new Error(`Avatar upload failed: ${error.message}`);
+
+    const { data: { publicUrl } } = supabase.storage
+        .from('saree-images')
+        .getPublicUrl(filePath);
+
+    return publicUrl;
+}
+

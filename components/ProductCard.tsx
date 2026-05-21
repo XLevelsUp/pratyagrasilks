@@ -42,7 +42,8 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
                         alt={product.name}
                         fill
                         className={`object-cover transition-transform duration-300 ${isSold ? ' grayscale-[30%]' : 'group-hover:scale-105'}`}
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        sizes="(max-width: 768px) 100vw, 296px"
+                        quality={60}
                     />
 
                     {/* Category Badge */}

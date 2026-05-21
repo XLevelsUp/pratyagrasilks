@@ -9,6 +9,7 @@ import CartBadge from "@/components/Cart/CartBadge";
 import WishlistBadge from "@/components/Wishlist/WishlistBadge";
 import { User, LogOut, Package, Heart, ChevronDown } from "lucide-react";
 import { silkCategories } from "@/lib/seo-config";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 export default function Header() {
     const { user, signOut } = useAuth();
@@ -16,10 +17,16 @@ export default function Header() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [isSilkTypesMenuOpen, setIsSilkTypesMenuOpen] = useState(false);
+    const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
+
+    const openSignOutDialog = () => {
+        setIsUserMenuOpen(false);
+        setIsMobileMenuOpen(false);
+        setIsSignOutDialogOpen(true);
+    };
 
     const handleSignOut = async () => {
         await signOut();
-        setIsUserMenuOpen(false);
         router.push('/');
     };
 
@@ -141,7 +148,7 @@ export default function Header() {
                                             Wishlist
                                         </Link>
                                         <button
-                                            onClick={handleSignOut}
+                                            onClick={openSignOutDialog}
                                             className="w-full flex items-center gap-2 px-4 py-2 hover:bg-red-50 text-red-600 transition-colors"
                                         >
                                             <LogOut className="w-4 h-4" />
@@ -243,7 +250,7 @@ export default function Header() {
                                     ))}
                                     <Link
                                         href="/collection"
-                                        className="block text-sm text-accent hover:text-accent-hover transition-colors py-1 font-medium"
+                                        className="block text-sm text-accent-700 hover:text-accent-hover transition-colors py-1 font-medium"
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >
                                         View All →
@@ -290,7 +297,7 @@ export default function Header() {
                                         Wishlist
                                     </Link>
                                     <button
-                                        onClick={handleSignOut}
+                                        onClick={openSignOutDialog}
                                         className="text-left text-red-600 hover:text-red-700 transition-colors font-medium px-2 py-2"
                                     >
                                         Sign Out
@@ -318,6 +325,17 @@ export default function Header() {
                     </div>
                 )}
             </nav>
+
+            <ConfirmDialog
+                isOpen={isSignOutDialogOpen}
+                onClose={() => setIsSignOutDialogOpen(false)}
+                onConfirm={handleSignOut}
+                title="Sign Out?"
+                message="Are you sure you want to sign out?"
+                confirmText="Sign Out"
+                cancelText="Cancel"
+                variant="danger"
+            />
         </header>
     );
 }
