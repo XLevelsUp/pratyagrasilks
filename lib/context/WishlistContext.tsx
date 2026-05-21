@@ -58,7 +58,21 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
 
     // Load wishlist when user changes
     useEffect(() => {
-        fetchWishlist();
+        let mounted = true;
+
+        if (user) {
+            // Defer fetch to not block critical rendering path (LCP)
+            const timer = setTimeout(() => {
+                if (mounted) fetchWishlist();
+            }, 1000);
+
+            return () => {
+                mounted = false;
+                clearTimeout(timer);
+            };
+        } else {
+            fetchWishlist();
+        }
     }, [user]);
 
     const addToWishlist = async (product: Product): Promise<boolean> => {

@@ -25,7 +25,7 @@ async function getProduct(id: string) {
 }
 
 async function getRelatedProducts(id: string) {
-    const res = await fetch(`/api/products/${id}/related`, { cache: 'no-store' });
+    const res = await fetch(`/api/products/${id}/related`);
     if (!res.ok) return [];
     return (await res.json()).products;
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/lib/context/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { type UserRole, ADMIN_LEVEL_ROLES } from '@/lib/constants/roles';
@@ -16,6 +16,7 @@ interface UseAdminReturn {
 export function useAdmin(): UseAdminReturn {
     const { user, loading: authLoading } = useAuth();
     const router = useRouter();
+    const pathname = usePathname();
     const [role, setRole] = useState<UserRole | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -48,6 +49,27 @@ export function useAdmin(): UseAdminReturn {
                     return;
                 }
 
+                // ── CASHIER guard ────────────────────────────────────────────────
+                if (userRole === 'CASHIER') {
+                    const CASHIER_ALLOWED =
+                        pathname === '/admin/pos' ||
+                        pathname.startsWith('/admin/pos/') ||
+                        pathname === '/admin/products' ||
+                        pathname.startsWith('/admin/products/') ||
+                        pathname === '/admin/vendors' ||
+                        pathname.startsWith('/admin/vendors/');
+
+                    const CASHIER_BLOCKED =
+                        pathname.startsWith('/admin/settings') ||
+                        pathname.startsWith('/admin/analytics') ||
+                        pathname.startsWith('/admin/users');
+
+                    if (!CASHIER_ALLOWED || CASHIER_BLOCKED) {
+                        router.push('/admin/pos');
+                        return;
+                    }
+                }
+
                 setRole(userRole);
             } catch {
                 router.push('/');
@@ -57,7 +79,7 @@ export function useAdmin(): UseAdminReturn {
         }
 
         checkRole();
-    }, [user, authLoading, router]);
+    }, [user, authLoading, router, pathname]);
 
     return {
         isAdmin: role === 'ADMIN',

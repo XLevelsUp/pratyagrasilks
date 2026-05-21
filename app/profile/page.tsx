@@ -2,17 +2,35 @@
 
 import { useAuth } from '@/lib/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { User, Mail, Phone, Calendar, Package } from 'lucide-react';
 
 export default function ProfilePage() {
     const { user, loading, signOut } = useAuth();
     const router = useRouter();
 
+    const [customerData, setCustomerData] = useState<any>(null);
+
     useEffect(() => {
         if (!loading && !user) {
             router.push('/auth/login');
+        } else if (user) {
+            fetch('/api/profile', { cache: 'no-store' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.customer) {
+                        const ts = Date.now();
+                        setCustomerData({
+                            ...data.customer,
+                            avatar_url: data.customer.avatar_url
+                                ? `${data.customer.avatar_url.split('?')[0]}?t=${ts}`
+                                : null,
+                        });
+                    }
+                })
+                .catch(err => console.error(err));
         }
     }, [user, loading, router]);
 
@@ -58,12 +76,21 @@ export default function ProfilePage() {
                     <div className="lg:col-span-1">
                         <div className="bg-white rounded-lg shadow-md p-6">
                             <div className="flex items-center gap-4 mb-6 pb-6 border-b">
-                                <div className="w-16 h-16 bg-accent-light rounded-full flex items-center justify-center">
-                                    <User className="w-8 h-8 text-accent" />
+                                <div className="relative w-16 h-16 bg-accent-light rounded-full flex items-center justify-center flex-shrink-0">
+                                    {(customerData?.avatar_url || user.user_metadata?.avatar_url) ? (
+                                        <Image
+                                            src={customerData?.avatar_url || user.user_metadata?.avatar_url}
+                                            alt="Profile"
+                                            fill
+                                            className="rounded-full object-cover"
+                                        />
+                                    ) : (
+                                        <User className="w-8 h-8 text-accent" />
+                                    )}
                                 </div>
                                 <div>
                                     <h2 className="font-semibold text-gray-900">
-                                        {user.user_metadata?.full_name || 'User'}
+                                        {customerData?.full_name || user.user_metadata?.full_name || 'User'}
                                     </h2>
                                     <p className="text-sm text-gray-500">{user.email}</p>
                                 </div>
@@ -118,7 +145,7 @@ export default function ProfilePage() {
                                     <div>
                                         <p className="text-sm text-gray-500">Full Name</p>
                                         <p className="font-medium text-gray-900">
-                                            {user.user_metadata?.full_name || 'Not set'}
+                                            {customerData?.full_name || user.user_metadata?.full_name || 'Not set'}
                                         </p>
                                     </div>
                                 </div>
@@ -136,7 +163,7 @@ export default function ProfilePage() {
                                     <div>
                                         <p className="text-sm text-gray-500">Phone</p>
                                         <p className="font-medium text-gray-900">
-                                            {user.user_metadata?.phone || 'Not set'}
+                                            {customerData?.phone || user.user_metadata?.phone || 'Not set'}
                                         </p>
                                     </div>
                                 </div>
@@ -152,9 +179,12 @@ export default function ProfilePage() {
                                 </div>
                             </div>
 
-                            <button className="mt-6 px-6 py-2 border-2 border-accent text-accent rounded-lg font-semibold hover:bg-accent-light transition-colors">
+                            <Link
+                                href="/profile/edit"
+                                className="inline-block mt-6 px-6 py-2 border-2 border-accent text-accent rounded-lg font-semibold hover:bg-accent-light transition-colors"
+                            >
                                 Edit Profile
-                            </button>
+                            </Link>
                         </div>
 
                         {/* Quick Actions */}

@@ -95,7 +95,7 @@ export default function CartPage() {
 
                                     <div className="flex justify-between text-textSecondary">
                                         <span>Shipping</span>
-                                        <span className="text-sm text-accent">Calculated at checkout</span>
+                                        <span className="text-sm text-accent-700">Calculated at checkout</span>
                                     </div>
 
                                     <div className="border-t pt-3">

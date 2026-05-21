@@ -6,21 +6,13 @@ import { createClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
 
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-);
-
-/**
- * POST /api/order/verify
- *
- * Called by RazorpayButton immediately after a successful payment.
- * - Verifies the HMAC-SHA256 signature to prove payment authenticity.
- * - Updates the Supabase order status to `processing` / `completed`.
- * - Idempotent: safe to call multiple times for the same payment.
- */
 export async function POST(req: NextRequest) {
+    const supabaseAdmin = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        { auth: { autoRefreshToken: false, persistSession: false } }
+    );
+
     try {
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = await req.json();
 

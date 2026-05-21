@@ -8,9 +8,10 @@ import Input from '@/components/ui/Input';
 
 interface Props {
     onSubmit: (data: ShippingAddress) => Promise<void>;
+    initialEmail?: string;
 }
 
-export default function ShippingForm({ onSubmit }: Props) {
+export default function ShippingForm({ onSubmit, initialEmail }: Props) {
     const [country, setCountry] = useState('India');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -21,7 +22,8 @@ export default function ShippingForm({ onSubmit }: Props) {
         formState: { errors },
     } = useForm<ShippingAddress>({
         resolver: zodResolver(shippingAddressSchema),
-        defaultValues: { country: 'India' },
+        mode: 'onTouched',
+        defaultValues: { country: 'India', email: initialEmail || '' },
     });
 
     const handleFormSubmit = async (data: ShippingAddress) => {
@@ -61,6 +63,7 @@ export default function ShippingForm({ onSubmit }: Props) {
                         placeholder="priya@example.com"
                         autoComplete="email"
                         error={errors.email?.message}
+                        readOnly={!!initialEmail}
                         {...register('email')}
                     />
                     <Input
@@ -122,6 +125,7 @@ export default function ShippingForm({ onSubmit }: Props) {
                     <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">Country *</label>
                     <select
                         id="country"
+                        autoComplete="country"
                         className={selectClass}
                         {...register('country')}
                         onChange={(e) => {
@@ -146,7 +150,7 @@ export default function ShippingForm({ onSubmit }: Props) {
                 {country === 'India' && (
                     <div>
                         <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">State *</label>
-                        <select id="state" className={selectClass} {...register('state')}>
+                        <select id="state" autoComplete="address-level1" className={selectClass} {...register('state')}>
                             <option value="">Select state</option>
                             {INDIAN_STATES.map((s) => (
                                 <option key={s} value={s}>{s}</option>

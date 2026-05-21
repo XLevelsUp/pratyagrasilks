@@ -1,7 +1,34 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import NewArrivals from "@/components/home/NewArrivals";
 import { silkCategories } from "@/lib/seo-config";
 import { Layers, Heart, Leaf, Sparkles, ChevronDown } from "lucide-react";
+
+function NewArrivalsSkeleton() {
+    return (
+        <section className="py-16 md:py-24 px-4 bg-primary-50">
+            <div className="max-w-7xl mx-auto">
+                <div className="text-center mb-10">
+                    <div className="inline-block h-6 w-36 rounded-full bg-accent-300/40 animate-pulse mb-4" />
+                    <div className="h-10 w-2/3 mx-auto rounded-lg bg-primary/10 animate-pulse mb-4" />
+                    <div className="h-4 w-1/2 mx-auto rounded bg-gray-200 animate-pulse" />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                        <div key={i} className="rounded-2xl overflow-hidden shadow-md bg-white">
+                            <div className="aspect-[3/4] bg-gradient-to-br from-primary-100 to-primary-200 animate-pulse" />
+                            <div className="p-4 space-y-2">
+                                <div className="h-4 w-3/4 rounded bg-gray-200 animate-pulse" />
+                                <div className="h-4 w-1/2 rounded bg-gray-200 animate-pulse" />
+                                <div className="h-6 w-1/3 rounded bg-accent-300/40 animate-pulse mt-2" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+}
 
 const benefits = [
     {
@@ -92,8 +119,10 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* ── New Arrivals ─────────────────────────────────────────── */}
-            <NewArrivals />
+            {/* ── New Arrivals — streaming SSR with Suspense skeleton ─── */}
+            <Suspense fallback={<NewArrivalsSkeleton />}>
+                <NewArrivals />
+            </Suspense>
 
             {/* ── Shop by Weave — Category Strip ───────────────────────── */}
             <section className="py-12 md:py-16 px-4 bg-white">
