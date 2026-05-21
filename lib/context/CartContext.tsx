@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Product } from '@/lib/types';
+import { useAuth } from './AuthContext';
 
 export interface CartItem {
     id: string;
@@ -24,6 +25,7 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
+    const { user } = useAuth();
     const [items, setItems] = useState<CartItem[]>([]);
     const [isOpen, setIsOpen] = useState(false);
     const [isInitialized, setIsInitialized] = useState(false);
@@ -47,6 +49,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
             localStorage.setItem('cart', JSON.stringify(items));
         }
     }, [items, isInitialized]);
+
+    // Clear cart on logout to prevent cart leak across different user accounts
+    useEffect(() => {
+        const wasLoggedIn = localStorage.getItem('was_logged_in') === 'true';
+        if (isInitialized) {
+            if (user) {
+                localStorage.setItem('was_logged_in', 'true');
+            } else if (wasLoggedIn && !user) {
+                // User just logged out!
+                setItems([]);
+                localStorage.removeItem('cart');
+                localStorage.removeItem('was_logged_in');
+            }
+        }
+    }, [user, isInitialized]);
 
     const addItem = (product: Product): boolean => {
         const existingItem = items.find((item) => item.product.id === product.id);
