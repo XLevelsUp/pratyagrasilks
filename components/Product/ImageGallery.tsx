@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import WatermarkOverlay from '@/components/WatermarkOverlay';
 
 interface ImageGalleryProps {
     images: string[];
@@ -31,6 +32,7 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
                     sizes="(max-width: 768px) 100vw, 50vw"
                     priority
                 />
+                <WatermarkOverlay />
             </div>
 
             {/* Thumbnail Gallery */}

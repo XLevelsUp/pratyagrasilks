@@ -4,6 +4,7 @@ import { Product } from '@/lib/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import WishlistButton from '@/components/Wishlist/WishlistButton';
+import WatermarkOverlay from '@/components/WatermarkOverlay';
 import { getCategoryBySlug } from '@/lib/seo-config';
 
 interface ProductCardProps {
@@ -55,6 +56,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
                         sizes="(max-width: 768px) 100vw, 296px"
                         quality={60}
                     />
+                    <WatermarkOverlay />
 
                     {/* Category badge — solid green */}
                     <div className="absolute top-2 left-2">
