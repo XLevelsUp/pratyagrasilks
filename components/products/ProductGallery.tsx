@@ -5,6 +5,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import YouTubeSlide from '@/components/products/YouTubeSlide';
+import WatermarkOverlay from '@/components/WatermarkOverlay';
 import { getYouTubeThumbnailUrl } from '@/lib/utils/youtube';
 
 interface ProductGalleryProps {
@@ -75,6 +76,7 @@ export default function ProductGallery({ images, yt_link, productName = 'Product
                                         sizes="(max-width: 768px) 100vw, 50vw"
                                         priority={index === 0}
                                     />
+                                    <WatermarkOverlay />
                                 </div>
                             </div>
                         ))}
