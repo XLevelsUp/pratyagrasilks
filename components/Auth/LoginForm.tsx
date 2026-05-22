@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/context/AuthContext';
 import Link from 'next/link';
 import EmailInput from '@/components/ui/EmailInput';
@@ -11,7 +11,9 @@ const MAX_PASSWORD_LENGTH = 20;
 
 export default function LoginForm() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { signIn, signInWithGoogle } = useAuth();
+    const nextUrl = searchParams.get('next') || '/profile';
     const [email, setEmail] = useState('');
     const [emailValid, setEmailValid] = useState(false);
     const [password, setPassword] = useState('');
@@ -44,7 +46,7 @@ export default function LoginForm() {
             setError(error.message);
             setLoading(false);
         } else {
-            router.push('/profile');
+            router.push(nextUrl);
         }
     };
 
