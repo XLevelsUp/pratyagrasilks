@@ -14,6 +14,46 @@ export function validatePostalCode(postalCode: string, countryCode: string): boo
     return regex.test(postalCode);
 }
 
+export const COUNTRIES = [
+    'India',
+    'Argentina', 'Australia', 'Austria', 'Bahrain', 'Bangladesh',
+    'Belgium', 'Brazil', 'Canada', 'China', 'Czech Republic',
+    'Denmark', 'Egypt', 'Finland', 'France', 'Germany',
+    'Hong Kong', 'Hungary', 'Indonesia', 'Ireland', 'Israel',
+    'Italy', 'Japan', 'Kenya', 'Kuwait', 'Malaysia',
+    'Mexico', 'Nepal', 'Netherlands', 'New Zealand', 'Nigeria',
+    'Norway', 'Oman', 'Pakistan', 'Philippines', 'Poland',
+    'Portugal', 'Qatar', 'Romania', 'Russia', 'Saudi Arabia',
+    'Singapore', 'South Africa', 'South Korea', 'Spain', 'Sri Lanka',
+    'Sweden', 'Switzerland', 'Taiwan', 'Thailand', 'Turkey',
+    'UAE', 'United Kingdom', 'United States', 'Vietnam',
+];
+
+export const US_STATES = [
+    'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado',
+    'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho',
+    'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana',
+    'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota',
+    'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada',
+    'New Hampshire', 'New Jersey', 'New Mexico', 'New York',
+    'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon',
+    'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota',
+    'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington',
+    'West Virginia', 'Wisconsin', 'Wyoming', 'District of Columbia',
+];
+
+export const CANADIAN_PROVINCES = [
+    'Alberta', 'British Columbia', 'Manitoba', 'New Brunswick',
+    'Newfoundland and Labrador', 'Northwest Territories', 'Nova Scotia',
+    'Nunavut', 'Ontario', 'Prince Edward Island', 'Quebec',
+    'Saskatchewan', 'Yukon',
+];
+
+export const AUSTRALIAN_STATES = [
+    'Australian Capital Territory', 'New South Wales', 'Northern Territory',
+    'Queensland', 'South Australia', 'Tasmania', 'Victoria', 'Western Australia',
+];
+
 export const INDIAN_STATES = [
     'Andhra Pradesh',
     'Arunachal Pradesh',
@@ -47,3 +87,10 @@ export const INDIAN_STATES = [
     'Jammu and Kashmir',
     'Ladakh',
 ];
+
+export const COUNTRY_STATES: Record<string, string[]> = {
+    India: INDIAN_STATES,
+    'United States': US_STATES,
+    Canada: CANADIAN_PROVINCES,
+    Australia: AUSTRALIAN_STATES,
+};

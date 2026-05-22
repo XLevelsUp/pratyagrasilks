@@ -2,7 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { shippingAddressSchema, ShippingAddress, INDIAN_STATES } from '@/lib/validations/checkout';
+import { shippingAddressSchema, ShippingAddress, COUNTRIES, COUNTRY_STATES } from '@/lib/validations/checkout';
 import { useState } from 'react';
 import Input from '@/components/ui/Input';
 
@@ -134,30 +134,35 @@ export default function ShippingForm({ onSubmit, initialEmail }: Props) {
                             setValue('state', '');
                         }}
                     >
-                        <option value="India">India</option>
-                        <option value="United States">United States</option>
-                        <option value="United Kingdom">United Kingdom</option>
-                        <option value="Canada">Canada</option>
-                        <option value="Australia">Australia</option>
-                        <option value="Singapore">Singapore</option>
-                        <option value="UAE">UAE</option>
-                        <option value="Other">Other</option>
+                        {COUNTRIES.map((c) => (
+                            <option key={c} value={c}>{c}</option>
+                        ))}
                     </select>
                     <p className="mt-1 text-xs min-h-[1rem] text-red-600" aria-live="polite">{errors.country?.message ?? ''}</p>
                 </div>
 
-                {/* State — only shown for India */}
-                {country === 'India' && (
+                {/* State / Province */}
+                {COUNTRY_STATES[country] ? (
                     <div>
                         <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">State *</label>
                         <select id="state" autoComplete="address-level1" className={selectClass} {...register('state')}>
                             <option value="">Select state</option>
-                            {INDIAN_STATES.map((s) => (
+                            {COUNTRY_STATES[country].map((s) => (
                                 <option key={s} value={s}>{s}</option>
                             ))}
                         </select>
                         <p className="mt-1 text-xs min-h-[1rem] text-red-600" aria-live="polite">{errors.state?.message ?? ''}</p>
                     </div>
+                ) : (
+                    <Input
+                        id="state"
+                        label="State / Province (optional)"
+                        type="text"
+                        placeholder="State or province"
+                        autoComplete="address-level1"
+                        error={errors.state?.message}
+                        {...register('state')}
+                    />
                 )}
 
                 <button
