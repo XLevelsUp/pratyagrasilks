@@ -54,7 +54,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
                             isSold ? 'grayscale-[30%]' : 'group-hover:scale-105'
                         }`}
                         sizes="(max-width: 768px) 100vw, 296px"
-                        quality={60}
+                        // quality={60}
                     />
                     <WatermarkOverlay />
 
