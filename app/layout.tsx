@@ -12,7 +12,7 @@ import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { Toaster } from "react-hot-toast";
 import OrganizationSchema from "@/components/seo/OrganizationSchema";
 import { siteMetadata } from "@/lib/seo/config";
-import WhatsAppFAB from "@/components/ui/WhatsAppFAB";
+import FloatingButtons from "@/components/ui/FloatingButtons";
 
 // Font configurations
 const playfair = Playfair_Display({
@@ -111,11 +111,11 @@ export default function RootLayout({
                             <CartSidebar />
                         </CartProvider>
                     </WishlistProvider>
+                    <FloatingButtons />
                 </AuthProvider>
                 <GoogleAnalytics />
                 <Analytics />
                 <Toaster position="top-right" />
-                <WhatsAppFAB />
             </body>
         </html>
     );
