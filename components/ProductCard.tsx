@@ -39,7 +39,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
                 <div className="relative aspect-square overflow-hidden bg-primary-50 silk-shimmer">
                     <Image
                         src={imageUrl}
-                        alt={product.name}
+                        alt={product.name + ' Pure silk sarees online in India | Pratyagra Silks'}
                         fill
                         className={`object-cover transition-transform duration-300 ${isSold ? ' grayscale-[30%]' : 'group-hover:scale-105'}`}
                         sizes="(max-width: 768px) 100vw, 296px"
