@@ -74,7 +74,7 @@ export default function ShippingPage() {
         },
         {
             question: "Can I change my delivery address?",
-            answer: "Yes, you can change your address within 24 hours of placing your order. Contact us at hello@kandangisarees.com immediately.",
+            answer: "Yes, you can change your address within 24 hours of placing your order. Contact us at kandangi2025@gmail.com immediately.",
         },
         {
             question: "What if my order is delayed?",

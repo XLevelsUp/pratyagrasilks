@@ -9,7 +9,7 @@ export const BRAND_FULL_NAME = 'Kandangi Sarees — Handpicked Sarees' as const;
 export const BRAND_TAGLINE = 'Handpicked for You, Rooted in Tradition.' as const;
 export const BRAND_PROMISE = 'Handpicked Weaves. Trusted Guidance. Real Wardrobes.' as const;
 
-export const BRAND_EMAIL = 'hello@kandangisarees.com' as const;
+export const BRAND_EMAIL = 'kandangi2025@gmail.com' as const;
 export const BRAND_DOMAIN = 'kandangisarees.com' as const;
 export const BRAND_URL = 'https://kandangisarees.com' as const;
 

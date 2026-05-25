@@ -106,7 +106,7 @@ export default async function SareesUnder5000Page() {
                     <section className="bg-white rounded-lg shadow-md p-8 mb-12">
                         <h2 className="text-3xl font-bold font-playfair text-primary mb-4">Silks Under ₹5,000</h2>
                         <p className="text-gray-700 leading-relaxed">
-                            Lighter silk varieties — Venkatagiri silk and raw silk — fall comfortably within this range without compromising on the beauty of a handwoven weave. These are not cut-price silks; they are simply lighter constructions from the same authentic traditions.
+                            Lighter silk varieties — Venkatagiri silk, soft silk, and raw silk — fall comfortably within this range without compromising on the beauty of a handwoven weave. These are not cut-price silks; they are simply lighter constructions from the same authentic traditions.
                         </p>
                     </section>
 
