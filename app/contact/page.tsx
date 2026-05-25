@@ -101,10 +101,10 @@ export default function ContactPage() {
                                 <div>
                                     <h3 className="font-semibold text-lg text-gray-900 mb-2">Email</h3>
                                     <a
-                                        href="mailto:hello@kandangisarees.com"
+                                        href="mailto:kandangi2025@gmail.com"
                                         className="text-primary hover:text-primary-light text-lg transition-colors"
                                     >
-                                        hello@kandangisarees.com
+                                        kandangi2025@gmail.com
                                     </a>
                                     <p className="text-textSecondary mt-2">We'll respond within 24 hours</p>
                                 </div>
@@ -266,7 +266,7 @@ export default function ContactPage() {
                                 Do you offer wholesale/bulk orders?
                             </summary>
                             <p className=" mt-4 leading-relaxed">
-                                Yes, we work with boutiques, shops, and organisations. Please contact us at hello@kandangisarees.com with your requirements.
+                                Yes, we work with boutiques, shops, and organisations. Please contact us at kandangi2025@gmail.com with your requirements.
                             </p>
                         </details>
 

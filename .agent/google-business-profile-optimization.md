@@ -331,7 +331,7 @@ We're glad to hear that you're pleased with the quality of your saree—our arti
 
 We've reviewed your order and identified [brief reason: courier delay/high demand period]. To make this right, we'd like to offer you a 15% discount on your next purchase as a gesture of our commitment to better service.
 
-Please reach out to us at hello@kandangisarees.com, and we'll ensure your next experience with Kandangi Sarees is seamless.
+Please reach out to us at kandangi2025@gmail.com, and we'll ensure your next experience with Kandangi Sarees is seamless.
 
 Thank you for your patience and understanding.
 

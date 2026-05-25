@@ -146,7 +146,7 @@ export default function PrivacyPage() {
                                 <li>Right to data portability</li>
                             </ul>
                             <p className="leading-relaxed mt-4">
-                                To exercise any of these rights, please contact us at hello@kandangisarees.com.
+                                To exercise any of these rights, please contact us at kandangi2025@gmail.com.
                             </p>
                         </div>
 
@@ -194,7 +194,7 @@ export default function PrivacyPage() {
                                 If you have questions about this Privacy Policy or our privacy practices, please contact us at:
                             </p>
                             <p className="mt-4 ">
-                                <strong>Email:</strong> hello@kandangisarees.com<br />
+                                <strong>Email:</strong> kandangi2025@gmail.com<br />
                                 <strong>Address:</strong> Kandangi Sarees — [PENDING — client to supply]
                             </p>
                         </div>

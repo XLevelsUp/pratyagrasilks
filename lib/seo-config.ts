@@ -271,6 +271,34 @@ export const silkCategories: SilkCategory[] = [
         ],
         priceRange: '₹3,000 – ₹14,000',
     },
+    {
+        slug: 'soft-silk',
+        name: 'Soft Silk',
+        description: 'Soft silk sarees with a smooth, lightweight drape — the gentler, more wearable face of pure silk.',
+        longDescription: 'Soft silk sarees are woven from a finer, lighter silk yarn that produces a smooth, fluid drape quite different from the structured weight of Kanjivaram or Gadwal. Often associated with Bangalore and Mysore silk traditions, soft silk sarees are a favourite for women who want the sheen and elegance of pure silk without the stiffness of heavier weaves. At Kandangi Sarees, we handpick soft silk sarees that combine a clean finish, vibrant colour palette, and everyday wearability.',
+        keywords: [
+            'soft silk sarees',
+            'soft silk sarees online',
+            'bangalore soft silk sarees',
+            'mysore soft silk sarees',
+            'lightweight silk sarees',
+            'pure soft silk sarees india',
+            'Kandangi Sarees soft silk',
+            'affordable silk sarees',
+        ],
+        metaTitle: 'Soft Silk Sarees | Lightweight Pure Silk | Kandangi Sarees',
+        metaDescription: 'Handpicked soft silk sarees — smooth drape, vibrant colours, and lightweight pure silk. Elegant for everyday and occasions. Shop at Kandangi Sarees.',
+        origin: 'Karnataka (Bangalore / Mysore)',
+        characteristics: [
+            'Smooth, lightweight drape',
+            'Bright, vibrant colour palette',
+            'Subtle natural sheen',
+            'Less stiff than heavier silk varieties',
+            'Versatile — daily wear to celebrations',
+        ],
+        priceRange: '₹2,500 – ₹8,000',
+        relatedSlugs: ['raw-silk', 'venkatagiri-silk', 'tussar-silk'],
+    },
 
     // ─── COTTONS ─────────────────────────────────────────────────────────────
     {

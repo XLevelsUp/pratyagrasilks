@@ -48,7 +48,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
                 <div className="relative aspect-[3/4] overflow-hidden bg-primary-50 silk-shimmer">
                     <Image
                         src={imageUrl}
-                        alt={product.name}
+                        alt={product.name + ' Buy authentic handloom ' + product.category?.replace(/-/g, ' ') + ' saree'}
                         fill
                         className={`object-cover transition-transform duration-300 ${
                             isSold ? 'grayscale-[30%]' : 'group-hover:scale-105'
