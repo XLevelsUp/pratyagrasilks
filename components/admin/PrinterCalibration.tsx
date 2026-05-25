@@ -24,7 +24,7 @@ export default function PrinterCalibration() {
         <>
             <button
                 onClick={handleCalibration}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+                className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
             >
                 <FlaskConical className="w-4 h-4" />
                 Test TVS Calibration

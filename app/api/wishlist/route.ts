@@ -37,6 +37,7 @@ export async function GET() {
                     category,
                     images,
                     in_stock,
+                    is_online,
                     sku,
                     material,
                     dimensions,
@@ -73,6 +74,7 @@ export async function GET() {
                     category: product.category,
                     images: product.images || [],
                     inStock: product.in_stock,
+                    isOnline: product.is_online,
                     sku: product.sku,
                     material: product.material,
                     dimensions: product.dimensions,
@@ -82,7 +84,7 @@ export async function GET() {
                 } : null,
                 createdAt: item.created_at,
             };
-        }).filter(item => item.product !== null) || [];
+        }).filter(item => item.product !== null && (item.product as any).isOnline !== false) || [];
 
         return NextResponse.json({
             items: transformedItems,
@@ -127,11 +129,12 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Check if product exists and is in stock
+        // Check if product exists, is online, and is in stock
         const { data: product, error: productError } = await supabase
             .from('products')
             .select('id, in_stock')
             .eq('id', productId)
+            .eq('is_online', true)
             .single();
 
         if (productError || !product) {

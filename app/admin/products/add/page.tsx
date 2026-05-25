@@ -267,7 +267,7 @@ export default function AddProductPage() {
                         disabled={loading || productImages.length === 0}
                         className="flex items-center gap-2 px-6 py-3 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                     >
-                        <Save className="w-5 h-5" />
+                        <Save className="w-5 h-5 hidden sm:block" />
                         {loading ? 'Creating...' : 'Create Product'}
                     </button>
                     <Link

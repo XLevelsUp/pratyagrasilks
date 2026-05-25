@@ -188,7 +188,7 @@ function NewProductForm() {
                             value={formData.name}
                             onChange={handleChange}
                             required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                             placeholder="e.g., Traditional Kanjivaram Silk Saree"
                         />
                     </div>
@@ -204,7 +204,7 @@ function NewProductForm() {
                             value={formData.sku}
                             onChange={handleChange}
                             required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                             placeholder="e.g., KAN-001"
                         />
                     </div>
@@ -215,14 +215,14 @@ function NewProductForm() {
                             <Calculator className="w-4 h-4 text-amber-600" />
                             Procurement &amp; Margin
                         </h3>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                             <div>
                                 <label className="block text-xs font-medium text-gray-600 mb-1">Purchase Price (₹)</label>
                                 <input
                                     type="number" name="purchase_price" min="0" step="1"
                                     value={formData.purchase_price}
                                     onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                                     placeholder="0"
                                 />
                             </div>
@@ -232,7 +232,7 @@ function NewProductForm() {
                                     type="number" name="purchase_tax_percent" min="0" max="100" step="0.5"
                                     value={formData.purchase_tax_percent}
                                     onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                                 />
                             </div>
                             <div>
@@ -241,7 +241,7 @@ function NewProductForm() {
                                     type="number" name="profit_margin_percent" min="0" max="1000" step="0.5"
                                     value={formData.profit_margin_percent}
                                     onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                                 />
                             </div>
                             <div>
@@ -250,7 +250,7 @@ function NewProductForm() {
                                     type="number" name="selling_tax_percent" min="0" max="100" step="0.5"
                                     value={formData.selling_tax_percent}
                                     onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                                 />
                             </div>
                         </div>
@@ -275,14 +275,14 @@ function NewProductForm() {
                                 required
                                 min="0"
                                 step="1"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                                 placeholder="e.g., 15000"
                             />
                             {formData.is_price_overridden && (
                                 <button
                                     type="button"
                                     onClick={() => setFormData(prev => ({ ...prev, is_price_overridden: false }))}
-                                    className="flex-shrink-0 px-3 py-2 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-300 rounded-lg hover:bg-amber-100 whitespace-nowrap"
+                                    className="flex-shrink-0 px-3 py-2 min-h-[44px] text-xs font-medium text-amber-700 bg-amber-50 border border-amber-300 rounded-lg hover:bg-amber-100 whitespace-nowrap"
                                 >
                                     Reset to calculated
                                 </button>
@@ -302,7 +302,7 @@ function NewProductForm() {
                             onChange={handleChange}
                             required
                             min="0"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                             placeholder="e.g., 10"
                         />
                     </div>
@@ -317,7 +317,7 @@ function NewProductForm() {
                             value={formData.category}
                             onChange={handleChange}
                             required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                         >
                             {categories.map((cat) => (
                                 <option key={cat.value} value={cat.value}>
@@ -353,7 +353,7 @@ function NewProductForm() {
                             value={formData.vendorId}
                             onChange={handleChange}
                             disabled={vendorsLoading}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50 disabled:text-gray-400"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50 disabled:text-gray-400"
                         >
                             <option value="">— No vendor / Walk-in —</option>
                             {vendors.map((v) => (
@@ -375,7 +375,7 @@ function NewProductForm() {
                             value={formData.material}
                             onChange={handleChange}
                             required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                             placeholder="e.g., Pure Silk"
                         />
                     </div>
@@ -390,7 +390,7 @@ function NewProductForm() {
                             name="dimensions"
                             value={formData.dimensions}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                             placeholder="e.g., 6.25 (5.5 Mts of saree and 70 cm Blouse)"
                         />
                     </div>
@@ -405,7 +405,7 @@ function NewProductForm() {
                             name="weight"
                             value={formData.weight}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                             placeholder="e.g., 800g"
                         />
                     </div>
@@ -421,7 +421,7 @@ function NewProductForm() {
                             onChange={handleChange}
                             required
                             rows={4}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                             placeholder="Detailed product description..."
                         />
                     </div>
@@ -437,7 +437,7 @@ function NewProductForm() {
                             name="yt_link"
                             value={formData.yt_link}
                             onChange={handleChange}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${ytLinkError ? 'border-red-500' : 'border-gray-300'
+                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${ytLinkError ? 'border-red-500' : 'border-gray-300'
                                 }`}
                             placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
                         />
@@ -522,7 +522,7 @@ function NewProductForm() {
                         disabled={loading || productImages.length === 0}
                         className="flex items-center gap-2 px-6 py-3 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                     >
-                        <Save className="w-5 h-5" />
+                        <Save className="w-5 h-5 hidden sm:block" />
                         {loading ? 'Creating...' : 'Create Product'}
                     </button>
                     <Link

@@ -269,7 +269,7 @@ export default function OptimizedUploader({
             </div>
 
             {/* URL Input */}
-            <div className="border-2 border-gray-300 rounded-lg p-4">
+            <div className="hidden sm:block border-2 border-gray-300 rounded-lg p-4">
                 <div className="flex items-start gap-2">
                     <LinkIcon className="w-5 h-5 text-gray-400 mt-2 flex-shrink-0" />
                     <div className="flex-1">
