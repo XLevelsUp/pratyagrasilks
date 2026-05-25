@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/ui/Header";
+import ConditionalHeader from "@/components/ui/ConditionalHeader";
 import ConditionalFooter from "@/components/ui/ConditionalFooter";
 import { CartProvider } from "@/lib/context/CartContext";
 import { AuthProvider } from "@/lib/context/AuthContext";
@@ -105,7 +105,7 @@ export default function RootLayout({
                 <AuthProvider>
                     <WishlistProvider>
                         <CartProvider>
-                            <Header />
+                            <ConditionalHeader />
                             <main className="min-h-screen">{children}</main>
                             <ConditionalFooter />
                             <CartSidebar />

@@ -32,6 +32,7 @@ export async function GET(request: NextRequest) {
                         description,
                         images,
                         in_stock,
+                        is_online,
                         sku,
                         category
                     )
@@ -46,11 +47,16 @@ export async function GET(request: NextRequest) {
                 );
             }
 
+            // Filter out any cart items whose product is POS-only (is_online = false)
+            const onlineItems = (cartItems || []).filter(
+                (item) => (item.products as any)?.is_online !== false
+            );
+
             return NextResponse.json({
                 source: 'database',
                 customerId: user.id,
-                items: cartItems || [],
-                totalItems: cartItems?.length || 0,
+                items: onlineItems,
+                totalItems: onlineItems.length,
             });
         } else {
             // Guest user: return empty cart (client will use localStorage)
@@ -119,8 +125,9 @@ export async function PUT(request: NextRequest) {
 
             const { data: products, error: productErr } = await supabase
                 .from('products')
-                .select('id, in_stock, name, price')
-                .in('id', productIds);
+                .select('id, in_stock, is_online, name, price')
+                .in('id', productIds)
+                .eq('is_online', true);
 
             if (productErr || !products) {
                 return NextResponse.json(

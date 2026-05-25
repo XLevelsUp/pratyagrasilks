@@ -56,7 +56,7 @@ export default function ProductDetailClient({ product, productId }: ProductDetai
             {/* Breadcrumb */}
             <div className="bg-white border-b">
                 <div className="container mx-auto px-4 py-4">
-                    <nav className="flex items-center space-x-2 text-sm">
+                    <nav className="flex items-center flex-wrap gap-x-2 gap-y-1 text-sm">
                         <Link href="/" className="text-gray-500 hover:text-primary">
                             Home
                         </Link>

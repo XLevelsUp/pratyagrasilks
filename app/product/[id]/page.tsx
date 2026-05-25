@@ -11,6 +11,7 @@ async function getProduct(id: string): Promise<Product | null> {
         .from('products')
         .select('*')
         .eq('id', id)
+        .eq('is_online', true)
         .single();
 
     if (!data) return null;
