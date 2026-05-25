@@ -11,6 +11,8 @@ import { ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { trackBeginCheckout } from '@/lib/analytics/gtag';
 import EmailVerificationForm from '@/components/Auth/EmailVerificationForm';
+import { useAuth } from '@/lib/context/AuthContext';
+import { Address } from '@/components/profile/AddressCard';
 
 interface ShippingZone {
     id: string;
@@ -21,6 +23,7 @@ interface ShippingZone {
 
 export default function CheckoutPage() {
     const { items, clearCart } = useCart();
+    const { user, loading: authLoading } = useAuth();
     const [shippingCost, setShippingCost] = useState(0);
     const [estimatedDays, setEstimatedDays] = useState('');
     const [shippingZoneId, setShippingZoneId] = useState<string | undefined>();
@@ -30,9 +33,38 @@ export default function CheckoutPage() {
     const [isEmailVerified, setIsEmailVerified] = useState(false);
     const [verifiedEmail, setVerifiedEmail] = useState('');
 
+    // Saved Addresses state
+    const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
+    const [isAddressesLoading, setIsAddressesLoading] = useState(false);
+    const [selectedAddressId, setSelectedAddressId] = useState<string | undefined>();
+
     // Once the shipping form is submitted, show the payment button
     const [confirmedShipping, setConfirmedShipping] = useState<ShippingAddress | null>(null);
     const paymentRef = useRef<HTMLDivElement>(null);
+
+    // Bypass contact verification if user is logged in
+    useEffect(() => {
+        if (!authLoading && user?.email) {
+            setIsEmailVerified(true);
+            setVerifiedEmail(user.email);
+        }
+    }, [user, authLoading]);
+
+    // Fetch user's saved addresses
+    useEffect(() => {
+        if (user) {
+            setIsAddressesLoading(true);
+            fetch(`/api/profile/addresses?t=${Date.now()}`, { cache: 'no-store' })
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.addresses) {
+                        setSavedAddresses(data.addresses);
+                    }
+                })
+                .catch((err) => console.error('Error fetching checkout addresses:', err))
+                .finally(() => setIsAddressesLoading(false));
+        }
+    }, [user]);
 
     // Track begin checkout in GA4
     useEffect(() => {
@@ -60,8 +92,9 @@ export default function CheckoutPage() {
         );
     }
 
-    const handleShippingSubmit = async (shippingData: ShippingAddress) => {
+    const handleShippingSubmit = async (shippingData: ShippingAddress, selAddressId?: string) => {
         setIsProcessing(true);
+        setSelectedAddressId(selAddressId);
 
         try {
             let shippingInfo: ShippingZone;
@@ -136,7 +169,12 @@ export default function CheckoutPage() {
                             </div>
                         ) : (
                             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
-                                <ShippingForm onSubmit={handleShippingSubmit} initialEmail={verifiedEmail} />
+                                <ShippingForm
+                                    onSubmit={handleShippingSubmit}
+                                    initialEmail={verifiedEmail}
+                                    savedAddresses={savedAddresses}
+                                    isAddressesLoading={isAddressesLoading}
+                                />
 
                                 {/* Payment section — revealed after shipping is confirmed */}
                                 {confirmedShipping && (
@@ -149,6 +187,7 @@ export default function CheckoutPage() {
                                         </p>
                                         <RazorpayButton
                                             shippingAddress={confirmedShipping}
+                                            selectedAddressId={selectedAddressId}
                                             cartItems={items.map((i) => ({
                                                 productId: i.product.id,
                                                 product: {

@@ -14,6 +14,25 @@ export function validatePostalCode(postalCode: string, countryCode: string): boo
     return regex.test(postalCode);
 }
 
+export function formatPhoneNumber(phone: string): string {
+    const cleaned = phone.trim().replace(/[\s-()]/g, '');
+    if (!cleaned) return '';
+    
+    if (cleaned.startsWith('+')) {
+        return cleaned;
+    }
+    
+    if (/^\d{10}$/.test(cleaned)) {
+        return `+91${cleaned}`;
+    }
+    
+    if (/^91\d{10}$/.test(cleaned)) {
+        return `+${cleaned}`;
+    }
+    
+    return `+${cleaned}`;
+}
+
 export const COUNTRIES = [
     'India',
     'Argentina', 'Australia', 'Austria', 'Bahrain', 'Bangladesh',

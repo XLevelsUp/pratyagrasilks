@@ -17,7 +17,7 @@ export default function ProfilePage() {
         if (!loading && !user) {
             router.push('/auth/login');
         } else if (user) {
-            fetch('/api/profile', { cache: 'no-store' })
+            fetch(`/api/profile?t=${Date.now()}`, { cache: 'no-store' })
                 .then(res => res.json())
                 .then(data => {
                     if (data.customer) {
@@ -84,6 +84,7 @@ export default function ProfilePage() {
                                             src={customerData?.avatar_url || user.user_metadata?.avatar_url}
                                             alt="Profile"
                                             fill
+                                            unoptimized
                                             className="rounded-full object-cover"
                                         />
                                     ) : (
