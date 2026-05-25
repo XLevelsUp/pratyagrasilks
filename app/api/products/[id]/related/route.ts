@@ -29,6 +29,7 @@ export async function GET(
             .from('products')
             .select('*')
             .eq('category', currentProduct.category)
+            .eq('is_online', true)
             .eq('in_stock', true)
             .neq('id', params.id)
             .limit(limit);
