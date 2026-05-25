@@ -14,8 +14,9 @@ const FloatingButtons = () => {
     message,
   )}`;
 
-  // Don't show floating buttons on admin pages (admin has its own layout)
   const isAdminPage = pathname.startsWith('/admin');
+
+  if (isAdminPage) return null;
 
   return (
     <div className='fixed bottom-5 right-5 z-[9999] flex flex-col items-end gap-3'>

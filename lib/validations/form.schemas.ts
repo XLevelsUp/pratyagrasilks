@@ -33,13 +33,13 @@ export const emailField = z
         message: 'Please enter a valid email address',
     });
 
-// E.164 format: + followed by 8–15 digits, first digit of country code non-zero
+// Allow international E.164 format or standard 10-digit national format
 const phoneField = z
     .string()
     .trim()
     .regex(
-        /^\+[1-9]\d{7,14}$/,
-        'Please provide a valid international phone number starting with + (e.g. +919876543210)'
+        /^(\+[1-9]\d{7,14}|\d{10})$/,
+        'Please provide a valid 10-digit mobile number or international number starting with + (e.g. 9876543210 or +919876543210)'
     );
 
 // ── Contact Form ──────────────────────────────────────────────────────────────

@@ -16,6 +16,7 @@ export async function GET(
             .from('products')
             .select('*')
             .eq('id', params.id)
+            .eq('is_online', true)
             .single();
 
         if (error || !product) {

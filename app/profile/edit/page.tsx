@@ -151,7 +151,7 @@ export default function EditProfilePage() {
   useEffect(() => {
     if (!user) return;
     const fetchCustomer = async () => {
-      const res = await fetch('/api/profile');
+      const res = await fetch(`/api/profile?t=${Date.now()}`);
       if (res.ok) {
         const { customer } = await res.json();
         setFullName(customer?.full_name ?? user.user_metadata?.full_name ?? '');
@@ -363,6 +363,7 @@ export default function EditProfilePage() {
                   src={displayAvatar}
                   alt='Profile photo'
                   fill
+                  unoptimized
                   className='rounded-full object-cover'
                 />
               ) : (

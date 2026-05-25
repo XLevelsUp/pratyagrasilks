@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Briefcase, MapPin, Pencil, Trash2, Check, ShieldCheck } from 'lucide-react';
+import { Home, Briefcase, MapPin, Pencil, Trash2, Check, ShieldCheck, Loader2 } from 'lucide-react';
 
 export interface Address {
     id: string;
@@ -24,6 +24,8 @@ interface AddressCardProps {
     onDelete: (id: string) => void;
     onSetDefault: (id: string) => void;
     isProcessing?: boolean;
+    isDeleting?: boolean;
+    isSettingDefault?: boolean;
 }
 
 export default function AddressCard({
@@ -32,6 +34,8 @@ export default function AddressCard({
     onDelete,
     onSetDefault,
     isProcessing = false,
+    isDeleting = false,
+    isSettingDefault = false,
 }: AddressCardProps) {
     const {
         id,
@@ -137,10 +141,14 @@ export default function AddressCard({
                     <button
                         onClick={() => onDelete(id)}
                         disabled={isProcessing}
-                        className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:hover:bg-transparent"
+                        className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:hover:bg-transparent flex items-center justify-center"
                         title="Delete Address"
                     >
-                        <Trash2 className="w-4.5 h-4.5" />
+                        {isDeleting ? (
+                            <Loader2 className="w-4.5 h-4.5 animate-spin text-red-600" />
+                        ) : (
+                            <Trash2 className="w-4.5 h-4.5" />
+                        )}
                     </button>
                 </div>
 
@@ -151,7 +159,14 @@ export default function AddressCard({
                         disabled={isProcessing}
                         className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 hover:border-accent text-xs font-semibold text-gray-700 hover:text-accent hover:bg-accent-light rounded-lg transition-all duration-200 shadow-sm disabled:opacity-50 disabled:hover:bg-white disabled:hover:text-gray-700 disabled:hover:border-gray-300"
                     >
-                        Set as Default
+                        {isSettingDefault ? (
+                            <>
+                                <Loader2 className="w-3 h-3 animate-spin text-accent" />
+                                Setting...
+                            </>
+                        ) : (
+                            'Set as Default'
+                        )}
                     </button>
                 ) : (
                     <span className="flex items-center gap-1 text-xs font-bold text-emerald-600">

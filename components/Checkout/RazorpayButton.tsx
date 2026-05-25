@@ -31,6 +31,7 @@ interface ShippingAddress {
 
 interface Props {
     shippingAddress: ShippingAddress;
+    selectedAddressId?: string;
     cartItems: CartItem[];
     shippingCost: number;
     shippingZoneId?: string;
@@ -40,6 +41,7 @@ interface Props {
 
 export default function RazorpayButton({
     shippingAddress,
+    selectedAddressId,
     cartItems,
     shippingCost,
     shippingZoneId,
@@ -69,6 +71,7 @@ export default function RazorpayButton({
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     shippingAddress,
+                    selectedAddressId,
                     items: cartItems.map((i) => ({ productId: i.productId })),
                     shippingCost,
                     shippingZoneId,

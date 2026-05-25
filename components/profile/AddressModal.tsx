@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Home, Briefcase, MapPin, Loader2 } from 'lucide-react';
 import { Address } from './AddressCard';
+import { formatPhoneNumber } from '@/lib/validations/checkout';
 
 interface AddressModalProps {
     isOpen: boolean;
@@ -33,33 +34,99 @@ export default function AddressModal({
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Populate form fields on edit mode or reset on new address
+    // Populate form fields on edit mode, reset on new address, or load draft
     useEffect(() => {
-        if (address) {
-            setLabel(address.label || 'Home');
-            setFullName(address.full_name || '');
-            setPhone(address.phone || '');
-            setAddressLine1(address.address_line1 || '');
-            setAddressLine2(address.address_line2 || '');
-            setCity(address.city || '');
-            setState(address.state || '');
-            setPostalCode(address.postal_code || '');
-            setCountry(address.country || 'India');
-            setIsDefault(address.is_default || false);
-        } else {
-            setLabel('Home');
-            setFullName('');
-            setPhone('');
-            setAddressLine1('');
-            setAddressLine2('');
-            setCity('');
-            setState('');
-            setPostalCode('');
-            setCountry('India');
-            setIsDefault(false);
+        if (!isOpen) return;
+
+        const savedDraftStr = typeof window !== 'undefined' ? localStorage.getItem('address_form_draft') : null;
+        let loadedFromDraft = false;
+
+        if (savedDraftStr) {
+            try {
+                const draft = JSON.parse(savedDraftStr);
+                const isMatchingCreate = !isEditMode && draft.mode === 'create';
+                const isMatchingEdit = isEditMode && draft.mode === 'edit' && draft.id === address?.id;
+
+                if (isMatchingCreate || isMatchingEdit) {
+                    setLabel(draft.label || 'Home');
+                    setFullName(draft.fullName || '');
+                    setPhone(draft.phone || '');
+                    setAddressLine1(draft.addressLine1 || '');
+                    setAddressLine2(draft.addressLine2 || '');
+                    setCity(draft.city || '');
+                    setState(draft.state || '');
+                    setPostalCode(draft.postalCode || '');
+                    setCountry(draft.country || 'India');
+                    setIsDefault(draft.isDefault || false);
+                    loadedFromDraft = true;
+                }
+            } catch (e) {
+                console.error('Error parsing address draft:', e);
+            }
+        }
+
+        if (!loadedFromDraft) {
+            if (address) {
+                setLabel(address.label || 'Home');
+                setFullName(address.full_name || '');
+                setPhone(address.phone || '');
+                setAddressLine1(address.address_line1 || '');
+                setAddressLine2(address.address_line2 || '');
+                setCity(address.city || '');
+                setState(address.state || '');
+                setPostalCode(address.postal_code || '');
+                setCountry(address.country || 'India');
+                setIsDefault(address.is_default || false);
+            } else {
+                setLabel('Home');
+                setFullName('');
+                setPhone('');
+                setAddressLine1('');
+                setAddressLine2('');
+                setCity('');
+                setState('');
+                setPostalCode('');
+                setCountry('India');
+                setIsDefault(false);
+            }
         }
         setErrors({});
-    }, [address, isOpen]);
+    }, [address, isOpen, isEditMode]);
+
+    // Save draft to localStorage whenever fields change
+    useEffect(() => {
+        if (!isOpen) return; // Only save draft when modal is open and active
+        
+        const draft = {
+            mode: isEditMode ? 'edit' : 'create',
+            id: address?.id,
+            label,
+            fullName,
+            phone,
+            addressLine1,
+            addressLine2,
+            city,
+            state,
+            postalCode,
+            country,
+            isDefault,
+        };
+        localStorage.setItem('address_form_draft', JSON.stringify(draft));
+    }, [
+        isOpen,
+        isEditMode,
+        address?.id,
+        label,
+        fullName,
+        phone,
+        addressLine1,
+        addressLine2,
+        city,
+        state,
+        postalCode,
+        country,
+        isDefault,
+    ]);
 
     if (!isOpen) return null;
 
@@ -75,8 +142,8 @@ export default function AddressModal({
 
         if (!phone.trim()) {
             tempErrors.phone = 'Phone number is required.';
-        } else if (!/^\d{10,15}$/.test(phone.trim().replace(/[\s-()]/g, ''))) {
-            tempErrors.phone = 'Phone number must be between 10 and 15 digits.';
+        } else if (!/^\+?\d{10,15}$/.test(phone.trim().replace(/[\s-()]/g, ''))) {
+            tempErrors.phone = 'Phone number must be between 10 and 15 digits (optionally starting with +).';
         }
 
         if (!addressLine1.trim()) {
@@ -108,10 +175,11 @@ export default function AddressModal({
         if (!validateForm()) return;
 
         setIsSubmitting(true);
+        const formattedPhone = formatPhoneNumber(phone);
         const data = {
             label,
             full_name: fullName.trim(),
-            phone: phone.trim(),
+            phone: formattedPhone,
             address_line1: addressLine1.trim(),
             address_line2: addressLine2 ? addressLine2.trim() : null,
             city: city.trim(),
@@ -125,6 +193,7 @@ export default function AddressModal({
         setIsSubmitting(false);
 
         if (success) {
+            localStorage.removeItem('address_form_draft');
             onClose();
         }
     };
@@ -137,24 +206,42 @@ export default function AddressModal({
                 onClick={onClose}
             ></div>
 
-            {/* Modal Dialog Content */}
-            <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden z-10 scale-95 md:scale-100 transition-all duration-300 border border-gray-100">
+            {/* Modal Dialog Content & Form Wrapper */}
+            <form onSubmit={handleSubmit} className="relative bg-white rounded-2xl shadow-xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden z-10 scale-95 md:scale-100 transition-all duration-300 border border-gray-100">
                 
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-150">
                     <h2 className="text-xl font-bold text-gray-900">
                         {isEditMode ? 'Edit Delivery Address' : 'Add a New Address'}
                     </h2>
-                    <button
-                        onClick={onClose}
-                        className="p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                        <X className="w-5 h-5" />
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            disabled={isSubmitting}
+                            className="px-4 py-2 border border-gray-300 text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 rounded-lg transition-colors disabled:opacity-50"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="flex items-center justify-center gap-2 px-5 py-2 bg-accent hover:bg-accent-dark text-sm font-semibold text-white rounded-lg transition-colors shadow-sm min-w-[100px] disabled:opacity-50"
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    Saving...
+                                </>
+                            ) : (
+                                'Save Address'
+                            )}
+                        </button>
+                    </div>
                 </div>
 
-                {/* Form Wrapper */}
-                <form onSubmit={handleSubmit} className="flex flex-col flex-grow overflow-y-auto">
+                {/* Form fields body wrapper */}
+                <div className="flex flex-col flex-grow overflow-y-auto">
                     <div className="p-6 space-y-5">
                         
                         {/* Address Label Pills */}
@@ -365,33 +452,8 @@ export default function AddressModal({
                         )}
                     </div>
 
-                    {/* Footer Actions */}
-                    <div className="bg-gray-50 px-6 py-4 border-t border-gray-150 flex items-center justify-end gap-3 mt-auto">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            disabled={isSubmitting}
-                            className="px-5 py-2 border border-gray-300 text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 rounded-lg transition-colors disabled:opacity-50"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="flex items-center justify-center gap-2 px-5 py-2 bg-accent hover:bg-accent-dark text-sm font-semibold text-white rounded-lg transition-colors shadow-sm min-w-[100px] disabled:opacity-50"
-                        >
-                            {isSubmitting ? (
-                                <>
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                    Saving...
-                                </>
-                            ) : (
-                                'Save Address'
-                            )}
-                        </button>
-                    </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     );
 }
