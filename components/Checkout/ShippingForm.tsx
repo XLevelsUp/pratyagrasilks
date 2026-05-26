@@ -9,15 +9,17 @@ import { Check, MapPin, Pencil, Loader2 } from 'lucide-react';
 import type { Address } from '@/components/profile/AddressCard';
 
 interface Props {
-    onSubmit: (data: ShippingAddress, selectedAddressId?: string) => Promise<void>;
+    onSubmit: (data: ShippingAddress, selectedAddressId?: string, saveToProfile?: boolean) => Promise<void>;
     initialEmail?: string;
     savedAddresses?: Address[];
     isAddressesLoading?: boolean;
+    isLoggedIn?: boolean;
 }
 
-export default function ShippingForm({ onSubmit, initialEmail, savedAddresses, isAddressesLoading = false }: Props) {
+export default function ShippingForm({ onSubmit, initialEmail, savedAddresses, isAddressesLoading = false, isLoggedIn = false }: Props) {
     const [country, setCountry] = useState('India');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [saveAddressToProfile, setSaveAddressToProfile] = useState(false);
 
     const [selectedOption, setSelectedOption] = useState<'saved' | 'manual'>(() => {
         return savedAddresses && savedAddresses.length > 0 ? 'saved' : 'manual';
@@ -111,7 +113,7 @@ export default function ShippingForm({ onSubmit, initialEmail, savedAddresses, i
                 }
             }
 
-            await onSubmit(submittedData, finalAddressId);
+            await onSubmit(submittedData, finalAddressId, saveAddressToProfile);
         } finally {
             setIsSubmitting(false);
         }
@@ -365,6 +367,21 @@ export default function ShippingForm({ onSubmit, initialEmail, savedAddresses, i
                         error={errors.state?.message}
                         {...register('state')}
                     />
+                )}
+
+                {isLoggedIn && selectedOption === 'manual' && (
+                    <div className="flex items-center gap-3 py-2">
+                        <input
+                            id="saveAddressToProfile"
+                            type="checkbox"
+                            checked={saveAddressToProfile}
+                            onChange={(e) => setSaveAddressToProfile(e.target.checked)}
+                            className="w-4 h-4 text-accent border-gray-300 rounded focus:ring-accent focus:ring-2 cursor-pointer"
+                        />
+                        <label htmlFor="saveAddressToProfile" className="text-sm font-semibold text-gray-700 cursor-pointer select-none">
+                            Save this address to my profile for future purchases
+                        </label>
+                    </div>
                 )}
 
                 <button
