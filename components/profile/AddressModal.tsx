@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Home, Briefcase, MapPin, Loader2 } from 'lucide-react';
 import { Address } from './AddressCard';
-import { formatPhoneNumber } from '@/lib/validations/checkout';
+import { formatPhoneNumber, COUNTRIES, COUNTRY_STATES } from '@/lib/validations/checkout';
 
 interface AddressModalProps {
     isOpen: boolean;
@@ -140,10 +140,11 @@ export default function AddressModal({
             tempErrors.fullName = 'Full name must be at least 2 characters.';
         }
 
-        if (!phone.trim()) {
+        const cleanedPhone = phone.trim().replace(/[\s-()]/g, '');
+        if (!cleanedPhone) {
             tempErrors.phone = 'Phone number is required.';
-        } else if (!/^\+?\d{10,15}$/.test(phone.trim().replace(/[\s-()]/g, ''))) {
-            tempErrors.phone = 'Phone number must be between 10 and 15 digits (optionally starting with +).';
+        } else if (!/^(\+[1-9]\d{7,14}|\d{10})$/.test(cleanedPhone)) {
+            tempErrors.phone = 'Please provide a valid 10-digit mobile number or international number starting with + (e.g. 9876543210 or +919876543210).';
         }
 
         if (!addressLine1.trim()) {
@@ -156,7 +157,7 @@ export default function AddressModal({
             tempErrors.city = 'City is required.';
         }
 
-        if (!state.trim()) {
+        if (COUNTRY_STATES[country] && !state.trim()) {
             tempErrors.state = 'State is required.';
         }
 
@@ -303,8 +304,25 @@ export default function AddressModal({
                                 <input
                                     type="tel"
                                     value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
-                                    placeholder="10-digit mobile number"
+                                    onChange={(e) => {
+                                        let v = e.target.value;
+                                        const hasPlus = v.startsWith('+');
+                                        v = v.replace(/[^\d]/g, '');
+                                        if (hasPlus) {
+                                            v = '+' + v;
+                                        }
+                                        v = v.slice(0, 16);
+                                        setPhone(v);
+                                        if (errors.phone) {
+                                            setErrors((prev) => {
+                                                const next = { ...prev };
+                                                delete next.phone;
+                                                return next;
+                                            });
+                                        }
+                                    }}
+                                    placeholder="10-digit mobile or international number"
+                                    maxLength={16}
                                     className={`w-full px-3.5 py-2 border rounded-lg text-sm transition-all focus:outline-none focus:ring-2 ${
                                         errors.phone
                                             ? 'border-red-400 focus:ring-red-100'
@@ -374,25 +392,50 @@ export default function AddressModal({
                                 )}
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                                    State <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    value={state}
-                                    onChange={(e) => setState(e.target.value)}
-                                    placeholder="Maharashtra"
-                                    className={`w-full px-3.5 py-2 border rounded-lg text-sm transition-all focus:outline-none focus:ring-2 ${
-                                        errors.state
-                                            ? 'border-red-400 focus:ring-red-100'
-                                            : 'border-gray-300 focus:border-accent focus:ring-accent-light'
-                                    }`}
-                                />
-                                {errors.state && (
-                                    <p className="mt-1 text-xs font-medium text-red-500">{errors.state}</p>
-                                )}
-                            </div>
+                            {COUNTRY_STATES[country] ? (
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                                        State <span className="text-red-500">*</span>
+                                    </label>
+                                    <select
+                                        value={state}
+                                        onChange={(e) => setState(e.target.value)}
+                                        className={`w-full px-3.5 py-2 border rounded-lg text-sm bg-white text-gray-900 font-medium transition-all focus:outline-none focus:ring-2 ${
+                                            errors.state
+                                                ? 'border-red-400 focus:ring-red-100'
+                                                : 'border-gray-300 focus:border-accent focus:ring-accent-light'
+                                        }`}
+                                    >
+                                        <option value="">Select state</option>
+                                        {COUNTRY_STATES[country].map((s) => (
+                                            <option key={s} value={s}>{s}</option>
+                                        ))}
+                                    </select>
+                                    {errors.state && (
+                                        <p className="mt-1 text-xs font-medium text-red-500">{errors.state}</p>
+                                    )}
+                                </div>
+                            ) : (
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                                        State / Province <span className="text-gray-400 text-xs font-normal">(Optional)</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={state}
+                                        onChange={(e) => setState(e.target.value)}
+                                        placeholder="State or province"
+                                        className={`w-full px-3.5 py-2 border rounded-lg text-sm transition-all focus:outline-none focus:ring-2 ${
+                                            errors.state
+                                                ? 'border-red-400 focus:ring-red-100'
+                                                : 'border-gray-300 focus:border-accent focus:ring-accent-light'
+                                        }`}
+                                    />
+                                    {errors.state && (
+                                        <p className="mt-1 text-xs font-medium text-red-500">{errors.state}</p>
+                                    )}
+                                </div>
+                            )}
 
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">
@@ -419,16 +462,20 @@ export default function AddressModal({
                         <div className="grid grid-cols-1 gap-4">
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                                    Country/Region
+                                    Country/Region <span className="text-red-500">*</span>
                                 </label>
-                                <input
-                                    type="text"
+                                <select
                                     value={country}
-                                    onChange={(e) => setCountry(e.target.value)}
-                                    placeholder="India"
-                                    className="w-full px-3.5 py-2 border border-gray-300 rounded-lg text-sm transition-all focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent-light bg-gray-50 text-gray-500 font-medium cursor-not-allowed"
-                                    disabled
-                                />
+                                    onChange={(e) => {
+                                        setCountry(e.target.value);
+                                        setState(''); // Reset state when country changes
+                                    }}
+                                    className="w-full px-3.5 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 font-medium transition-all focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent-light"
+                                >
+                                    {COUNTRIES.map((c) => (
+                                        <option key={c} value={c}>{c}</option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
 
