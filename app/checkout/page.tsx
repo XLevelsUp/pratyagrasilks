@@ -92,11 +92,44 @@ export default function CheckoutPage() {
         );
     }
 
-    const handleShippingSubmit = async (shippingData: ShippingAddress, selAddressId?: string) => {
+    const handleShippingSubmit = async (shippingData: ShippingAddress, selAddressId?: string, saveToProfile?: boolean) => {
         setIsProcessing(true);
-        setSelectedAddressId(selAddressId);
+        let finalAddressId = selAddressId;
 
         try {
+            // Save address to user profile if requested and user is logged in
+            if (saveToProfile && !selAddressId && user) {
+                try {
+                    const saveRes = await fetch('/api/profile/addresses', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            label: 'Home',
+                            full_name: shippingData.fullName,
+                            phone: shippingData.phone,
+                            address_line1: shippingData.addressLine1,
+                            address_line2: shippingData.addressLine2 || null,
+                            city: shippingData.city,
+                            state: shippingData.state || '',
+                            postal_code: shippingData.postalCode,
+                            country: shippingData.country,
+                            is_default: false,
+                        }),
+                    });
+                    const saveData = await saveRes.json();
+                    if (saveRes.ok && saveData.success && saveData.address?.id) {
+                        finalAddressId = saveData.address.id;
+                        toast.success('Address saved to your profile! 🏠');
+                    } else {
+                        console.error('Failed to auto-save address to profile:', saveData.error);
+                    }
+                } catch (err) {
+                    console.error('Error auto-saving address to profile:', err);
+                }
+            }
+
+            setSelectedAddressId(finalAddressId);
+
             let shippingInfo: ShippingZone;
 
             if (shippingData.country === 'India') {
@@ -159,21 +192,54 @@ export default function CheckoutPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Left — Shipping Form + Payment */}
                     <div className="lg:col-span-2 space-y-6">
-                        {!isEmailVerified ? (
-                            <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                                <h2 className="text-lg font-semibold text-gray-900 mb-6">Contact Information</h2>
+                        {/* Contact Information Step */}
+                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-lg font-semibold text-gray-900">Contact Information</h2>
+                                {isEmailVerified && !user && (
+                                    <button
+                                        onClick={() => {
+                                            setIsEmailVerified(false);
+                                            setConfirmedShipping(null); // Clear shipping confirmation on email change
+                                        }}
+                                        className="text-sm font-semibold text-accent hover:text-accent-hover transition-colors"
+                                    >
+                                        Edit
+                                    </button>
+                                )}
+                            </div>
+                            
+                            {!isEmailVerified ? (
                                 <EmailVerificationForm onSuccess={(email) => {
                                     setIsEmailVerified(true);
                                     setVerifiedEmail(email);
                                 }} />
-                            </div>
-                        ) : (
+                            ) : (
+                                <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-lg p-4">
+                                    <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
+                                        <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-textSecondary font-medium">
+                                            {user ? 'Logged in as' : 'Contact Email'}
+                                        </p>
+                                        <p className="font-semibold text-gray-900 text-sm">{verifiedEmail}</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Shipping details step — visible only when email is verified */}
+                        {isEmailVerified && (
                             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
                                 <ShippingForm
                                     onSubmit={handleShippingSubmit}
                                     initialEmail={verifiedEmail}
                                     savedAddresses={savedAddresses}
                                     isAddressesLoading={isAddressesLoading}
+                                    isLoggedIn={!!user}
                                 />
 
                                 {/* Payment section — revealed after shipping is confirmed */}

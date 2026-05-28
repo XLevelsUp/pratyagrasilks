@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import imageCompression from 'browser-image-compression';
 import { Upload, X, FileImage, CheckCircle2 } from 'lucide-react';
 import Image from 'next/image';
 import { uploadVendorDoc, getVendorDocSignedUrl, deleteVendorDoc } from '@/lib/supabase/storage-utils';
@@ -89,31 +88,16 @@ export default function VendorDocUploader({
                 const file = files[i];
                 setProgress(Math.round((i / files.length) * 90));
 
-                // Compress and convert to WebP
-                const compressed = await imageCompression(file, {
-                    maxSizeMB: 1,
-                    maxWidthOrHeight: 1920,
-                    useWebWorker: true,
-                    fileType: 'image/webp',
-                    initialQuality: 0.85,
-                });
-
-                const webpFile = new File(
-                    [compressed],
-                    file.name.replace(/\.[^.]+$/, '.webp'),
-                    { type: 'image/webp' }
-                );
-
                 // Blob URL for immediate preview (revoked on unmount)
-                const blobUrl = URL.createObjectURL(webpFile);
+                const blobUrl = URL.createObjectURL(file);
                 blobUrlsRef.current.push(blobUrl);
 
-                const path = await uploadVendorDoc(webpFile);
+                const path = await uploadVendorDoc(file);
 
                 newDocs.push({
                     path,
                     previewUrl: blobUrl,
-                    fileName: webpFile.name,
+                    fileName: file.name,
                 });
             }
 

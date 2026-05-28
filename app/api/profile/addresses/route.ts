@@ -78,8 +78,9 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Full name must be at least 2 characters.' }, { status: 400 });
         }
 
-        if (!phone || typeof phone !== 'string' || phone.trim().length < 10 || phone.trim().length > 15) {
-            return NextResponse.json({ error: 'Phone number must be between 10 and 15 digits.' }, { status: 400 });
+        const cleanedPhone = phone ? phone.trim().replace(/[\s-()]/g, '') : '';
+        if (!cleanedPhone || !/^(\+[1-9]\d{7,14}|\d{10})$/.test(cleanedPhone)) {
+            return NextResponse.json({ error: 'Please provide a valid 10-digit mobile number or international number starting with + (e.g. 9876543210 or +919876543210).' }, { status: 400 });
         }
 
         if (!address_line1 || typeof address_line1 !== 'string' || address_line1.trim().length < 5) {
@@ -90,8 +91,15 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'City is required.' }, { status: 400 });
         }
 
-        if (!state || typeof state !== 'string' || state.trim().length < 2) {
-            return NextResponse.json({ error: 'State is required.' }, { status: 400 });
+        const countryHasStates = country && ['India', 'United States', 'Canada', 'Australia'].includes(country);
+        if (countryHasStates) {
+            if (!state || typeof state !== 'string' || state.trim().length < 2) {
+                return NextResponse.json({ error: 'State is required.' }, { status: 400 });
+            }
+        } else {
+            if (state && (typeof state !== 'string' || state.trim().length < 2)) {
+                return NextResponse.json({ error: 'State must be at least 2 characters.' }, { status: 400 });
+            }
         }
 
         if (!postal_code || typeof postal_code !== 'string' || postal_code.trim().length < 5 || postal_code.trim().length > 10) {
@@ -109,11 +117,11 @@ export async function POST(req: NextRequest) {
                 customer_id: customer.id,
                 label,
                 full_name: full_name.trim(),
-                phone: phone.trim(),
+                phone: cleanedPhone,
                 address_line1: address_line1.trim(),
                 address_line2: address_line2 ? address_line2.trim() : null,
                 city: city.trim(),
-                state: state.trim(),
+                state: state ? state.trim() : '',
                 postal_code: postal_code.trim(),
                 country: country.trim(),
                 is_default,

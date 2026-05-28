@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import Input from '@/components/ui/Input';
 
-const PHONE_REGEX = /^\d{10}$/;
+const PHONE_REGEX = /^(\+[1-9]\d{7,14}|\d{10})$/;
 const MAX_PASSWORD_LENGTH = 20;
 
 // ── Inline alert helper ───────────────────────────────────────────────────────
@@ -234,8 +234,9 @@ export default function EditProfilePage() {
       errs.fullName = 'Full name must be at least 2 characters.';
     if (fullName.trim().length > 100)
       errs.fullName = 'Full name must not exceed 100 characters.';
-    if (phone && !PHONE_REGEX.test(phone))
-      errs.phone = 'Phone must be exactly 10 digits.';
+    const cleanedPhone = phone.trim().replace(/[\s-()]/g, '');
+    if (cleanedPhone && !PHONE_REGEX.test(cleanedPhone))
+      errs.phone = 'Please provide a valid 10-digit mobile number or international number starting with + (e.g. 9876543210 or +919876543210).';
     setInfoErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -437,13 +438,19 @@ export default function EditProfilePage() {
             type='tel'
             value={phone}
             onChange={(e) => {
-              const v = e.target.value.replace(/\D/g, '').slice(0, 10);
+              let v = e.target.value;
+              const hasPlus = v.startsWith('+');
+              v = v.replace(/[^\d]/g, '');
+              if (hasPlus) {
+                v = '+' + v;
+              }
+              v = v.slice(0, 16);
               setPhone(v);
               if (infoErrors.phone)
                 setInfoErrors((p) => ({ ...p, phone: undefined }));
             }}
-            placeholder='10-digit mobile number'
-            maxLength={10}
+            placeholder='10-digit mobile or international number'
+            maxLength={16}
             autoComplete='tel'
             error={infoErrors.phone}
           />
