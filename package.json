@@ -13,7 +13,6 @@
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.105.4",
     "@vercel/analytics": "^1.5.0",
-    "browser-image-compression": "^2.0.2",
     "embla-carousel-react": "^8.6.0",
     "libphonenumber-js": "^1.12.41",
     "lucide-react": "^0.555.0",
@@ -27,6 +26,7 @@
     "react-hook-form": "^7.67.0",
     "react-hot-toast": "^2.6.0",
     "resend": "^6.10.0",
+    "sharp": "^0.34.5",
     "xlsx": "^0.18.5",
     "zod": "^4.1.13"
   },
@@ -34,6 +34,7 @@
     "@types/node": "^20.11.30",
     "@types/react": "^18.2.67",
     "@types/react-dom": "^18.2.22",
+    "@types/sharp": "^0.31.1",
     "autoprefixer": "^10.4.19",
     "eslint": "^8.57.0",
     "eslint-config-next": "14.2.3",
