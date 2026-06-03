@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { Upload, X, GripVertical, Link as LinkIcon, CheckCircle2 } from 'lucide-react';
 import Image from 'next/image';
+import { createClient } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
 
 interface OptimizedUploaderProps {
@@ -46,31 +47,55 @@ export default function OptimizedUploader({
         }
 
         setUploading(true);
-        setProgress(10);
+        setProgress(5);
 
-        // Show preview of the first selected file
         const firstPreview = URL.createObjectURL(files[0]);
         setPreviewUrl(firstPreview);
 
         try {
-            const fd = new FormData();
-            files.forEach((file) => fd.append('files', file));
-
-            setProgress(40);
-
-            const res = await fetch('/api/products/upload-image', {
+            // Step 1: Get signed upload URLs from server (tiny JSON request)
+            const res1 = await fetch('/api/products/get-upload-urls', {
                 method: 'POST',
-                body: fd,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filenames: files.map(f => f.name) }),
             });
 
-            setProgress(90);
-
-            if (!res.ok) {
-                const { error } = await res.json() as { error: string };
-                throw new Error(error || 'Upload failed');
+            if (!res1.ok) {
+                const { error } = await res1.json() as { error: string };
+                throw new Error(error || 'Could not get upload URLs');
             }
 
-            const { urls } = await res.json() as { urls: string[] };
+            const { uploads } = await res1.json() as {
+                uploads: { path: string; signedUrl: string; token: string }[];
+            };
+
+            setProgress(15);
+
+            // Step 2: Upload raw files directly to Supabase — bypasses Vercel entirely, no size limit
+            const supabase = createClient();
+            await Promise.all(
+                uploads.map(({ path, token }, i) =>
+                    supabase.storage
+                        .from('saree-images')
+                        .uploadToSignedUrl(path, token, files[i])
+                )
+            );
+
+            setProgress(70);
+
+            // Step 3: Trigger server-side sharp processing (download → WebP → re-upload)
+            const res3 = await fetch('/api/products/process-uploaded-images', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paths: uploads.map(u => u.path) }),
+            });
+
+            if (!res3.ok) {
+                const { error } = await res3.json() as { error: string };
+                throw new Error(error || 'Image processing failed');
+            }
+
+            const { urls } = await res3.json() as { urls: string[] };
 
             URL.revokeObjectURL(firstPreview);
 
@@ -169,7 +194,8 @@ export default function OptimizedUploader({
     };
 
     const getStatusText = () => {
-        if (uploading) return 'Uploading...';
+        if (uploading && progress < 70) return 'Uploading...';
+        if (uploading && progress >= 70) return 'Processing...';
         if (progress === 100) return 'Success!';
         return 'Select Images (Multiple)';
     };
@@ -227,7 +253,7 @@ export default function OptimizedUploader({
                         <div className="w-full max-w-md mt-4">
                             <div className="bg-gray-200 rounded-full h-2 overflow-hidden">
                                 <div
-                                    className="bg-amber-600 h-full transition-all duration-300"
+                                    className="bg-amber-600 h-full transition-all duration-500"
                                     style={{ width: `${progress}%` }}
                                 />
                             </div>
