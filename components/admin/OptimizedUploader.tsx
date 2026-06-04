@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import imageCompression from 'browser-image-compression';
 import { Upload, X, GripVertical, Link as LinkIcon, CheckCircle2 } from 'lucide-react';
 import Image from 'next/image';
-import { uploadProductImage } from '@/lib/supabase/storage-utils';
+import { createClient } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
 
 interface OptimizedUploaderProps {
@@ -19,7 +18,6 @@ export default function OptimizedUploader({
     maxImages = 10,
 }: OptimizedUploaderProps) {
     const [uploading, setUploading] = useState(false);
-    const [compressing, setCompressing] = useState(false);
     const [progress, setProgress] = useState(0);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [images, setImages] = useState<string[]>(existingImages);
@@ -50,58 +48,67 @@ export default function OptimizedUploader({
             return;
         }
 
-        setCompressing(true);
         setUploading(true);
+        setProgress(5);
 
-        const uploadedUrls: string[] = [];
-        const totalFiles = files.length;
+        const firstPreview = URL.createObjectURL(files[0]);
+        setPreviewUrl(firstPreview);
 
         try {
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const fileProgress = ((i / totalFiles) * 100);
+            // Step 1: Get signed upload URLs from server (tiny JSON request)
+            const res1 = await fetch('/api/products/get-upload-urls', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filenames: files.map(f => f.name) }),
+            });
 
-                setProgress(Math.round(fileProgress));
-
-                // Show preview of current file
-                const originalPreview = URL.createObjectURL(file);
-                setPreviewUrl(originalPreview);
-
-                // Compress image (skip for SVG and GIF)
-                let fileToUpload = file;
-                if (file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/webp') {
-                    const options = {
-                        maxSizeMB: 1,
-                        maxWidthOrHeight: 1920,
-                        useWebWorker: true,
-                        fileType: file.type === 'image/png' ? 'image/png' : 'image/jpeg',
-                        initialQuality: 0.8,
-                    };
-
-                    fileToUpload = await imageCompression(file, options);
-                }
-
-                // Upload to Supabase
-                const publicUrl = await uploadProductImage(fileToUpload);
-                uploadedUrls.push(publicUrl);
-
-                // Cleanup preview
-                URL.revokeObjectURL(originalPreview);
+            if (!res1.ok) {
+                const { error } = await res1.json() as { error: string };
+                throw new Error(error || 'Could not get upload URLs');
             }
 
-            // Add all uploaded images to the array
-            const newImages = [...images, ...uploadedUrls];
+            const { uploads } = await res1.json() as {
+                uploads: { path: string; signedUrl: string; token: string }[];
+            };
+
+            setProgress(15);
+
+            // Step 2: Upload raw files directly to Supabase — bypasses Vercel entirely, no size limit
+            const supabase = createClient();
+            await Promise.all(
+                uploads.map(({ path, token }, i) =>
+                    supabase.storage
+                        .from('saree-images')
+                        .uploadToSignedUrl(path, token, files[i])
+                )
+            );
+
+            setProgress(70);
+
+            // Step 3: Trigger server-side sharp processing (download → WebP → re-upload)
+            const res3 = await fetch('/api/products/process-uploaded-images', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paths: uploads.map(u => u.path) }),
+            });
+
+            if (!res3.ok) {
+                const { error } = await res3.json() as { error: string };
+                throw new Error(error || 'Image processing failed');
+            }
+
+            const { urls } = await res3.json() as { urls: string[] };
+
+            URL.revokeObjectURL(firstPreview);
+
+            const newImages = [...images, ...urls];
             updateImages(newImages);
 
             setProgress(100);
+            toast.success(`Successfully uploaded ${urls.length} image${urls.length > 1 ? 's' : ''}!`);
 
-            // Show success message
-            toast.success(`Successfully uploaded ${uploadedUrls.length} image${uploadedUrls.length > 1 ? 's' : ''}!`);
-
-            // Reset states
             setTimeout(() => {
                 setUploading(false);
-                setCompressing(false);
                 setPreviewUrl(null);
                 setProgress(0);
                 if (fileInputRef.current) {
@@ -111,18 +118,11 @@ export default function OptimizedUploader({
 
         } catch (error) {
             console.error('Upload error:', error);
-            toast.error('Failed to upload some images. Please try again.');
-            setCompressing(false);
+            toast.error('Failed to upload images. Please try again.');
+            URL.revokeObjectURL(firstPreview);
             setUploading(false);
-            setProgress(0);
             setPreviewUrl(null);
-
-            // If some images were uploaded successfully, still add them
-            if (uploadedUrls.length > 0) {
-                const newImages = [...images, ...uploadedUrls];
-                updateImages(newImages);
-                toast.success(`Uploaded ${uploadedUrls.length} of ${totalFiles} images`);
-            }
+            setProgress(0);
         }
     };
 
@@ -199,8 +199,8 @@ export default function OptimizedUploader({
     };
 
     const getStatusText = () => {
-        if (compressing) return 'Compressing...';
-        if (uploading) return 'Uploading...';
+        if (uploading && progress < 70) return 'Uploading...';
+        if (uploading && progress >= 70) return 'Processing...';
         if (progress === 100) return 'Success!';
         return 'Select Images (Multiple)';
     };
@@ -215,13 +215,13 @@ export default function OptimizedUploader({
                     accept="image/png,image/jpeg,image/jpg,image/webp,image/gif,image/svg+xml"
                     multiple
                     onChange={handleFileSelect}
-                    disabled={uploading || compressing || images.length >= maxImages}
+                    disabled={uploading || images.length >= maxImages}
                     className="hidden"
                     id="image-upload"
                 />
                 <label
                     htmlFor="image-upload"
-                    className={`flex flex-col items-center justify-center cursor-pointer ${uploading || compressing || images.length >= maxImages
+                    className={`flex flex-col items-center justify-center cursor-pointer ${uploading || images.length >= maxImages
                         ? 'opacity-50 cursor-not-allowed'
                         : ''
                         }`}
@@ -247,18 +247,18 @@ export default function OptimizedUploader({
 
                     <p className="text-sm font-medium text-gray-700 mb-1">{getStatusText()}</p>
 
-                    {!compressing && !uploading && (
+                    {!uploading && (
                         <p className="text-xs text-gray-500">
-                            PNG, JPEG, WebP, GIF, SVG • Auto-compressed for optimal web performance
+                            PNG, JPEG, WebP, GIF, SVG • Server-processed WebP for maximum texture fidelity
                         </p>
                     )}
 
                     {/* Progress Bar */}
-                    {(compressing || uploading) && (
+                    {uploading && (
                         <div className="w-full max-w-md mt-4">
                             <div className="bg-gray-200 rounded-full h-2 overflow-hidden">
                                 <div
-                                    className="bg-amber-600 h-full transition-all duration-300"
+                                    className="bg-amber-600 h-full transition-all duration-500"
                                     style={{ width: `${progress}%` }}
                                 />
                             </div>

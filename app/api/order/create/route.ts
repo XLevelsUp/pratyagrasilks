@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
     try {
         const body = await req.json();
-        const { shippingAddress, items, shippingCost = 0, shippingZoneId, estimatedDeliveryDays } = body;
+        const { shippingAddress, items, shippingCost = 0, shippingZoneId, estimatedDeliveryDays, selectedAddressId } = body;
 
         // ── 1. Validate request shape ────────────────────────────────────────────
         if (!shippingAddress || !items || items.length === 0) {
@@ -99,25 +99,43 @@ export async function POST(req: NextRequest) {
         }
 
         // ── 5. Persist shipping address ───────────────────────────────────────────
-        const { data: address, error: addrErr } = await supabaseAdmin
-            .from('addresses')
-            .insert({
-                customer_id: customerId,
-                full_name: validatedAddress.fullName,
-                address_line1: validatedAddress.addressLine1,
-                address_line2: validatedAddress.addressLine2 || '',
-                city: validatedAddress.city,
-                state: validatedAddress.state || '',
-                postal_code: validatedAddress.postalCode,
-                country: validatedAddress.country || 'India',
-                phone: validatedAddress.phone,
-                is_default: false,
-            })
-            .select()
-            .single();
+        let shippingAddressId: string;
 
-        if (addrErr || !address) {
-            return NextResponse.json({ error: 'Failed to save address' }, { status: 500 });
+        if (selectedAddressId) {
+            // Verify that this address exists and belongs to the customer
+            const { data: address, error: addrErr } = await supabaseAdmin
+                .from('addresses')
+                .select('id')
+                .eq('id', selectedAddressId)
+                .eq('customer_id', customerId)
+                .single();
+
+            if (addrErr || !address) {
+                return NextResponse.json({ error: 'Selected address not found or invalid' }, { status: 400 });
+            }
+            shippingAddressId = address.id;
+        } else {
+            const { data: address, error: addrErr } = await supabaseAdmin
+                .from('addresses')
+                .insert({
+                    customer_id: customerId,
+                    full_name: validatedAddress.fullName,
+                    address_line1: validatedAddress.addressLine1,
+                    address_line2: validatedAddress.addressLine2 || '',
+                    city: validatedAddress.city,
+                    state: validatedAddress.state || '',
+                    postal_code: validatedAddress.postalCode,
+                    country: validatedAddress.country || 'India',
+                    phone: validatedAddress.phone,
+                    is_default: false,
+                })
+                .select()
+                .single();
+
+            if (addrErr || !address) {
+                return NextResponse.json({ error: 'Failed to save address' }, { status: 500 });
+            }
+            shippingAddressId = address.id;
         }
 
         // ── 6. Create pending order in Supabase ───────────────────────────────────
@@ -131,7 +149,7 @@ export async function POST(req: NextRequest) {
                 order_number: orderNumber,
                 total_amount: totalAmount,
                 shipping_cost: shippingCost,
-                shipping_address_id: address.id,
+                shipping_address_id: shippingAddressId,
                 status: 'pending',
                 payment_method: 'razorpay',
                 payment_status: 'pending',

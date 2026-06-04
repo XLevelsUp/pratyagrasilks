@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { User, Package, Plus, MapPin, Loader2, ArrowLeft } from 'lucide-react';
 import AddressCard, { Address } from '@/components/profile/AddressCard';
 import AddressModal from '@/components/profile/AddressModal';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 export default function AddressesPage() {
     const { user, loading, signOut } = useAuth();
@@ -21,6 +22,14 @@ export default function AddressesPage() {
     const [editingAddress, setEditingAddress] = useState<Address | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
     const [alertMessage, setAlertMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [settingDefaultId, setSettingDefaultId] = useState<string | null>(null);
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [confirmConfig, setConfirmConfig] = useState<{ title: string; message: string; onConfirm: () => void }>({
+        title: '',
+        message: '',
+        onConfirm: () => {},
+    });
 
     useEffect(() => {
         if (!loading && !user) {
@@ -55,7 +64,7 @@ export default function AddressesPage() {
     const fetchAddresses = async () => {
         setIsAddressesLoading(true);
         try {
-            const res = await fetch('/api/profile/addresses');
+            const res = await fetch(`/api/profile/addresses?t=${Date.now()}`);
             const data = await res.json();
             if (data.addresses) {
                 setAddresses(data.addresses);
@@ -72,6 +81,11 @@ export default function AddressesPage() {
 
     const showAlert = (type: 'success' | 'error', text: string) => {
         setAlertMessage({ type, text });
+    };
+
+    const showConfirm = (title: string, message: string, onConfirm: () => void) => {
+        setConfirmConfig({ title, message, onConfirm });
+        setIsConfirmOpen(true);
     };
 
     const handleSignOut = async () => {
@@ -113,29 +127,37 @@ export default function AddressesPage() {
         }
     };
 
-    const handleDeleteAddress = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this address?')) return;
+    const handleDeleteAddress = (id: string) => {
+        showConfirm(
+            'Delete Address',
+            'Are you sure you want to delete this address? This action cannot be undone.',
+            async () => {
+                setIsConfirmOpen(false);
+                setDeletingId(id);
+                setIsProcessing(true);
+                try {
+                    const res = await fetch(`/api/profile/addresses/${id}`, { method: 'DELETE' });
+                    const data = await res.json();
 
-        setIsProcessing(true);
-        try {
-            const res = await fetch(`/api/profile/addresses/${id}`, { method: 'DELETE' });
-            const data = await res.json();
-
-            if (res.ok && data.success) {
-                showAlert('success', 'Address deleted successfully!');
-                await fetchAddresses();
-            } else {
-                showAlert('error', data.error || 'Failed to delete address.');
+                    if (res.ok && data.success) {
+                        showAlert('success', 'Address deleted successfully!');
+                        await fetchAddresses();
+                    } else {
+                        showAlert('error', data.error || 'Failed to delete address.');
+                    }
+                } catch (err) {
+                    console.error('Error deleting address:', err);
+                    showAlert('error', 'Network error. Failed to delete address.');
+                } finally {
+                    setDeletingId(null);
+                    setIsProcessing(false);
+                }
             }
-        } catch (err) {
-            console.error('Error deleting address:', err);
-            showAlert('error', 'Network error. Failed to delete address.');
-        } finally {
-            setIsProcessing(false);
-        }
+        );
     };
 
     const handleSetDefault = async (id: string) => {
+        setSettingDefaultId(id);
         setIsProcessing(true);
         try {
             const res = await fetch(`/api/profile/addresses/${id}/default`, { method: 'PATCH' });
@@ -151,6 +173,7 @@ export default function AddressesPage() {
             console.error('Error setting default address:', err);
             showAlert('error', 'Network error. Failed to update default address.');
         } finally {
+            setSettingDefaultId(null);
             setIsProcessing(false);
         }
     };
@@ -189,7 +212,6 @@ export default function AddressesPage() {
                             <span className="text-gray-900">Addresses</span>
                         </div>
                         <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">Delivery Addresses</h1>
-                        <p className="text-sm text-gray-500 mt-1">Add, edit, or configure your delivery locations</p>
                     </div>
                 </div>
             </div>
@@ -207,6 +229,7 @@ export default function AddressesPage() {
                                             src={customerData?.avatar_url || user.user_metadata?.avatar_url}
                                             alt="Profile"
                                             fill
+                                            unoptimized
                                             className="rounded-full object-cover border-2 border-white shadow-sm"
                                         />
                                     ) : (
@@ -281,6 +304,8 @@ export default function AddressesPage() {
                                         onDelete={handleDeleteAddress}
                                         onSetDefault={handleSetDefault}
                                         isProcessing={isProcessing}
+                                        isDeleting={deletingId === address.id}
+                                        isSettingDefault={settingDefaultId === address.id}
                                     />
                                 ))}
 
@@ -304,6 +329,16 @@ export default function AddressesPage() {
                 onClose={() => setIsModalOpen(false)}
                 onSave={handleSaveAddress}
                 address={editingAddress}
+            />
+
+            <ConfirmDialog
+                isOpen={isConfirmOpen}
+                title={confirmConfig.title}
+                message={confirmConfig.message}
+                onConfirm={confirmConfig.onConfirm}
+                onClose={() => setIsConfirmOpen(false)}
+                variant="danger"
+                confirmText="Delete"
             />
         </div>
     );

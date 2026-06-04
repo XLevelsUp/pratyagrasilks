@@ -45,9 +45,12 @@ export async function PUT(req: NextRequest) {
         return NextResponse.json({ error: 'Full name must not exceed 100 characters.' }, { status: 400 });
     }
 
-    // Validate phone (optional, 10 digits if provided)
-    if (phone && !/^\d{10}$/.test(phone)) {
-        return NextResponse.json({ error: 'Phone must be exactly 10 digits.' }, { status: 400 });
+    // Validate phone (optional, E.164 or 10-digit national format if provided)
+    if (phone) {
+        const cleanedPhone = phone.trim().replace(/[\s-()]/g, '');
+        if (!/^(\+[1-9]\d{7,14}|\d{10})$/.test(cleanedPhone)) {
+            return NextResponse.json({ error: 'Please provide a valid 10-digit mobile number or international number starting with + (e.g. 9876543210 or +919876543210).' }, { status: 400 });
+        }
     }
 
     // Update customers table

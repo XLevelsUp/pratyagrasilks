@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Home, Briefcase, MapPin, Loader2 } from 'lucide-react';
 import { Address } from './AddressCard';
+import { formatPhoneNumber, COUNTRIES, COUNTRY_STATES } from '@/lib/validations/checkout';
 
 interface AddressModalProps {
     isOpen: boolean;
@@ -31,6 +32,18 @@ export default function AddressModal({
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const DRAFT_KEY = 'address_modal_draft';
+
+    // Auto-save draft for new addresses only
+    useEffect(() => {
+        if (!address && isOpen) {
+            localStorage.setItem(DRAFT_KEY, JSON.stringify({
+                label, fullName, phone, addressLine1, addressLine2,
+                city, state, postalCode, country, isDefault,
+            }));
+        }
+    }, [label, fullName, phone, addressLine1, addressLine2, city, state, postalCode, country, isDefault, address, isOpen]);
+
     useEffect(() => {
         if (address) {
             setLabel(address.label || 'Home');
@@ -43,17 +56,37 @@ export default function AddressModal({
             setPostalCode(address.postal_code || '');
             setCountry(address.country || 'India');
             setIsDefault(address.is_default || false);
+            localStorage.removeItem(DRAFT_KEY);
         } else {
-            setLabel('Home');
-            setFullName('');
-            setPhone('');
-            setAddressLine1('');
-            setAddressLine2('');
-            setCity('');
-            setState('');
-            setPostalCode('');
-            setCountry('India');
-            setIsDefault(false);
+            const draft = localStorage.getItem(DRAFT_KEY);
+            if (draft) {
+                try {
+                    const d = JSON.parse(draft);
+                    setLabel(d.label || 'Home');
+                    setFullName(d.fullName || '');
+                    setPhone(d.phone || '');
+                    setAddressLine1(d.addressLine1 || '');
+                    setAddressLine2(d.addressLine2 || '');
+                    setCity(d.city || '');
+                    setState(d.state || '');
+                    setPostalCode(d.postalCode || '');
+                    setCountry(d.country || 'India');
+                    setIsDefault(d.isDefault || false);
+                } catch {
+                    localStorage.removeItem(DRAFT_KEY);
+                }
+            } else {
+                setLabel('Home');
+                setFullName('');
+                setPhone('');
+                setAddressLine1('');
+                setAddressLine2('');
+                setCity('');
+                setState('');
+                setPostalCode('');
+                setCountry('India');
+                setIsDefault(false);
+            }
         }
         setErrors({});
     }, [address, isOpen]);
@@ -65,13 +98,17 @@ export default function AddressModal({
 
         if (!fullName.trim() || fullName.trim().length < 2)
             tempErrors.fullName = 'Full name must be at least 2 characters.';
-        if (!phone.trim() || !/^\d{10,15}$/.test(phone.trim().replace(/[\s-()]/g, '')))
-            tempErrors.phone = 'Phone number must be between 10 and 15 digits.';
+        const cleanedPhone = phone.trim().replace(/[\s-()]/g, '');
+        if (!cleanedPhone) {
+            tempErrors.phone = 'Phone number is required.';
+        } else if (!/^(\+[1-9]\d{7,14}|\d{10})$/.test(cleanedPhone)) {
+            tempErrors.phone = 'Please provide a valid 10-digit mobile number or international number starting with + (e.g. 9876543210 or +919876543210).';
+        }
         if (!addressLine1.trim() || addressLine1.trim().length < 5)
             tempErrors.addressLine1 = 'Address Line 1 must be at least 5 characters.';
         if (!city.trim())
             tempErrors.city = 'City is required.';
-        if (!state.trim())
+        if (COUNTRY_STATES[country] && !state.trim())
             tempErrors.state = 'State is required.';
         if (!postalCode.trim() || postalCode.trim().length < 5 || postalCode.trim().length > 10)
             tempErrors.postalCode = 'Enter a valid postal code (5 to 10 characters).';
@@ -88,7 +125,7 @@ export default function AddressModal({
         const data = {
             label,
             full_name: fullName.trim(),
-            phone: phone.trim(),
+            phone: formatPhoneNumber(phone.trim()),
             address_line1: addressLine1.trim(),
             address_line2: addressLine2 ? addressLine2.trim() : null,
             city: city.trim(),
@@ -102,6 +139,7 @@ export default function AddressModal({
         setIsSubmitting(false);
 
         if (success) {
+            localStorage.removeItem(DRAFT_KEY);
             onClose();
         }
     };
@@ -116,16 +154,29 @@ export default function AddressModal({
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
             <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden z-10 border border-gray-100">
+                <form onSubmit={handleSubmit} className="flex flex-col flex-grow overflow-hidden">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-150">
                     <h2 className="text-xl font-bold text-gray-900">
                         {isEditMode ? 'Edit Delivery Address' : 'Add a New Address'}
                     </h2>
-                    <button onClick={onClose} className="p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
-                        <X className="w-5 h-5" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button type="button" onClick={onClose} disabled={isSubmitting} className="px-4 py-1.5 border border-gray-300 text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 rounded-lg transition-colors disabled:opacity-50">
+                            Cancel
+                        </button>
+                        <button type="submit" disabled={isSubmitting} className="flex items-center justify-center gap-2 px-4 py-1.5 bg-accent hover:bg-accent-dark text-sm font-semibold text-white rounded-lg transition-colors shadow-sm min-w-[90px] disabled:opacity-50">
+                            {isSubmitting ? (
+                                <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</>
+                            ) : (
+                                'Save Address'
+                            )}
+                        </button>
+                        <button onClick={onClose} type="button" className="p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors ml-1">
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="flex flex-col flex-grow overflow-y-auto">
+                <div className="flex flex-col flex-grow overflow-y-auto">
                     <div className="p-6 space-y-5">
 
                         {/* Label pills */}
@@ -165,7 +216,28 @@ export default function AddressModal({
                             </div>
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Phone Number <span className="text-red-500">*</span></label>
-                                <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="10-digit mobile number" className={fieldClass(errors.phone)} />
+                                <input
+                                    type="tel"
+                                    value={phone}
+                                    onChange={(e) => {
+                                        let v = e.target.value;
+                                        const hasPlus = v.startsWith('+');
+                                        v = v.replace(/[^\d]/g, '');
+                                        if (hasPlus) v = '+' + v;
+                                        v = v.slice(0, 16);
+                                        setPhone(v);
+                                        if (errors.phone) {
+                                            setErrors((prev) => {
+                                                const next = { ...prev };
+                                                delete next.phone;
+                                                return next;
+                                            });
+                                        }
+                                    }}
+                                    placeholder="10-digit mobile or international number"
+                                    maxLength={16}
+                                    className={fieldClass(errors.phone)}
+                                />
                                 {errors.phone && <p className="mt-1 text-xs font-medium text-red-500">{errors.phone}</p>}
                             </div>
                         </div>
@@ -190,11 +262,28 @@ export default function AddressModal({
                                 <input type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Mumbai" className={fieldClass(errors.city)} />
                                 {errors.city && <p className="mt-1 text-xs font-medium text-red-500">{errors.city}</p>}
                             </div>
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">State <span className="text-red-500">*</span></label>
-                                <input type="text" value={state} onChange={(e) => setState(e.target.value)} placeholder="Maharashtra" className={fieldClass(errors.state)} />
-                                {errors.state && <p className="mt-1 text-xs font-medium text-red-500">{errors.state}</p>}
-                            </div>
+                            {COUNTRY_STATES[country] ? (
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">State <span className="text-red-500">*</span></label>
+                                    <select
+                                        value={state}
+                                        onChange={(e) => setState(e.target.value)}
+                                        className={`w-full px-3.5 py-2 border rounded-lg text-sm bg-white text-gray-900 font-medium transition-all focus:outline-none focus:ring-2 ${errors.state ? 'border-red-400 focus:ring-red-100' : 'border-gray-300 focus:border-accent focus:ring-accent-light'}`}
+                                    >
+                                        <option value="">Select state</option>
+                                        {COUNTRY_STATES[country].map((s) => (
+                                            <option key={s} value={s}>{s}</option>
+                                        ))}
+                                    </select>
+                                    {errors.state && <p className="mt-1 text-xs font-medium text-red-500">{errors.state}</p>}
+                                </div>
+                            ) : (
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">State / Province <span className="text-gray-400 text-xs font-normal">(Optional)</span></label>
+                                    <input type="text" value={state} onChange={(e) => setState(e.target.value)} placeholder="State or province" className={fieldClass(errors.state)} />
+                                    {errors.state && <p className="mt-1 text-xs font-medium text-red-500">{errors.state}</p>}
+                                </div>
+                            )}
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Pincode <span className="text-red-500">*</span></label>
                                 <input type="text" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} placeholder="400001" className={fieldClass(errors.postalCode)} />
@@ -202,10 +291,23 @@ export default function AddressModal({
                             </div>
                         </div>
 
-                        {/* Country (read-only) */}
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Country/Region</label>
-                            <input type="text" value={country} onChange={(e) => setCountry(e.target.value)} placeholder="India" disabled className="w-full px-3.5 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50 text-gray-500 font-medium cursor-not-allowed" />
+                        {/* Country */}
+                        <div className="grid grid-cols-1 gap-4">
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Country/Region <span className="text-red-500">*</span></label>
+                                <select
+                                    value={country}
+                                    onChange={(e) => {
+                                        setCountry(e.target.value);
+                                        setState('');
+                                    }}
+                                    className="w-full px-3.5 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 font-medium transition-all focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent-light"
+                                >
+                                    {COUNTRIES.map((c) => (
+                                        <option key={c} value={c}>{c}</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
 
                         {/* Default checkbox */}
@@ -218,19 +320,7 @@ export default function AddressModal({
                             </div>
                         )}
                     </div>
-
-                    <div className="bg-gray-50 px-6 py-4 border-t border-gray-150 flex items-center justify-end gap-3 mt-auto">
-                        <button type="button" onClick={onClose} disabled={isSubmitting} className="px-5 py-2 border border-gray-300 text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 rounded-lg transition-colors disabled:opacity-50">
-                            Cancel
-                        </button>
-                        <button type="submit" disabled={isSubmitting} className="flex items-center justify-center gap-2 px-5 py-2 bg-accent hover:bg-accent-dark text-sm font-semibold text-white rounded-lg transition-colors shadow-sm min-w-[100px] disabled:opacity-50">
-                            {isSubmitting ? (
-                                <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</>
-                            ) : (
-                                'Save Address'
-                            )}
-                        </button>
-                    </div>
+                </div>
                 </form>
             </div>
         </div>
