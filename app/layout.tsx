@@ -9,6 +9,7 @@ import { WishlistProvider } from "@/lib/context/WishlistContext";
 import CartSidebar from "@/components/Cart/CartSidebar";
 import { Analytics } from "@vercel/analytics/react";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import MetaPixel from "@/components/MetaPixel";
 import { Toaster } from "react-hot-toast";
 import OrganizationSchema from "@/components/seo/OrganizationSchema";
 import { siteMetadata } from "@/lib/seo/config";
@@ -114,6 +115,7 @@ export default function RootLayout({
                     <FloatingButtons />
                 </AuthProvider>
                 <GoogleAnalytics />
+                <MetaPixel />
                 <Analytics />
                 <Toaster position="top-right" />
             </body>
