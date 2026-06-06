@@ -1,5 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    async headers() {
+        return [
+            {
+                // Transactional and private routes — strongest noindex signal
+                source: '/(cart|checkout|orders|profile|auth|admin)(.*)',
+                headers: [
+                    { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+                ],
+            },
+        ];
+    },
     experimental: {
         serverActions: {
             bodySizeLimit: '50mb',

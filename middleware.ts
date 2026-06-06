@@ -1,8 +1,27 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 
+const BLOCKED_BOTS = ['Bytespider', 'SemrushBot', 'AhrefsBot', 'MJ12bot', 'DotBot'];
+
+const PROTECTED_PATHS = ['/admin', '/orders'];
+
+function isProtectedPath(pathname: string): boolean {
+    return PROTECTED_PATHS.some(p => pathname === p || pathname.startsWith(`${p}/`));
+}
+
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
+    const ua = request.headers.get('user-agent') ?? '';
+
+    // Block aggressive scrapers at the edge before any auth or DB work
+    if (BLOCKED_BOTS.some(bot => ua.includes(bot))) {
+        return new NextResponse('Forbidden', { status: 403 });
+    }
+
+    // Only run auth checks on protected routes
+    if (!isProtectedPath(pathname)) {
+        return NextResponse.next();
+    }
 
     // Create a response that we can modify (to set refreshed cookies)
     let supabaseResponse = NextResponse.next({ request });
@@ -50,6 +69,8 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    // Only run middleware on protected routes
-    matcher: ['/admin/:path*', '/orders', '/orders/:path*'],
+    matcher: [
+        // Run on all routes except Next.js internals and static assets
+        '/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js)$).*)',
+    ],
 };

@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
-        xmlns:mobile="http://www.mobile.googlebot.org/schemas/mobile/1.0">
-  
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
   <!-- Homepage -->
   <url>
     <loc>https://pratyagrasilks.com/</loc>
@@ -26,33 +24,6 @@
     <priority>0.95</priority>
   </url>
 
-  <!-- Product Pages (Dynamic) -->
-  <!-- Note: Individual product pages [id] are generated dynamically -->
-  <!-- These should be submitted via Google Search Console or generated via a dynamic sitemap -->
-
-  <!-- User Account Pages -->
-  <url>
-    <loc>https://pratyagrasilks.com/cart</loc>
-    <lastmod>2025-11-29</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://pratyagrasilks.com/checkout</loc>
-    <lastmod>2025-11-29</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://pratyagrasilks.com/orders</loc>
-    <lastmod>2025-11-29</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Policy & Information Pages -->
   <url>
     <loc>https://pratyagrasilks.com/contact</loc>
     <lastmod>2025-11-29</lastmod>
@@ -60,6 +31,7 @@
     <priority>0.85</priority>
   </url>
 
+  <!-- Policy & Information Pages -->
   <url>
     <loc>https://pratyagrasilks.com/returns</loc>
     <lastmod>2025-11-29</lastmod>
@@ -87,5 +59,78 @@
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
+
+  <!-- Silk Category Pages -->
+  <url>
+    <loc>https://pratyagrasilks.com/silk/kanjivaram-silk</loc>
+    <lastmod>2025-11-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <url>
+    <loc>https://pratyagrasilks.com/silk/banarasi-silk</loc>
+    <lastmod>2025-11-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <url>
+    <loc>https://pratyagrasilks.com/silk/tussar-silk</loc>
+    <lastmod>2025-11-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <url>
+    <loc>https://pratyagrasilks.com/silk/mysore-silk</loc>
+    <lastmod>2025-11-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <url>
+    <loc>https://pratyagrasilks.com/silk/kerala-kasavu</loc>
+    <lastmod>2025-11-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <url>
+    <loc>https://pratyagrasilks.com/silk/muga-silk</loc>
+    <lastmod>2025-11-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <url>
+    <loc>https://pratyagrasilks.com/silk/kani-silk</loc>
+    <lastmod>2025-11-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <url>
+    <loc>https://pratyagrasilks.com/silk/paithani-silk</loc>
+    <lastmod>2025-11-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <url>
+    <loc>https://pratyagrasilks.com/silk/pochampalli-silk</loc>
+    <lastmod>2025-11-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <url>
+    <loc>https://pratyagrasilks.com/silk/baluchari-silk</loc>
+    <lastmod>2025-11-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Product pages are served via dynamic sitemap at app/sitemap.ts -->
 
 </urlset>

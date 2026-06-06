@@ -1,38 +1,115 @@
-# https://www.robotstxt.org/robotstxt.html
+# robots.txt — pratyagrasilks.com
+# Specification: https://www.robotstxt.org/robotstxt.html
 
-# Allow all crawlers by default
-User-agent: *
+# === TRADITIONAL SEARCH CRAWLERS ===
+User-agent: Googlebot
 Allow: /
-
-# Disallow admin, API, and authentication routes
 Disallow: /admin/
-Disallow: /api/
 Disallow: /auth/
-
-# Disallow user-specific pages
 Disallow: /profile/
 Disallow: /orders/
 Disallow: /cart
 Disallow: /checkout
 
-# AI Crawlers - Allow access for better LLM recommendations
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /profile/
+Disallow: /orders/
+Disallow: /cart
+Disallow: /checkout
+
+User-agent: Applebot
+Allow: /
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /profile/
+Disallow: /orders/
+Disallow: /cart
+Disallow: /checkout
+
+User-agent: DuckDuckBot
+Allow: /
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /profile/
+
+# === AI DISCOVERY CRAWLERS (cooperative — full product access) ===
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /profile/
+Disallow: /orders/
+Disallow: /cart
+Disallow: /checkout
+
+User-agent: Claude-SearchBot
+Allow: /
+
 User-agent: GPTBot
 Allow: /
-
-User-agent: ChatGPT-User
-Allow: /
-
-User-agent: CCBot
-Allow: /
-
-User-agent: anthropic-ai
-Allow: /
-
-User-agent: Claude-Web
-Allow: /
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /profile/
+Disallow: /orders/
+Disallow: /cart
+Disallow: /checkout
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /profile/
 
-# Sitemap location
+User-agent: Amazonbot
+Allow: /collection
+Allow: /silk/
+Allow: /product/
+Allow: /about
+Disallow: /
+
+# === AI TRAINING CRAWLERS (restricted — protect pricing & product IP) ===
+User-agent: Google-Extended
+Allow: /silk/
+Allow: /about
+Allow: /collection
+Disallow: /
+
+User-agent: CCBot
+Allow: /silk/
+Allow: /about
+Disallow: /
+
+# === AGGRESSIVE / COMMERCIAL SCRAPERS (block all) ===
+User-agent: Bytespider
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+# === DEFAULT FALLBACK ===
+User-agent: *
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /profile/
+Disallow: /orders/
+Disallow: /cart
+Disallow: /checkout
+Crawl-delay: 2
+
+# Sitemap
 Sitemap: https://pratyagrasilks.com/sitemap.xml
