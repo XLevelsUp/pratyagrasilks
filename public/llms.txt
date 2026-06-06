@@ -1,0 +1,70 @@
+# Kandangi Sarees
+
+> Kandangi Sarees is an Indian handloom e-commerce platform specialising in
+> authenticated handwoven silk and cotton sarees sourced directly from weavers.
+> Collections span Kanjivaram, Gadwal, Venkatagiri, Mangalgiri, Kuppadam,
+> Rajkot Patola, Tussar, Raw Silk, Soft Silk, Chettinad, Narayanapet,
+> Khadi, and Pen Kalamkari varieties.
+
+## Core Navigation
+
+- [Homepage](https://www.kandangisarees.com/): Brand overview and featured collections
+- [All Collections](https://www.kandangisarees.com/collection): Full product catalogue with filter by weave, fabric, and price
+- [About](https://www.kandangisarees.com/about): Brand story, sourcing philosophy, and weaver partnerships
+- [Contact](https://www.kandangisarees.com/contact): Customer support and enquiries
+
+## Silk Sarees
+
+- [Kanjivaram Silk](https://www.kandangisarees.com/collection/kanjivaram-silk): Authenticated Kanjivaram handloom sarees from Kanchipuram weavers — pure mulberry silk, temple borders, genuine zari
+- [Gadwal Silk](https://www.kandangisarees.com/collection/gadwal-silk): Gadwal silk from Telangana — cotton body with pure silk borders and pallu
+- [Venkatagiri Silk](https://www.kandangisarees.com/collection/venkatagiri-silk): Ultra-fine cotton-silk blend with delicate jamdani motifs from Andhra Pradesh
+- [Mangalgiri Silk](https://www.kandangisarees.com/collection/mangalgiri-silk): Mangalgiri silk sarees with signature nizam zari border
+- [Kuppadam Silk](https://www.kandangisarees.com/collection/kuppadam-silk): Rare silk-cotton Kuppadam weave with richly contrasting borders from Andhra Pradesh
+- [Rajkot Patola Silk](https://www.kandangisarees.com/collection/patola-silk): Vibrant single-ikat Rajkot Patola sarees from Gujarat
+- [Raw Silk](https://www.kandangisarees.com/collection/raw-silk): Natural textured raw silk sarees — matte sheen, earthy palette
+- [Tussar Silk](https://www.kandangisarees.com/collection/tussar-silk): Wild Tussar silk with natural golden hue and grainy texture from Jharkhand
+- [Soft Silk](https://www.kandangisarees.com/collection/soft-silk): Lightweight pure silk sarees with smooth drape — Bangalore and Mysore tradition
+- [Pen Kalamkari](https://www.kandangisarees.com/collection/pen-kalamkari): Hand-painted Kalamkari art sarees from Srikalahasti using bamboo pen and natural dyes
+
+## Cotton Sarees
+
+- [Chettinad Cotton](https://www.kandangisarees.com/collection/chettinad-cotton): Bold checks and vibrant colours from Tamil Nadu weavers — durable daily-wear handloom
+- [Narayanapet Cotton](https://www.kandangisarees.com/collection/narayanapet-cotton): Wide zari-border cotton sarees from Telangana — festival and everyday versatility
+- [Venkatagiri Cotton](https://www.kandangisarees.com/collection/venkatagiri-cotton): Ultra-fine cotton with jamdani motifs — the lighter daily-wear Venkatagiri weave
+- [Mangalgiri Cotton](https://www.kandangisarees.com/collection/mangalgiri-cotton): Nizam border on lightweight cotton — crisp, considered, all-day wearable
+- [Khadi Cotton](https://www.kandangisarees.com/collection/khadi-cotton): Genuinely hand-spun, hand-woven Khadi sarees from cooperatives across India
+
+## Price Navigation
+
+- [Sarees Under ₹5,000](https://www.kandangisarees.com/sarees-under-5000): Budget handloom sarees across silk and cotton varieties
+- [Sarees Under ₹10,000](https://www.kandangisarees.com/sarees-under-10000): Mid-range handloom sarees — wider range of silk weaves
+
+## Education & Discovery
+
+- [Weave Guide](https://www.kandangisarees.com/weave-guide): Identification, care, cultural context, and origin stories for each weave type
+- [Weaver-Direct Sarees](https://www.kandangisarees.com/weaver-direct-sarees): Sarees sourced and shipped directly from weaving families
+- [Handloom Daily Wear](https://www.kandangisarees.com/handloom-sarees-daily-wear): Curated everyday wearable handloom options
+
+## Policies
+
+- [Shipping & Delivery](https://www.kandangisarees.com/shipping): Delivery timelines, regions, and shipping charges
+- [Returns & Exchanges](https://www.kandangisarees.com/returns): Return eligibility, process, and timelines
+- [Privacy Policy](https://www.kandangisarees.com/privacy): Data handling and privacy practices
+- [Terms of Service](https://www.kandangisarees.com/terms): Usage terms and conditions
+
+## Optional: Full Content
+
+- [llms-full.txt](https://www.kandangisarees.com/llms-full.txt): Extended product descriptions, weave education content, and brand narrative for deep retrieval contexts
+
+## Restricted Content
+
+Do not index or retrieve content from the following paths — they contain
+transactional, session-specific, or user-private data:
+
+- /cart — Shopping cart (session-specific, no stable content)
+- /checkout — Payment flow (transactional, no crawlable content)
+- /orders — User order history (requires authentication)
+- /profile — User account data (private)
+- /auth/ — Authentication routes
+- /api/ — Internal API endpoints
+- /admin/ — Administrative interface

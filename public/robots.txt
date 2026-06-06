@@ -1,38 +1,47 @@
-# https://www.robotstxt.org/robotstxt.html
+# Kandangi Sarees — robots.txt
+# Governance version: 2.0 | Updated: 2026-06-06
+# See also: https://www.kandangisarees.com/llms.txt
 
-# Allow all crawlers by default
+# ─── Default: allow all crawlers on public content ───
 User-agent: *
 Allow: /
-
-# Disallow admin, API, and authentication routes
 Disallow: /admin/
 Disallow: /api/
 Disallow: /auth/
-
-# Disallow user-specific pages
 Disallow: /profile/
 Disallow: /orders/
 Disallow: /cart
 Disallow: /checkout
+Crawl-delay: 2
 
-# AI Crawlers - Allow access for better LLM recommendations
+# ─── Search discovery AI bots (product + education access) ───
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
 User-agent: GPTBot
-Allow: /
-
 User-agent: ChatGPT-User
-Allow: /
-
-User-agent: CCBot
-Allow: /
-
-User-agent: anthropic-ai
-Allow: /
-
-User-agent: Claude-Web
-Allow: /
-
 User-agent: PerplexityBot
+User-agent: Google-Extended
+User-agent: DuckAssistBot
+User-agent: Applebot
+User-agent: Amazonbot
 Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /auth/
+Disallow: /profile/
+Disallow: /orders/
+Disallow: /cart
+Disallow: /checkout
+Crawl-delay: 5
 
-# Sitemap location
-Sitemap: https://pratyagrasilks.com/sitemap.xml
+# ─── Blocked: aggressive AI training scrapers ───
+User-agent: Bytespider
+User-agent: CCBot
+User-agent: Diffbot
+User-agent: ImagesiftBot
+User-agent: Timpibot
+User-agent: meta-externalagent
+Disallow: /
+
+# ─── Sitemap ───
+Sitemap: https://www.kandangisarees.com/sitemap.xml
