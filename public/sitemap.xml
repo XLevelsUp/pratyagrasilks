@@ -21,7 +21,7 @@
     <loc>https://pratyagrasilks.com/collection</loc>
     <lastmod>2025-11-29</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.95</priority>
+    <priority>0.8</priority>
   </url>
 
   <url>
@@ -65,70 +65,77 @@
     <loc>https://pratyagrasilks.com/silk/kanjivaram-silk</loc>
     <lastmod>2025-11-29</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://pratyagrasilks.com/silk/banarasi-silk</loc>
     <lastmod>2025-11-29</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://pratyagrasilks.com/silk/tussar-silk</loc>
     <lastmod>2025-11-29</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://pratyagrasilks.com/silk/mysore-silk</loc>
     <lastmod>2025-11-29</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://pratyagrasilks.com/silk/kerala-kasavu</loc>
     <lastmod>2025-11-29</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://pratyagrasilks.com/silk/muga-silk</loc>
     <lastmod>2025-11-29</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://pratyagrasilks.com/silk/georgette-silk</loc>
+    <lastmod>2025-11-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://pratyagrasilks.com/silk/kani-silk</loc>
     <lastmod>2025-11-29</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://pratyagrasilks.com/silk/paithani-silk</loc>
     <lastmod>2025-11-29</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://pratyagrasilks.com/silk/pochampalli-silk</loc>
     <lastmod>2025-11-29</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://pratyagrasilks.com/silk/baluchari-silk</loc>
     <lastmod>2025-11-29</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.8</priority>
   </url>
 
   <!-- Product pages are served via dynamic sitemap at app/sitemap.ts -->

@@ -23,7 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/collection`,
       lastModified: now,
       changeFrequency: 'daily',
-      priority: 0.95,
+      priority: 0.8,
     },
     {
       url: `${baseUrl}/contact`,
@@ -63,7 +63,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${baseUrl}/silk/${category.slug}`,
     lastModified: now,
     changeFrequency: 'weekly' as const,
-    priority: 0.9, // High priority for category pages
+    priority: 0.8, // Updated priority for category pages
   }))
 
   // NOTE: Individual product pages are NOT included in the sitemap
