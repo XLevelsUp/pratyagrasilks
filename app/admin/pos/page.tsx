@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
+import { isSupabaseImage } from '@/lib/utils/image';
 import { Search, Trash2, CreditCard, X, ShoppingCart, Banknote, Smartphone, CheckCircle2, Loader2, User } from 'lucide-react';
 import { Product } from '@/lib/types';
 import { useQrScanner } from '@/hooks/useQrScanner';
@@ -358,6 +359,7 @@ export default function PosPage() {
                                                     fill
                                                     className="object-cover rounded-lg"
                                                     sizes="64px"
+                                                    unoptimized={isSupabaseImage(product.images[0])}
                                                 />
                                             ) : (
                                                 <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">

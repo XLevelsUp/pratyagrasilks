@@ -6,6 +6,7 @@ import { Search, Plus, Edit, Trash2, Package, Printer } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
+import { isSupabaseImage } from '@/lib/utils/image';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { useAdmin } from '@/lib/hooks/useAdmin';
 import { deleteProduct } from '@/lib/actions/product.actions';
@@ -219,6 +220,7 @@ export default function AdminProductsPage() {
                                 fill
                                 className="object-cover"
                                 sizes="48px"
+                                unoptimized={isSupabaseImage(product.images[0])}
                             />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center">
@@ -338,6 +340,7 @@ export default function AdminProductsPage() {
                             fill
                             className="object-cover"
                             sizes="56px"
+                            unoptimized={isSupabaseImage(product.images[0])}
                         />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center">
