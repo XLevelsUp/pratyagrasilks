@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import YouTubeSlide from '@/components/products/YouTubeSlide';
 import WatermarkOverlay from '@/components/WatermarkOverlay';
 import { getYouTubeThumbnailUrl } from '@/lib/utils/youtube';
+import { isSupabaseImage } from '@/lib/utils/image';
 
 interface ProductGalleryProps {
     images: string[];
@@ -75,6 +76,7 @@ export default function ProductGallery({ images, yt_link, productName = 'Product
                                         className="object-cover"
                                         sizes="(max-width: 768px) 100vw, 50vw"
                                         priority={index === 0}
+                                        unoptimized={isSupabaseImage(image)}
                                     />
                                     <WatermarkOverlay />
                                 </div>
@@ -140,6 +142,7 @@ export default function ProductGallery({ images, yt_link, productName = 'Product
                                     fill
                                     className="object-cover"
                                     sizes="20vw"
+                                    unoptimized={isSupabaseImage(image)}
                                 />
                             </button>
                         ))}

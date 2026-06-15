@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, Package, Home } from 'lucide-react';
 import Image from 'next/image';
+import { isSupabaseImage } from '@/lib/utils/image';
 import { trackPurchase } from '@/lib/analytics/gtag';
 
 interface OrderData {
@@ -145,6 +146,7 @@ export default function OrderConfirmationPage() {
                                             fill
                                             className="object-cover"
                                             sizes="80px"
+                                            unoptimized={isSupabaseImage(imageUrl)}
                                         />
                                     </div>
                                     <div className="flex-1">

@@ -1,11 +1,8 @@
-'use client';
-
 import { Product } from '@/lib/types';
 import Image from 'next/image';
 import Link from 'next/link';
+import { isSupabaseImage } from '@/lib/utils/image';
 import WishlistButton from '@/components/Wishlist/WishlistButton';
-import WatermarkOverlay from '@/components/WatermarkOverlay';
-import { getCategoryBySlug } from '@/lib/seo-config';
 
 interface ProductCardProps {
     product: Product;
@@ -13,25 +10,24 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, showNewBadge = false }: ProductCardProps) {
-    const formatPrice = (price: number) =>
-        new Intl.NumberFormat('en-IN', {
+    const formatPrice = (price: number) => {
+        return new Intl.NumberFormat('en-IN', {
             style: 'currency',
             currency: 'INR',
             maximumFractionDigits: 0,
         }).format(price);
+    };
 
-    const imageUrl =
-        product.images && product.images.length > 0
-            ? product.images[0]
-            : '/placeholder-product.jpg';
+    const imageUrl = product.images && product.images.length > 0
+        ? product.images[0]
+        : '/placeholder-product.jpg';
 
-    const origin = getCategoryBySlug(product.category)?.origin ?? '';
-
+    // Show "New In" badge if created within last 14 days and still in stock
     const isNewArrival = (() => {
         if (!product.createdAt || !product.inStock) return false;
-        const cutoff = new Date();
-        cutoff.setDate(cutoff.getDate() - 14);
-        return new Date(product.createdAt) > cutoff;
+        const fourteenDaysAgo = new Date();
+        fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+        return new Date(product.createdAt) > fourteenDaysAgo;
     })();
 
     const displayNewBadge = (showNewBadge || isNewArrival) && product.inStock;
@@ -39,51 +35,42 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
 
     return (
         <Link href={`/product/${product.id}`} className="group">
-            <div
-                className={`bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 ${
-                    isSold ? 'hover:shadow-md' : 'hover:shadow-xl hover:-translate-y-1'
-                }`}
-            >
+            <div className={`bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 ${isSold ? 'hover:shadow-md' : 'hover:shadow-xl hover:-translate-y-1'}`}>
                 {/* Product Image */}
-                <div className="relative aspect-[3/4] overflow-hidden bg-primary-50 silk-shimmer">
+                <div className="relative aspect-square overflow-hidden bg-primary-50 silk-shimmer">
                     <Image
                         src={imageUrl}
-                        alt={product.name + ' Buy authentic handloom ' + product.category?.replace(/-/g, ' ') + ' saree'}
+                        alt={product.name + ' Pure silk sarees online in India | Pratyagra Silks'}
                         fill
-                        className={`object-cover transition-transform duration-300 ${
-                            isSold ? 'grayscale-[30%]' : 'group-hover:scale-105'
-                        }`}
+                        className={`object-cover transition-transform duration-300 ${isSold ? ' grayscale-[30%]' : 'group-hover:scale-105'}`}
                         sizes="(max-width: 768px) 100vw, 296px"
-                        // quality={60}
+                        quality={60}
+                        unoptimized={isSupabaseImage(imageUrl)}
                     />
-                    <WatermarkOverlay />
 
-                    {/* Category badge — solid green */}
+                    {/* Category Badge */}
                     <div className="absolute top-2 left-2">
-                        <span
-                            className="inline-block px-2.5 py-1 text-white text-xs font-semibold rounded-md uppercase tracking-wide"
-                            style={{ backgroundColor: '#104210' }}
-                        >
+                        <span className="inline-block px-3 py-1 border border-slate text-slate bg-black/50 text-xs font-medium rounded-lg capitalize">
                             {product.category?.replace(/-/g, ' ')}
                         </span>
                     </div>
 
-                    {/* Sold / New Arrival badge */}
+                    {/* Recently Sold Badge — replaces New Arrival when sold */}
                     {isSold ? (
                         <div className="absolute bottom-2 left-2">
-                            <span className="inline-block px-3 py-1 border border-stone-400 bg-stone-800/70 text-stone-200 text-xs font-semibold rounded-md tracking-wide shadow-md">
+                            <span className="inline-block px-3 py-1 border border-stone-400 bg-stone-800/70 text-stone-200 text-xs font-semibold rounded-lg tracking-wide shadow-md">
                                 Recently Sold
                             </span>
                         </div>
                     ) : displayNewBadge ? (
-                        <div className="absolute bottom-2 left-2">
-                            <span className="inline-block px-3 py-1 border border-primary bg-primary/70 text-white text-xs font-semibold rounded-md tracking-wide shadow-md">
+                        <div className="absolute bottom-2 left-2 mt-8">
+                            <span className="inline-block px-3 py-1 border border-primary bg-primary/50 text-white text-xs font-semibold rounded-lg tracking-wide shadow-md">
                                 ✦ New Arrival
                             </span>
                         </div>
                     ) : null}
 
-                    {/* Wishlist */}
+                    {/* Wishlist Button */}
                     <div className="absolute top-2 right-2 z-10">
                         <WishlistButton product={product} variant="icon-only" />
                     </div>
@@ -91,36 +78,26 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
 
                 {/* Product Info */}
                 <div className="p-4">
-                    <h3
-                        className={`text-base font-semibold line-clamp-2 transition-colors min-h-[48px] ${
-                            isSold ? 'text-gray-500' : 'text-[#1A0A00] group-hover:text-primary'
-                        }`}
-                    >
+                    <h3 className={`text-lg font-semibold mb-2 line-clamp-2 transition-colors min-h-[56px] ${isSold ? 'text-gray-500' : 'group-hover:text-primary-light'}`}>
                         {product.name}
                     </h3>
 
-                    {/* Region origin */}
-                    {origin && (
-                        <p className="text-xs mt-0.5 mb-2 truncate" style={{ color: '#8C5A3C' }}>
-                            {origin}
-                        </p>
-                    )}
-
-                    <div className='flex justify-between items-center'>
-
-                    {/* Price */}
-                    <p
-                        className={`text-xl font-bold ${isSold ? 'text-gray-400' : ''}`}
-                        style={isSold ? {} : { color: '#E8AB16' }}
-                    >
-                        {formatPrice(product.price)}
+                    <p className="text-sm text-textSecondary mb-3 line-clamp-2">
+                        {product.description}
                     </p>
 
-                    {!isSold && (
-                        <div className="px-3 py-2 bg-primary text-white rounded-md text-sm font-medium text-center group-hover:bg-primary-light transition-colors">
-                            View Details
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className={`text-2xl font-bold ${isSold ? 'text-gray-400' : 'text-accent-700'}`}>
+                                {formatPrice(product.price)}
+                            </p>
                         </div>
-                    )}
+
+                        {!isSold && (
+                            <div className="px-4 py-2 bg-primary text-white rounded-md text-sm font-medium group-hover:bg-primary-light transition-colors min-w-fit">
+                                View Details
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

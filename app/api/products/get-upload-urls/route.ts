@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
         const uploads = await Promise.all(
             filenames.map(async (name) => {
                 const base = name.replace(/[^a-zA-Z0-9.-]/g, '_').replace(/\.[^.]+$/, '');
-                const path = `temp/products/${Date.now()}-${base}`;
+                const path = `products/${Date.now()}-${base}`;
 
                 const { data, error } = await supabase.storage
                     .from('saree-images')
