@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { Upload, X, GripVertical, Link as LinkIcon, CheckCircle2 } from 'lucide-react';
 import Image from 'next/image';
+import { isSupabaseImage } from '@/lib/utils/image';
 import { createClient } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
 
@@ -35,21 +36,49 @@ export default function OptimizedUploader({
         const files = Array.from(e.target.files || []);
         if (files.length === 0) return;
 
-        if (images.length + files.length > maxImages) {
-            toast.error(`Maximum ${maxImages} images allowed. You can add ${maxImages - images.length} more.`);
+        const maxSizeBytes = 50 * 1024 * 1024; // 50MB
+
+        // Validate file types and sizes in one pass
+        const invalidFiles = files.filter(file => !file.type.startsWith('image/'));
+        const oversizedFiles = files.filter(file => file.size > maxSizeBytes);
+
+        // Show warnings for invalid/oversized files
+        if (invalidFiles.length > 0) {
+            toast.error(`${invalidFiles.length} file(s) not recognized as images. Accepted: PNG, JPEG, WebP, GIF, SVG`);
+        }
+
+        if (oversizedFiles.length > 0) {
+            const sizes = oversizedFiles
+                .map(f => `${f.name} (${(f.size / 1024 / 1024).toFixed(1)}MB)`)
+                .join(', ');
+            toast.error(`Skipping oversized files (>50MB): ${sizes}`);
+        }
+
+        // Filter to only valid files
+        const validFiles = files.filter(
+            file =>
+                file.type.startsWith('image/') &&
+                file.size <= maxSizeBytes
+        );
+
+        if (validFiles.length === 0) {
+            // No valid files to upload
+            if (invalidFiles.length > 0 || oversizedFiles.length > 0) {
+                toast.error('No valid images to upload. Please check file types and sizes.');
+            }
             return;
         }
 
-        const invalidFiles = files.filter(file => !file.type.startsWith('image/'));
-        if (invalidFiles.length > 0) {
-            toast.error('Please select only image files (PNG, JPEG, WebP, GIF, SVG)');
+        // Check total image count with valid files only
+        if (images.length + validFiles.length > maxImages) {
+            toast.error(`Maximum ${maxImages} images allowed. You can add ${maxImages - images.length} more.`);
             return;
         }
 
         setUploading(true);
         setProgress(5);
 
-        const firstPreview = URL.createObjectURL(files[0]);
+        const firstPreview = URL.createObjectURL(validFiles[0]);
         setPreviewUrl(firstPreview);
 
         try {
@@ -57,7 +86,7 @@ export default function OptimizedUploader({
             const res1 = await fetch('/api/products/get-upload-urls', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ filenames: files.map(f => f.name) }),
+                body: JSON.stringify({ filenames: validFiles.map(f => f.name) }),
             });
 
             if (!res1.ok) {
@@ -73,13 +102,19 @@ export default function OptimizedUploader({
 
             // Step 2: Upload raw files directly to Supabase — bypasses Vercel entirely, no size limit
             const supabase = createClient();
-            await Promise.all(
+            const uploadResults = await Promise.allSettled(
                 uploads.map(({ path, token }, i) =>
                     supabase.storage
                         .from('saree-images')
-                        .uploadToSignedUrl(path, token, files[i])
+                        .uploadToSignedUrl(path, token, validFiles[i])
                 )
             );
+
+            // Check if any uploads failed
+            const failedUploads = uploadResults.filter(r => r.status === 'rejected');
+            if (failedUploads.length > 0) {
+                throw new Error(`Failed to upload ${failedUploads.length} image(s) to storage`);
+            }
 
             setProgress(70);
 
@@ -91,19 +126,31 @@ export default function OptimizedUploader({
             });
 
             if (!res3.ok) {
-                const { error } = await res3.json() as { error: string };
-                throw new Error(error || 'Image processing failed');
+                const errorData = await res3.json() as { error: string };
+                throw new Error(errorData.error || 'Image processing failed');
             }
 
-            const { urls } = await res3.json() as { urls: string[] };
+            const responseData = await res3.json() as { urls: string[]; partialFailure?: string };
+            const { urls, partialFailure } = responseData;
 
             URL.revokeObjectURL(firstPreview);
 
-            const newImages = [...images, ...urls];
-            updateImages(newImages);
+            // Only add successfully processed images
+            if (urls.length > 0) {
+                const newImages = [...images, ...urls];
+                updateImages(newImages);
 
-            setProgress(100);
-            toast.success(`Successfully uploaded ${urls.length} image${urls.length > 1 ? 's' : ''}!`);
+                setProgress(100);
+                
+                if (partialFailure) {
+                    toast.success(`Uploaded ${urls.length} of ${validFiles.length} images`);
+                    toast.error(`Some images failed: ${partialFailure}`);
+                } else {
+                    toast.success(`Successfully uploaded ${urls.length} image${urls.length > 1 ? 's' : ''}!`);
+                }
+            } else {
+                throw new Error(partialFailure || 'No images were processed successfully');
+            }
 
             setTimeout(() => {
                 setUploading(false);
@@ -115,8 +162,9 @@ export default function OptimizedUploader({
             }, 1000);
 
         } catch (error) {
-            console.error('Upload error:', error);
-            toast.error('Failed to upload images. Please try again.');
+            const message = error instanceof Error ? error.message : 'Failed to upload images';
+            console.error('Upload error:', message);
+            toast.error(message);
             URL.revokeObjectURL(firstPreview);
             setUploading(false);
             setPreviewUrl(null);
@@ -331,6 +379,7 @@ export default function OptimizedUploader({
                                         fill
                                         className="object-cover"
                                         sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                                        unoptimized={isSupabaseImage(url)}
                                     />
                                 </div>
 

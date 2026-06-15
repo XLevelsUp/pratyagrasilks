@@ -1,6 +1,7 @@
 import { Product } from '@/lib/types';
 import Image from 'next/image';
 import Link from 'next/link';
+import { isSupabaseImage } from '@/lib/utils/image';
 import WishlistButton from '@/components/Wishlist/WishlistButton';
 
 interface ProductCardProps {
@@ -44,6 +45,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
                         className={`object-cover transition-transform duration-300 ${isSold ? ' grayscale-[30%]' : 'group-hover:scale-105'}`}
                         sizes="(max-width: 768px) 100vw, 296px"
                         quality={60}
+                        unoptimized={isSupabaseImage(imageUrl)}
                     />
 
                     {/* Category Badge */}

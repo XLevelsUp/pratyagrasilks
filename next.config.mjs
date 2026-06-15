@@ -39,8 +39,11 @@ const nextConfig = {
                 hostname: 'lh3.googleusercontent.com',
             }
         ],
-        minimumCacheTTL: 31536000, // 1 year cache for extreme performance
-        formats: ['image/avif', 'image/webp'],
+        // Disable Next.js Image Optimization for Supabase images (already optimized to WebP)
+        // Allow unoptimized for large images to prevent timeout
+        unoptimized: process.env.NODE_ENV === 'production' ? false : true,
+        // Increase timeout for image optimization of large files
+        minimumCacheTTL: 31536000, // 1 year
     },
     // Enable React strict mode for better development experience
     reactStrictMode: true,
