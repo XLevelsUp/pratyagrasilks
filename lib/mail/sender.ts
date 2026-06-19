@@ -10,6 +10,7 @@ export async function sendOrderConfirmation(
     await resend.emails.send({
         from: process.env.RESEND_FROM_EMAIL ?? 'orders@pratyagrasilks.com',
         to: toEmail,
+        cc: ['pratyagra.in@gmail.com'],
         subject: `Order Confirmed — ${data.orderNumber} | Pratyagra Silks`,
         html,
     });

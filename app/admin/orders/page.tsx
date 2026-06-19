@@ -7,6 +7,7 @@ import * as XLSX from 'xlsx';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import BulkReceiptWrapper from '@/components/admin/BulkReceiptWrapper';
+import TestMailButton from '@/components/admin/TestMailButton';
 import { type PosReceiptData } from '@/components/admin/PosReceipt';
 
 interface Order {
@@ -259,9 +260,12 @@ export default function AdminOrdersPage() {
         <div>
             <div className="flex items-center justify-between mb-8">
                 <h1 className="text-3xl font-bold text-gray-900">Orders</h1>
-                <div className="flex items-center gap-2 text-sm text-textSecondary">
-                    <Package className="w-4 h-4" />
-                    <span>{filteredOrders.length} orders</span>
+                <div className="flex items-center gap-3">
+                    <TestMailButton />
+                    <div className="flex items-center gap-2 text-sm text-textSecondary">
+                        <Package className="w-4 h-4" />
+                        <span>{filteredOrders.length} orders</span>
+                    </div>
                 </div>
             </div>
 
