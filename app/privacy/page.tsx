@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Privacy Policy | PratyagraSilks",
-    description: "Read PratyagraSilks Privacy Policy. Learn how we collect, use, and protect your personal information.",
+    title: "Privacy Policy | Pratyagra Silks",
+    description: "Read Pratyagra Silks' Privacy Policy. Learn how we collect, use, and protect your personal information.",
     keywords: ["privacy policy", "data protection", "personal information"],
 };
 
@@ -31,7 +31,7 @@ export default function PrivacyPage() {
                                 1. Introduction
                             </h2>
                             <p className="leading-relaxed">
-                                PratyagraSilks ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services.
+                                Pratyagra Silks ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services.
                             </p>
                         </div>
 

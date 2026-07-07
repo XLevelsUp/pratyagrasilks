@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Silk Saree Collection | Authentic Handwoven Sarees | PratyagraSilks',
+    title: 'Silk Saree Collection | Authentic Handwoven Sarees | Pratyagra Silks',
     robots: {
         index: true,
         follow: true,
@@ -27,16 +27,16 @@ export const metadata: Metadata = {
         'traditional sarees',
     ],
     openGraph: {
-        title: 'Silk Saree Collection | PratyagraSilks',
+        title: 'Silk Saree Collection | Pratyagra Silks',
         description: 'Browse our exquisite collection of authentic handwoven silk sarees from India\'s finest weavers.',
         url: 'https://pratyagrasilks.com/collection',
-        siteName: 'PratyagraSilks',
+        siteName: 'Pratyagra Silks',
         locale: 'en_IN',
         type: 'website',
     },
     twitter: {
         card: 'summary_large_image',
-        title: 'Silk Saree Collection | PratyagraSilks',
+        title: 'Silk Saree Collection | Pratyagra Silks',
         description: 'Browse our exquisite collection of authentic handwoven silk sarees.',
     },
     alternates: {

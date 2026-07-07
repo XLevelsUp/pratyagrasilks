@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Terms of Service | PratyagraSilks",
-    description: "Read PratyagraSilks Terms of Service. Learn about our policies, user agreements, and terms and conditions.",
+    title: "Terms of Service | Pratyagra Silks",
+    description: "Read Pratyagra Silks' Terms of Service. Learn about our policies, user agreements, and terms and conditions.",
     keywords: ["terms of service", "user agreement", "terms and conditions"],
 };
 
@@ -17,7 +17,7 @@ export default function TermsPage() {
                         Terms of Service
                     </h1>
                     <p className="text-lg md:text-xl opacity-95">
-                        Please read these terms carefully before using PratyagraSilks
+                        Please read these terms carefully before using Pratyagra Silks
                     </p>
                 </div>
             </section>
@@ -31,7 +31,7 @@ export default function TermsPage() {
                                 1. Acceptance of Terms
                             </h2>
                             <p className="leading-relaxed">
-                                By accessing and using the PratyagraSilks website and services, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
+                                By accessing and using the Pratyagra Silks website and services, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
                             </p>
                         </div>
 
@@ -40,7 +40,7 @@ export default function TermsPage() {
                                 2. Use License
                             </h2>
                             <p className="leading-relaxed mb-4">
-                                Permission is granted to temporarily download one copy of the materials (information or software) on PratyagraSilks website for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:
+                                Permission is granted to temporarily download one copy of the materials (information or software) on Pratyagra Silks' website for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:
                             </p>
                             <ul className="list-disc list-inside space-y-2  ml-4">
                                 <li>Modifying or copying the materials</li>
@@ -57,7 +57,7 @@ export default function TermsPage() {
                                 3. Disclaimer
                             </h2>
                             <p className="leading-relaxed">
-                                The materials on PratyagraSilks website are provided on an 'as is' basis. PratyagraSilks makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.
+                                The materials on Pratyagra Silks' website are provided on an 'as is' basis. Pratyagra Silks makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.
                             </p>
                         </div>
 
@@ -66,7 +66,7 @@ export default function TermsPage() {
                                 4. Limitations
                             </h2>
                             <p className="leading-relaxed">
-                                In no event shall PratyagraSilks or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on the PratyagraSilks website, even if we or our authorized representative has been notified orally or in writing of the possibility of such damage.
+                                In no event shall Pratyagra Silks or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on the Pratyagra Silks' website, even if we or our authorized representative has been notified orally or in writing of the possibility of such damage.
                             </p>
                         </div>
 
@@ -75,7 +75,7 @@ export default function TermsPage() {
                                 5. Accuracy of Materials
                             </h2>
                             <p className="leading-relaxed">
-                                The materials appearing on PratyagraSilks website could include technical, typographical, or photographic errors. PratyagraSilks does not warrant that any of the materials on the website are accurate, complete, or current. PratyagraSilks may make changes to the materials contained on the website at any time without notice.
+                                The materials appearing on Pratyagra Silks' website could include technical, typographical, or photographic errors. Pratyagra Silks does not warrant that any of the materials on the website are accurate, complete, or current. Pratyagra Silks may make changes to the materials contained on the website at any time without notice.
                             </p>
                         </div>
 
@@ -84,7 +84,7 @@ export default function TermsPage() {
                                 6. Links
                             </h2>
                             <p className="leading-relaxed">
-                                PratyagraSilks has not reviewed all of the sites linked to its website and is not responsible for the contents of any such linked site. The inclusion of any link does not imply endorsement by PratyagraSilks of the site. Use of any such linked website is at the user's own risk.
+                                Pratyagra Silks has not reviewed all of the sites linked to its website and is not responsible for the contents of any such linked site. The inclusion of any link does not imply endorsement by Pratyagra Silks of the site. Use of any such linked website is at the user's own risk.
                             </p>
                         </div>
 
@@ -93,7 +93,7 @@ export default function TermsPage() {
                                 7. Modifications
                             </h2>
                             <p className="leading-relaxed">
-                                PratyagraSilks may revise these terms of service for the website at any time without notice. By using this website, you are agreeing to be bound by the then current version of these terms of service.
+                                Pratyagra Silks may revise these terms of service for the website at any time without notice. By using this website, you are agreeing to be bound by the then current version of these terms of service.
                             </p>
                         </div>
 

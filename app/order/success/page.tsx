@@ -6,7 +6,7 @@ import { CheckCircle, Package, Truck, ArrowRight, Download } from 'lucide-react'
 import ConfettiEffect from '@/components/ui/ConfettiEffect';
 
 export const metadata: Metadata = {
-    title: 'Order Successful | PratyagraSilks',
+    title: 'Order Successful | Pratyagra Silks',
     description: 'Your order has been placed successfully',
 };
 
@@ -79,7 +79,7 @@ export default async function OrderSuccessPage({ searchParams }: PageProps) {
                     </h1>
 
                     <p className="text-lg text-gray-600 mb-2">
-                        Thank you for your purchase from PratyagraSilks
+                        Thank you for your purchase from Pratyagra Silks
                     </p>
 
                     <div className="inline-block bg-white px-6 py-3 rounded-lg shadow-md border-2 border-purple-200">

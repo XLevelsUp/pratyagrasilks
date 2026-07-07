@@ -2,8 +2,8 @@ import Link from "next/link";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Returns & Exchanges | PratyagraSilks - Quality Guarantee",
-    description: "PratyagraSilks Returns & Exchange Policy. We accept returns for defects only within 24 hours of delivery. Learn about our quality commitment and return process.",
+    title: "Returns & Exchanges | Pratyagra Silks - Quality Guarantee",
+    description: "Pratyagra Silks' Returns & Exchange Policy. We accept returns for defects only within 24 hours of delivery. Learn about our quality commitment and return process.",
     keywords: ["returns policy", "exchanges", "defects", "refunds", "handloom quality"],
 };
 
@@ -195,7 +195,7 @@ export default function ReturnsPage() {
                             <li>• Saree must be returned in original condition and packaging</li>
                             <li>• Report defects within 24 hours of delivery</li>
                             <li>• Photos must clearly show the defect</li>
-                            <li>• Decision to accept returns rests with PratyagraSilks Team</li>
+                            <li>• Decision to accept returns rests with Pratyagra Silks Team</li>
                             <li>• This policy is non-negotiable for all returns</li>
                         </ul>
                     </div>

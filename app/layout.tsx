@@ -37,7 +37,7 @@ export const metadata: Metadata = {
         "luxury sarees",
         "Indian sarees",
         "traditional sarees",
-        "PratyagraSilks",
+        "Pratyagra Silks",
         "buy silk sarees online",
         "authentic silk sarees",
         "kanjivaram silk sarees",

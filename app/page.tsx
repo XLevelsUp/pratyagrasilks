@@ -178,7 +178,7 @@ export default function Home() {
                         </p>
                         <div className="bg-primary/5 border-l-4 border-primary p-6 mt-8">
                             <p className="font-semibold text-primary text-xl">
-                                "Experience luxury that honors tradition. Experience PratyagraSilks."
+                                "Experience luxury that honors tradition. Experience Pratyagra Silks."
                             </p>
                         </div>
                     </div>

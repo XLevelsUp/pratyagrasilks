@@ -333,7 +333,7 @@ export function generateOrganizationSchema() {
     return {
         '@context': 'https://schema.org',
         '@type': 'Organization',
-        name: 'PratyagraSilks',
+        name: 'Pratyagra Silks',
         url: 'https://pratyagrasilks.com',
         logo: 'https://pratyagrasilks.com/logo.png',
         description: 'Authentic handcrafted silk sarees from India\'s finest weavers. Premium quality traditional and contemporary silk sarees.',
@@ -377,7 +377,7 @@ export function generateProductSchema(product: {
         },
         brand: {
             '@type': 'Brand',
-            name: 'PratyagraSilks',
+            name: 'Pratyagra Silks',
         },
         category: product.category,
     };

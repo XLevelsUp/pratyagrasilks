@@ -156,7 +156,7 @@ export default function Footer() {
                 {/* Copyright */}
                 <div className="flex flex-wrap gap-3 justify-between border-t border-white/20 mt-8 pt-8 text-center text-white/70 text-sm">
                     <p>
-                        &copy; {currentYear} PratyagraSilks.com. All rights reserved.
+                        &copy; {currentYear} Pratyagra Silks. All rights reserved.
                     </p>
                      <p>
                             Built with ❤️ by{' '}

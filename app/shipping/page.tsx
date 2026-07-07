@@ -2,8 +2,8 @@ import Link from "next/link";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Shipping & Delivery | PratyagraSilks - Global Delivery",
-    description: "PratyagraSilks Shipping Policy. We deliver globally with secure packaging. India: 2-7 days. International: 10-14 days. DDU terms apply internationally.",
+    title: "Shipping & Delivery | Pratyagra Silks - Global Delivery",
+    description: "Pratyagra Silks' Shipping Policy. We deliver globally with secure packaging. India: 2-7 days. International: 10-14 days. DDU terms apply internationally.",
     keywords: ["shipping", "delivery", "international delivery", "shipping policy", "customs duties"],
 };
 
@@ -204,7 +204,7 @@ export default function ShippingPage() {
                             </div>
                             <div>
                                 <p className="font-semibold text-primary mb-2">Refusal of Delivery:</p>
-                                <p className="text-sm">If you refuse to pay these charges and the shipment is returned to PratyagraSilks, any eligible refund will be processed ONLY after deducting:</p>
+                                <p className="text-sm">If you refuse to pay these charges and the shipment is returned to Pratyagra Silks, any eligible refund will be processed ONLY after deducting:</p>
                                 <ul className="list-disc list-inside text-sm mt-2 ml-2">
                                     <li>Return handling charges</li>
                                     <li>Any duties, taxes, or penalties imposed by customs authorities</li>
@@ -367,7 +367,7 @@ export default function ShippingPage() {
                                 What happens if I refuse to pay customs charges?
                             </summary>
                             <p className=" mt-4 leading-relaxed">
-                                If you refuse to pay customs duties and the shipment is returned to PratyagraSilks, any eligible refund will be processed ONLY after deducting return handling charges and any duties, taxes, or penalties imposed by customs authorities.
+                                If you refuse to pay customs duties and the shipment is returned to Pratyagra Silks, any eligible refund will be processed ONLY after deducting return handling charges and any duties, taxes, or penalties imposed by customs authorities.
                             </p>
                         </details>
 

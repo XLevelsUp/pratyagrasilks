@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
             title: category.metaTitle,
             description: category.metaDescription,
             url: `https://pratyagrasilks.com/silk/${category.slug}`,
-            siteName: 'PratyagraSilks',
+            siteName: 'Pratyagra Silks',
             locale: 'en_IN',
             type: 'website',
         },

@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import { siteMetadata } from "@/lib/seo/config";
 
 export const metadata: Metadata = {
-    title: "About PratyagraSilks | Authentic Indian Handloom Silk Sarees",
-    description: "Learn about PratyagraSilks' mission to preserve Indian handloom craftsmanship. Discover our commitment to authentic silk sarees, artisan partnerships, and sustainable practices.",
-    keywords: ["about pratyagrasilks", "handloom sarees", "silk saree heritage", "artisan support", "Indian craftsmanship"],
+    title: "About Pratyagra Silks | Authentic Indian Handloom Silk Sarees",
+    description: "Learn about Pratyagra Silks' mission to preserve Indian handloom craftsmanship. Discover our commitment to authentic silk sarees, artisan partnerships, and sustainable practices.",
+    keywords: ["about pratyagra silks", "handloom sarees", "silk saree heritage", "artisan support", "Indian craftsmanship"],
 };
 
 export default function AboutPage() {
@@ -96,8 +97,38 @@ export default function AboutPage() {
         },
     ];
 
+    const schema = {
+        '@context': 'https://schema.org',
+        '@type': 'AboutPage',
+        name: 'About PratyagraSilks | Authentic Indian Handloom Silk Sarees',
+        description: "Learn about PratyagraSilks' mission to preserve Indian handloom craftsmanship. Discover our commitment to authentic silk sarees, artisan partnerships, and sustainable practices.",
+        url: `${siteMetadata.baseUrl}/about`,
+        breadcrumb: {
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+                {
+                    '@type': 'ListItem',
+                    position: 1,
+                    name: 'Home',
+                    item: siteMetadata.baseUrl,
+                },
+                {
+                    '@type': 'ListItem',
+                    position: 2,
+                    name: 'About Us',
+                    item: `${siteMetadata.baseUrl}/about`,
+                },
+            ],
+        },
+    };
+
     return (
-        <div className="flex flex-col">
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+            />
+            <div className="flex flex-col">
             {/* Hero Section */}
             <section className="relative bg-gradient-to-br from-primary via-primary/90 to-primary-light text-white py-16 md:py-24 px-4">
                 <div className="absolute inset-0 bg-[url('https://images.pixieset.com/859010601/d7c3222457a03fa54d40c17b0f874229-large.jpg')] bg-no-repeat bg-cover opacity-15"></div>
@@ -216,14 +247,14 @@ export default function AboutPage() {
                         Supporting Artisan Communities
                     </h2>
                     <p className=" text-lg leading-relaxed mb-8">
-                        Every purchase of a PratyagraSilks saree directly supports the livelihoods of skilled artisans and their families. We believe in fair trade practices, ensuring that weavers receive equitable compensation for their exceptional work.
+                        Every purchase of a Pratyagra Silks saree directly supports the livelihoods of skilled artisans and their families. We believe in fair trade practices, ensuring that weavers receive equitable compensation for their exceptional work.
                     </p>
                     <p className=" text-lg leading-relaxed mb-8">
-                        By choosing PratyagraSilks, you're not just acquiring a beautiful saree—you're investing in preserving traditional crafts, supporting artisan dignity, and ensuring these remarkable skills are passed down to future generations.
+                        By choosing Pratyagra Silks, you're not just acquiring a beautiful saree—you're investing in preserving traditional crafts, supporting artisan dignity, and ensuring these remarkable skills are passed down to future generations.
                     </p>
                     <div className="bg-primary/5 border-l-4 border-primary p-6 text-left">
                         <p className="text-primary font-semibold text-lg">
-                            "Craft. Community. Culture. That's the PratyagraSilks promise."
+                            "Craft. Community. Culture. That's the Pratyagra Silks promise."
                         </p>
                     </div>
                 </div>
@@ -247,6 +278,7 @@ export default function AboutPage() {
                 </div>
             </section>
         </div>
+        </>
     );
 }
 

@@ -1,4 +1,4 @@
-// Core TypeScript interfaces for PratyagraSilks e-commerce
+// Core TypeScript interfaces for Pratyagra Silks e-commerce
 
 // Vendor type ('Artisan' | 'City' | 'Wholesaler') is stored in metadata.type
 export interface Vendor {
