@@ -11,6 +11,45 @@ const nextConfig = {
             },
         ];
     },
+    async redirects() {
+        return [
+            {
+                source: '/x',
+                destination: 'https://x.com/PratyagraSilks',
+                permanent: true,
+            },
+            {
+                source: '/reddit',
+                destination: 'https://reddit.com/user/Pratyagra_silks',
+                permanent: true,
+            },
+            {
+                source: '/blogger',
+                destination: 'https://pratyagrasilks.blogspot.com',
+                permanent: true,
+            },
+            {
+                source: '/pinterest',
+                destination: 'https://pin.it/2Uc1Y596H',
+                permanent: true,
+            },
+            {
+                source: '/instagram',
+                destination: 'https://instagram.com/pratyagra_silks',
+                permanent: true,
+            },
+            {
+                source: '/youtube',
+                destination: 'https://youtube.com/@pratyagrasilks',
+                permanent: true,
+            },
+            {
+                source: '/facebook',
+                destination: 'https://facebook.com/pratyagrasilks',
+                permanent: true,
+            },
+        ];
+    },
     experimental: {
         serverActions: {
             bodySizeLimit: '50mb',

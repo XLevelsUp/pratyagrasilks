@@ -342,7 +342,13 @@ export function generateOrganizationSchema() {
             addressCountry: 'IN',
         },
         sameAs: [
-            // Add social media URLs when available
+            'https://facebook.com/pratyagrasilks',
+            'https://instagram.com/pratyagra_silks',
+            'https://youtube.com/@pratyagrasilks',
+            'https://x.com/PratyagraSilks',
+            'https://reddit.com/user/Pratyagra_silks',
+            'https://pratyagrasilks.blogspot.com',
+            'https://pin.it/2Uc1Y596H',
         ],
     };
 }
