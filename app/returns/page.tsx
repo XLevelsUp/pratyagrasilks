@@ -11,7 +11,7 @@ export default function ReturnsPage() {
     const defectSteps = [
         {
             number: 1,
-            title: "Report Within 24 Hours",
+            title: "Report Within 7 Days",
             description: "If the saree is damaged or defective, email kandangi2025@gmail.com within 7 days of delivery with your order ID, description, and photos or video of the issue.",
         },
         {
@@ -193,7 +193,7 @@ export default function ReturnsPage() {
                         </h3>
                         <ul className="space-y-3  ml-4">
                             <li>• Saree must be returned in original condition and packaging</li>
-                            <li>• Report defects within 24 hours of delivery</li>
+                            <li>• Report defects within 7 days of delivery</li>
                             <li>• Photos must clearly show the defect</li>
                             <li>• Decision to accept exchanges rests with the Kandangi Sarees team</li>
                             <li>• This policy is non-negotiable for all returns</li>
@@ -223,7 +223,7 @@ export default function ReturnsPage() {
                         </div>
                         <div className="bg-white rounded-lg shadow-md p-6">
                             <p className="text-2xl font-bold text-primary mb-2">Same Process</p>
-                            <p className="">Report within 24 hours with photos</p>
+                            <p className="">Report within 7 days with photos</p>
                         </div>
                     </div>
                 </div>
@@ -248,7 +248,7 @@ export default function ReturnsPage() {
 
                         <details className="bg-gray-50 rounded-lg shadow-md p-6 cursor-pointer">
                             <summary className="font-semibold text-lg text-primary">
-                                Why do I have to report within 24 hours?
+                                Why do I have to report within 7 days?
                             </summary>
                             <p className=" mt-4 leading-relaxed">
                                 Raise the issue within 7 days of delivery with photos or video. Reporting quickly allows us to assess the issue properly and help you faster.

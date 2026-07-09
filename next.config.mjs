@@ -4,6 +4,8 @@ const nextConfig = {
         serverActions: {
             bodySizeLimit: '50mb',
         },
+        // Tree-shake icon/util barrel imports so only used exports ship to the client
+        optimizePackageImports: ['lucide-react'],
     },
     async redirects() {
         return [

@@ -1,6 +1,6 @@
 # Kandangi Sarees — robots.txt
 # Governance version: 2.0 | Updated: 2026-06-06
-# See also: https://www.kandangisarees.com/llms.txt
+# See also: https://kandangisarees.com/llms.txt
 
 # ─── Default: allow all crawlers on public content ───
 User-agent: *
@@ -44,4 +44,4 @@ User-agent: meta-externalagent
 Disallow: /
 
 # ─── Sitemap ───
-Sitemap: https://www.kandangisarees.com/sitemap.xml
+Sitemap: https://kandangisarees.com/sitemap.xml

@@ -248,7 +248,7 @@ export default function ContactPage() {
                                 How long does delivery take?
                             </summary>
                             <p className=" mt-4 leading-relaxed">
-                                We typically deliver within 5-7 business days for orders within India. International orders may take 10-15 business days depending on customs clearance.
+                                We typically deliver within 5-7 business days for orders within India. International orders may take 10-14 business days depending on customs clearance.
                             </p>
                         </details>
 

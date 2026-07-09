@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Suspense } from "react";
 import NewArrivals from "@/components/home/NewArrivals";
 import { silkCategories } from "@/lib/seo-config";
@@ -59,13 +60,15 @@ export default function Home() {
 
             {/* ── Hero Section ─────────────────────────────────────────── */}
             <section className="relative h-[100dvh] md:h-[80vh] flex items-end overflow-hidden">
-                {/* Background image */}
-                <div
-                    className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                    style={{
-                        backgroundImage:
-                            "url('/images/sarees/backgrounds/Hero_bg.webp')",
-                    }}
+                {/* Background image — LCP element: prioritized so it's discovered
+                    immediately in the HTML head and served responsively to mobile */}
+                <Image
+                    src="/images/sarees/backgrounds/Hero_bg.webp"
+                    alt=""
+                    fill
+                    priority
+                    sizes="100vw"
+                    className="object-cover object-center"
                 />
 
                 {/* Gradient overlay — warm brown from bottom */}
