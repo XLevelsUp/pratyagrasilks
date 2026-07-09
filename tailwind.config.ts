@@ -24,7 +24,7 @@ const config: Config = {
                 "accent-hover": "#D4961C",   // Darker gold hover
                 "accent-light": "#FDF6E3",   // Warm off-white subtle bg
                 "accent-300": "#F0BE44",     // Light gold — badges, shimmer
-                "accent-700": "#B8860B",     // Meets 4.5:1 on white — body-size text
+                "accent-700": "#8A5A00",     // Bronze-gold text — WCAG AA: ~5.9:1 on white, ~5.5:1 on #FDF6E3 cream
 
                 // ── Brand accent colors ─────────────────────────────────────────────
                 secondary: "#F0BE44",        // Light gold — secondary buttons
