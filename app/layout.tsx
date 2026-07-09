@@ -15,17 +15,19 @@ import OrganizationSchema from "@/components/seo/OrganizationSchema";
 import { siteMetadata } from "@/lib/seo/config";
 import FloatingButtons from "@/components/ui/FloatingButtons";
 
-// Font configurations
+// Font configurations — display:optional keeps text painting instantly in
+// the metric-matched fallback; the webfont applies when cached (repeat
+// visits) or when it arrives within the grace period. Clean LCP/CLS.
 const playfair = Playfair_Display({
     subsets: ["latin"],
     variable: "--font-playfair",
-    display: "swap",
+    display: "optional",
 });
 
 const inter = Inter({
     subsets: ["latin"],
     variable: "--font-inter",
-    display: "swap",
+    display: "optional",
 });
 
 export const metadata: Metadata = {

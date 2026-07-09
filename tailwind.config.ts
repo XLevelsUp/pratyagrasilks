@@ -37,8 +37,47 @@ const config: Config = {
                 slate: "#E1EDE7",            // Original cool grey-green
             },
             fontFamily: {
-                playfair: ['"Playfair Display"', 'serif'],
-                sans: ['Inter', 'system-ui', 'sans-serif'],
+                // Must reference the next/font CSS variables (set on <html> in
+                // app/layout.tsx) — literal family names never match the hashed
+                // families next/font registers, silently falling back to system fonts.
+                playfair: ['var(--font-playfair)', 'serif'],
+                sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+            },
+            keyframes: {
+                // Transform-only line-mask reveal — never gates LCP paint on opacity
+                'hero-rise': {
+                    from: { transform: 'translateY(110%)' },
+                    to: { transform: 'translateY(0)' },
+                },
+                'fade-up': {
+                    from: { opacity: '0', transform: 'translateY(12px)' },
+                    to: { opacity: '1', transform: 'translateY(0)' },
+                },
+                'hero-zoom': {
+                    from: { transform: 'scale(1.06)' },
+                    to: { transform: 'scale(1)' },
+                },
+                shimmer: {
+                    from: { transform: 'translateX(-100%)' },
+                    to: { transform: 'translateX(100%)' },
+                },
+                // Track contains the list twice; -50% loops seamlessly
+                marquee: {
+                    from: { transform: 'translateX(0)' },
+                    to: { transform: 'translateX(-50%)' },
+                },
+                sheen: {
+                    from: { transform: 'translateX(-150%) rotate(25deg)' },
+                    to: { transform: 'translateX(250%) rotate(25deg)' },
+                },
+            },
+            animation: {
+                'hero-rise': 'hero-rise 0.9s cubic-bezier(0.22,1,0.36,1) both',
+                'fade-up': 'fade-up 0.6s ease-out both',
+                'hero-zoom': 'hero-zoom 1.6s ease-out both',
+                shimmer: 'shimmer 1.8s ease-in-out infinite',
+                marquee: 'marquee 30s linear infinite',
+                sheen: 'sheen 8s linear infinite',
             },
         },
     },

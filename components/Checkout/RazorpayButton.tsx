@@ -161,11 +161,11 @@ export default function RazorpayButton({
                 disabled={loading || !scriptReady}
                 className="
                     group relative w-full flex items-center justify-center gap-3
-                    px-8 py-4 rounded-lg font-semibold text-base
-                    bg-primary text-white
+                    px-8 py-4 rounded-full font-semibold text-lg
+                    bg-primary text-secondary
                     hover:bg-primary-light active:bg-primary-dark
                     disabled:opacity-60 disabled:cursor-not-allowed
-                    transition-all duration-200 shadow-md hover:shadow-lg
+                    transition-all duration-200
                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
                 "
             >
@@ -185,7 +185,7 @@ export default function RazorpayButton({
                 )}
             </button>
 
-            <p className="mt-2 text-center text-xs text-gray-400">
+            <p className="mt-3 text-center text-[10px] font-semibold tracking-[0.15em] uppercase text-textSecondary/50">
                 Secured by Razorpay · UPI · Cards · NetBanking
             </p>
         </>

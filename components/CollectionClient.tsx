@@ -1,26 +1,35 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState, useEffect, useMemo } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import ProductCard from '@/components/ProductCard';
 import FilterSidebar, { FilterState } from '@/components/FilterSidebar';
 import { Product } from '@/lib/types';
 
 export default function CollectionClient() {
     const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [filters, setFilters] = useState<FilterState>({
-        category: searchParams.get('category') || '',
-        colorFamily: searchParams.get('color') || '',
-        minPrice: 0,
-        maxPrice: 0,
-        search: '',
-    });
+
+    // URL query string is the single source of truth for filters —
+    // shareable links, SSR-friendly, back/forward-navigable.
+    const filters = useMemo<FilterState>(
+        () => ({
+            category: searchParams.get('category') || '',
+            colorFamily: searchParams.get('color') || '',
+            minPrice: Number(searchParams.get('minPrice')) || 0,
+            maxPrice: Number(searchParams.get('maxPrice')) || 0,
+            search: searchParams.get('search') || '',
+        }),
+        [searchParams]
+    );
 
     useEffect(() => {
         fetchProducts();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filters]);
 
     const fetchProducts = async () => {
@@ -53,100 +62,93 @@ export default function CollectionClient() {
         }
     };
 
-    const handleFilterChange = (newFilters: FilterState) => {
-        setFilters(newFilters);
-    };
-
     return (
-        <div className="container mx-auto px-4 py-8">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                {/* Sidebar */}
-                <aside className="lg:col-span-1">
-                    <FilterSidebar onFilterChange={handleFilterChange} currentFilters={filters} />
-                </aside>
+        <div className="container mx-auto px-4 py-4 md:py-0 md:pb-8">
+            {/* Filter bar (md+) + bottom-sheet drawer (mobile) */}
+            <FilterSidebar
+                currentFilters={filters}
+                resultCount={products.length}
+                loading={loading}
+            />
 
-                {/* Product Grid */}
-                <main className="lg:col-span-3">
-                    {/* Results Header */}
-                    <div className="mb-6 flex items-center justify-between">
-                        <p className="text-textSecondary">
-                            {loading ? (
-                                'Loading products...'
-                            ) : (
-                                `${products.length} product${products.length !== 1 ? 's' : ''} found`
-                            )}
+            {/* Product Grid — height floor so result changes (including zero
+                results) never collapse the page and jolt the scroll position */}
+            <main className="flex flex-col min-h-[50vh] pt-2 md:pt-8">
+                    {/* Results count — mobile only; the bar owns it on md+ */}
+                    <div className="mb-6 md:hidden">
+                        <p className="text-xs font-semibold tracking-[0.2em] uppercase text-textSecondary/70">
+                            {loading && products.length === 0
+                                ? 'Curating the collection…'
+                                : `${products.length} ${products.length === 1 ? 'piece' : 'pieces'}`}
                         </p>
                     </div>
 
-                    {/* Error State */}
+                    {/* Error State — fills the reserved column height */}
                     {error && (
-                        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+                        <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
                             <p className="text-red-800 font-medium mb-2">Error loading products</p>
                             <p className="text-red-600 text-sm">{error}</p>
                             <button
                                 onClick={fetchProducts}
-                                className="mt-4 px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                                className="mt-6 px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
                             >
                                 Try Again
                             </button>
                         </div>
                     )}
 
-                    {/* Loading State */}
-                    {loading && !error && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {/* Skeleton — first load only; refetches keep the stale grid mounted */}
+                    {loading && products.length === 0 && !error && (
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 md:gap-x-6 md:gap-y-12 xl:grid-cols-4">
                             {[...Array(6)].map((_, i) => (
-                                <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
-                                    <div className="aspect-square bg-gray-200"></div>
-                                    <div className="p-4">
-                                        <div className="h-6 bg-gray-200 rounded mb-2"></div>
-                                        <div className="h-4 bg-gray-200 rounded mb-3 w-3/4"></div>
-                                        <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+                                <div key={i}>
+                                    <div className="aspect-[3/4] rounded-xl bg-gradient-to-br from-primary-100 to-primary-200 relative overflow-hidden">
+                                        <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/50 to-transparent" />
+                                    </div>
+                                    <div className="pt-4 space-y-2 animate-pulse">
+                                        <div className="h-3 w-1/3 rounded bg-gray-200"></div>
+                                        <div className="h-5 w-3/4 rounded bg-gray-200"></div>
+                                        <div className="h-5 w-1/3 rounded bg-gray-200"></div>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     )}
 
-                    {/* Products Grid */}
-                    {!loading && !error && products.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {/* Products Grid — stays mounted during refetch (stale-while-revalidate)
+                        so the page height never collapses and the sticky sidebar stays put;
+                        a gentle dim signals the update instead */}
+                    {!error && products.length > 0 && (
+                        <div
+                            className={`grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 md:gap-x-6 md:gap-y-12 xl:grid-cols-4 transition-opacity duration-300 ${loading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
+                        >
                             {products.map((product) => (
                                 <ProductCard key={product.id} product={product} />
                             ))}
                         </div>
                     )}
 
-                    {/* Empty State */}
+                    {/* Empty State — centered in the reserved column height */}
                     {!loading && !error && products.length === 0 && (
-                        <div className="bg-white rounded-lg shadow-md p-12 text-center">
-                            <svg
-                                className="mx-auto h-16 w-16 text-gray-400 mb-4"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-                                />
-                            </svg>
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">No products found</h3>
-                            <p className="text-textSecondary mb-4">
-                                Try adjusting your filters or search terms
+                        <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
+                            <p className="text-xs font-semibold tracking-[0.25em] uppercase text-textSecondary/50 mb-4">
+                                No pieces found
+                            </p>
+                            <h3 className="font-playfair text-2xl md:text-3xl font-semibold text-primary mb-3">
+                                Nothing matches your refinement
+                            </h3>
+                            <p className="text-textSecondary mb-8 max-w-sm">
+                                Try broadening your selection — or explore the full collection.
                             </p>
                             <button
-                                onClick={() => setFilters({ category: '', colorFamily: '', minPrice: 0, maxPrice: 0, search: '' })}
-                                className="px-6 py-2 bg-accent text-white rounded-md hover:bg-accent-hover transition-colors"
+                                onClick={() => router.replace(pathname, { scroll: false })}
+                                className="px-8 py-3 bg-primary text-secondary font-semibold rounded-full hover:bg-primary-light transition-colors"
                             >
                                 Clear Filters
                             </button>
                         </div>
                     )}
                 </main>
-            </div>
         </div>
     );
 }

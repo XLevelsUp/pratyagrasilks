@@ -78,10 +78,11 @@ const nextConfig = {
                 hostname: 'lh3.googleusercontent.com',
             }
         ],
-        // Disable Next.js Image Optimization for Supabase images (already optimized to WebP)
-        // Allow unoptimized for large images to prevent timeout
+        // Skip optimization in dev only — production always optimizes
         unoptimized: process.env.NODE_ENV === 'production' ? false : true,
-        // Increase timeout for image optimization of large files
+        // AVIF first (30-50% smaller than WebP for photography), WebP fallback
+        formats: ['image/avif', 'image/webp'],
+        // Each transformed variant is cached for a year — encode cost paid once
         minimumCacheTTL: 31536000, // 1 year
     },
     // Enable React strict mode for better development experience

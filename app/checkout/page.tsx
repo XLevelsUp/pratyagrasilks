@@ -7,7 +7,7 @@ import OrderSummary from '@/components/Checkout/OrderSummary';
 import RazorpayButton from '@/components/Checkout/RazorpayButton';
 import { ShippingAddress } from '@/lib/validations/checkout';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { trackBeginCheckout } from '@/lib/analytics/gtag';
 import EmailVerificationForm from '@/components/Auth/EmailVerificationForm';
@@ -19,6 +19,51 @@ interface ShippingZone {
     name: string;
     base_charge: number;
     estimated_days: string;
+}
+
+// Presentational 3-step rail driven by existing checkout state
+function StepRail({ current }: { current: 1 | 2 | 3 }) {
+    const steps = ['Contact', 'Shipping', 'Payment'] as const;
+    return (
+        <ol className="flex items-center gap-3 md:gap-5" aria-label="Checkout progress">
+            {steps.map((label, i) => {
+                const stepNo = (i + 1) as 1 | 2 | 3;
+                const done = stepNo < current;
+                const active = stepNo === current;
+                return (
+                    <li key={label} className="flex items-center gap-3 md:gap-5">
+                        {i > 0 && (
+                            <span
+                                className={`w-6 md:w-10 h-px ${done || active ? 'bg-primary' : 'bg-primary-200'}`}
+                                aria-hidden="true"
+                            />
+                        )}
+                        <span className="flex items-center gap-2">
+                            <span
+                                className={`flex items-center justify-center w-6 h-6 rounded-full text-[11px] font-semibold transition-colors ${
+                                    done
+                                        ? 'bg-primary text-secondary'
+                                        : active
+                                          ? 'border-2 border-primary text-primary'
+                                          : 'border border-primary-200 text-textSecondary/50'
+                                }`}
+                                aria-hidden="true"
+                            >
+                                {done ? <Check className="w-3.5 h-3.5" /> : stepNo}
+                            </span>
+                            <span
+                                className={`text-[11px] font-semibold tracking-[0.15em] uppercase ${
+                                    active ? 'text-primary' : done ? 'text-textPrimary' : 'text-textSecondary/50'
+                                }`}
+                            >
+                                {label}
+                            </span>
+                        </span>
+                    </li>
+                );
+            })}
+        </ol>
+    );
 }
 
 export default function CheckoutPage() {
@@ -77,13 +122,18 @@ export default function CheckoutPage() {
     // Redirect if cart is empty
     if (items.length === 0) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h1>
-                    <p className="text-textSecondary mb-4">Add some items before checking out.</p>
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center px-4">
+                    <p className="text-xs font-semibold tracking-[0.25em] uppercase text-textSecondary/50 mb-4">
+                        Nothing to check out
+                    </p>
+                    <h1 className="font-playfair text-2xl md:text-3xl font-semibold text-primary mb-3">
+                        Your cart is empty
+                    </h1>
+                    <p className="text-textSecondary mb-8">Add some items before checking out.</p>
                     <Link
                         href="/collection"
-                        className="inline-block px-6 py-3 bg-accent text-white rounded-lg font-semibold hover:bg-accent-hover transition-colors"
+                        className="inline-block px-8 py-3 bg-primary text-secondary rounded-full font-semibold hover:bg-primary-light transition-colors"
                     >
                         Continue Shopping
                     </Link>
@@ -91,6 +141,8 @@ export default function CheckoutPage() {
             </div>
         );
     }
+
+    const currentStep: 1 | 2 | 3 = !isEmailVerified ? 1 : !confirmedShipping ? 2 : 3;
 
     const handleShippingSubmit = async (shippingData: ShippingAddress, selAddressId?: string, saveToProfile?: boolean) => {
         setIsProcessing(true);
@@ -167,23 +219,28 @@ export default function CheckoutPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen">
             {/* Header */}
-            <div className="bg-white border-b">
-                <div className="container mx-auto px-4 py-6">
-                    <div className="flex items-center justify-between">
+            <div className="border-b border-primary-100">
+                <div className="container mx-auto px-4 py-8">
+                    <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900">Checkout</h1>
-                            <p className="text-textSecondary mt-1">Complete your order</p>
+                            <p className="text-[11px] font-semibold tracking-[0.25em] uppercase text-accent-700 mb-3">
+                                Secure Checkout
+                            </p>
+                            <h1 className="font-playfair text-3xl md:text-4xl font-bold text-primary">
+                                Complete Your Order
+                            </h1>
                         </div>
                         <Link
                             href="/cart"
-                            className="flex items-center gap-2 text-accent-700 hover:text-accent-hover font-medium"
+                            className="flex items-center gap-2 text-sm text-textSecondary/70 hover:text-primary font-medium transition-colors"
                         >
-                            <ArrowLeft className="w-5 h-5" />
+                            <ArrowLeft className="w-4 h-4" />
                             Back to Cart
                         </Link>
                     </div>
+                    <StepRail current={currentStep} />
                 </div>
             </div>
 
@@ -193,39 +250,40 @@ export default function CheckoutPage() {
                     {/* Left — Shipping Form + Payment */}
                     <div className="lg:col-span-2 space-y-6">
                         {/* Contact Information Step */}
-                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                        <div className="bg-white rounded-2xl border border-primary-100 p-6">
                             <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-lg font-semibold text-gray-900">Contact Information</h2>
+                                <h2 className="text-xs font-semibold tracking-[0.2em] uppercase text-textSecondary/60">
+                                    <span className="font-playfair text-2xl font-bold text-primary/15 mr-3 normal-case tracking-normal align-middle" aria-hidden="true">01</span>
+                                    Contact Information
+                                </h2>
                                 {isEmailVerified && !user && (
                                     <button
                                         onClick={() => {
                                             setIsEmailVerified(false);
                                             setConfirmedShipping(null); // Clear shipping confirmation on email change
                                         }}
-                                        className="text-sm font-semibold text-accent hover:text-accent-hover transition-colors"
+                                        className="text-sm font-medium text-textSecondary underline underline-offset-4 hover:text-primary transition-colors"
                                     >
                                         Edit
                                     </button>
                                 )}
                             </div>
-                            
+
                             {!isEmailVerified ? (
                                 <EmailVerificationForm onSuccess={(email) => {
                                     setIsEmailVerified(true);
                                     setVerifiedEmail(email);
                                 }} />
                             ) : (
-                                <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-lg p-4">
-                                    <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
-                                        <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                                        </svg>
+                                <div className="flex items-center gap-3 bg-primary-50/60 border border-primary-100 rounded-xl p-4">
+                                    <div className="w-8 h-8 rounded-full bg-white border border-primary-200 flex items-center justify-center text-primary shrink-0">
+                                        <Check className="w-4 h-4" aria-hidden="true" />
                                     </div>
                                     <div>
-                                        <p className="text-xs text-textSecondary font-medium">
+                                        <p className="text-[10px] font-semibold tracking-[0.15em] uppercase text-textSecondary/60">
                                             {user ? 'Logged in as' : 'Contact Email'}
                                         </p>
-                                        <p className="font-semibold text-gray-900 text-sm">{verifiedEmail}</p>
+                                        <p className="font-medium text-textPrimary text-sm">{verifiedEmail}</p>
                                     </div>
                                 </div>
                             )}
@@ -244,13 +302,31 @@ export default function CheckoutPage() {
 
                                 {/* Payment section — revealed after shipping is confirmed */}
                                 {confirmedShipping && (
-                                    <div ref={paymentRef} className="bg-white rounded-xl border border-primary-100 p-6 shadow-sm">
-                                        <h2 className="text-lg font-semibold text-gray-900 mb-1">
+                                    <div ref={paymentRef} className="bg-white rounded-2xl border border-primary-100 p-6">
+                                        <h2 className="text-xs font-semibold tracking-[0.2em] uppercase text-textSecondary/60 mb-1">
+                                            <span className="font-playfair text-2xl font-bold text-primary/15 mr-3 normal-case tracking-normal align-middle" aria-hidden="true">03</span>
                                             Payment
                                         </h2>
-                                        <p className="text-sm text-textSecondary mb-5">
+                                        <p className="text-sm text-textSecondary mb-6">
                                             Address confirmed. Complete your purchase securely via Razorpay.
                                         </p>
+
+                                        {/* Trust micro-strip */}
+                                        <div className="grid grid-cols-3 gap-4 mb-6">
+                                            {[
+                                                { title: '256-bit Encrypted', text: 'Your details stay private' },
+                                                { title: 'Secured by Razorpay', text: 'PCI-DSS compliant payments' },
+                                                { title: 'Authentic Handloom', text: 'Guaranteed genuine weaves' },
+                                            ].map((item) => (
+                                                <div key={item.title} className="border-t border-primary-100 pt-3">
+                                                    <p className="text-[10px] font-semibold tracking-[0.15em] uppercase text-accent-700 mb-1">
+                                                        {item.title}
+                                                    </p>
+                                                    <p className="text-xs text-textSecondary/70 leading-relaxed">{item.text}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+
                                         <RazorpayButton
                                             shippingAddress={confirmedShipping}
                                             selectedAddressId={selectedAddressId}
@@ -282,10 +358,12 @@ export default function CheckoutPage() {
 
             {/* Processing Overlay (shipping calculation) */}
             {isProcessing && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-8 text-center">
+                <div className="fixed inset-0 bg-primary-900/60 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white rounded-2xl p-8 text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
-                        <p className="text-gray-900 font-medium">Calculating shipping…</p>
+                        <p className="text-xs font-semibold tracking-[0.2em] uppercase text-textSecondary/70">
+                            Calculating shipping…
+                        </p>
                     </div>
                 </div>
             )}

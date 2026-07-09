@@ -28,8 +28,10 @@ export default function EmailVerificationForm({ onSuccess }: EmailVerificationFo
     };
 
     return (
-        <div className="w-full max-w-md mx-auto p-8 bg-white rounded-2xl shadow-sm border border-gray-100">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-6">Sign in or create an account</h2>
+        <div className="w-full">
+            <p className="text-sm text-textSecondary mb-5">
+                We&apos;ll send your order confirmation and delivery updates here.
+            </p>
 
             <form onSubmit={handleEmailSubmit} className="space-y-4" noValidate>
                 <EmailInput
@@ -46,7 +48,7 @@ export default function EmailVerificationForm({ onSuccess }: EmailVerificationFo
                 <button
                     type="submit"
                     disabled={!emailValid}
-                    className="w-full py-3 px-4 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium rounded-xl transition-colors duration-200"
+                    className="w-full py-3.5 px-4 bg-primary hover:bg-primary-light disabled:bg-gray-300 disabled:cursor-not-allowed text-secondary disabled:text-white font-semibold rounded-full transition-colors duration-200"
                 >
                     Continue
                 </button>

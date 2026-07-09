@@ -113,6 +113,32 @@ function ProductSchema({ product }: { product: Product }) {
     );
 }
 
+function BreadcrumbSchema({ product }: { product: Product }) {
+    const categoryLabel = product.category?.replace(/-/g, ' ') ?? 'Sarees';
+    const schema = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: siteMetadata.baseUrl },
+            { '@type': 'ListItem', position: 2, name: 'Silk Collection', item: `${siteMetadata.baseUrl}/collection` },
+            {
+                '@type': 'ListItem',
+                position: 3,
+                name: categoryLabel.replace(/\b\w/g, (c) => c.toUpperCase()),
+                item: `${siteMetadata.baseUrl}/collection?category=${product.category}`,
+            },
+            { '@type': 'ListItem', position: 4, name: product.name, item: `${siteMetadata.baseUrl}/product/${product.id}` },
+        ],
+    };
+
+    return (
+        <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+    );
+}
+
 export default async function ProductPage({ params }: { params: { id: string } }) {
     const product = await getProduct(params.id);
 
@@ -121,6 +147,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
     return (
         <>
             <ProductSchema product={product} />
+            <BreadcrumbSchema product={product} />
             <ProductDetailClient product={product} productId={params.id} />
         </>
     );

@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import YouTubeSlide from '@/components/products/YouTubeSlide';
 import { getYouTubeThumbnailUrl } from '@/lib/utils/youtube';
-import { isSupabaseImage } from '@/lib/utils/image';
 
 interface ProductGalleryProps {
     images: string[];
@@ -62,20 +61,19 @@ export default function ProductGallery({ images, yt_link, productName = 'Product
         <div className="space-y-4">
             {/* Main Carousel */}
             <div className="relative">
-                <div className="overflow-hidden rounded-lg" ref={mainViewportRef}>
+                <div className="overflow-hidden rounded-2xl" ref={mainViewportRef}>
                     <div className="flex">
                         {/* Image Slides */}
                         {images.map((image, index) => (
                             <div key={`image-${index}`} className="flex-[0_0_100%] min-w-0">
-                                <div className="relative aspect-square bg-gray-100">
+                                <div className="relative aspect-square bg-primary-50 silk-shimmer overflow-hidden group">
                                     <Image
                                         src={image}
                                         alt={`${productName} - Image ${index + 1}`}
                                         fill
-                                        className="object-cover"
+                                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                                         sizes="(max-width: 768px) 100vw, 50vw"
                                         priority={index === 0}
-                                        unoptimized={isSupabaseImage(image)}
                                     />
                                 </div>
                             </div>
@@ -99,23 +97,23 @@ export default function ProductGallery({ images, yt_link, productName = 'Product
                     <>
                         <button
                             onClick={scrollPrev}
-                            className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full p-2 shadow-lg transition-all z-10"
+                            className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center w-11 h-11 rounded-full bg-white/95 backdrop-blur border border-primary/15 shadow-xl text-primary hover:bg-primary hover:text-secondary transition-all duration-300 z-10"
                             aria-label="Previous image"
                         >
-                            <ChevronLeft className="w-6 h-6" />
+                            <ChevronLeft className="w-5 h-5" />
                         </button>
                         <button
                             onClick={scrollNext}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full p-2 shadow-lg transition-all z-10"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center w-11 h-11 rounded-full bg-white/95 backdrop-blur border border-primary/15 shadow-xl text-primary hover:bg-primary hover:text-secondary transition-all duration-300 z-10"
                             aria-label="Next image"
                         >
-                            <ChevronRight className="w-6 h-6" />
+                            <ChevronRight className="w-5 h-5" />
                         </button>
                     </>
                 )}
 
                 {/* Slide Counter */}
-                <div className="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
+                <div className="absolute bottom-4 right-4 bg-primary-900/70 backdrop-blur text-white/90 px-3 py-1 rounded-full text-xs tracking-[0.15em]">
                     {selectedIndex + 1} / {totalItems}
                 </div>
             </div>
@@ -130,8 +128,8 @@ export default function ProductGallery({ images, yt_link, productName = 'Product
                                 key={`thumb-${index}`}
                                 onClick={() => onThumbClick(index)}
                                 className={`flex-[0_0_20%] min-w-0 relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${index === selectedIndex
-                                    ? 'border-accent ring-2 ring-accent ring-offset-2'
-                                    : 'border-gray-200 hover:border-gray-400'
+                                    ? 'border-primary ring-1 ring-primary ring-offset-2'
+                                    : 'border-primary-100 hover:border-primary-300'
                                     }`}
                             >
                                 <Image
@@ -140,7 +138,6 @@ export default function ProductGallery({ images, yt_link, productName = 'Product
                                     fill
                                     className="object-cover"
                                     sizes="20vw"
-                                    unoptimized={isSupabaseImage(image)}
                                 />
                             </button>
                         ))}
@@ -151,8 +148,8 @@ export default function ProductGallery({ images, yt_link, productName = 'Product
                                 key="thumb-video"
                                 onClick={() => onThumbClick(images.length)}
                                 className={`flex-[0_0_20%] min-w-0 relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${selectedIndex === images.length
-                                    ? 'border-accent ring-2 ring-accent ring-offset-2'
-                                    : 'border-gray-200 hover:border-gray-400'
+                                    ? 'border-primary ring-1 ring-primary ring-offset-2'
+                                    : 'border-primary-100 hover:border-primary-300'
                                     }`}
                             >
                                 {getYouTubeThumbnailUrl(yt_link) && (
