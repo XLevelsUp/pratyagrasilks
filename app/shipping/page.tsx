@@ -412,7 +412,7 @@ export default function ShippingPage() {
                             </div>
                         </div>
                         <p className="text-gray-800 mt-4 font-semibold italic">
-                            Contact us at hello@adakkami.com for any shipping concerns.
+                            Contact us at kandangi2025@gmail.com for any shipping concerns.
                         </p>
                     </div>
                 </div>
