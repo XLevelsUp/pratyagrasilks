@@ -1,7 +1,7 @@
 'use client';
 
 import { useCart } from '@/lib/context/CartContext';
-import { ShoppingBag } from 'lucide-react';
+import { Lock } from 'lucide-react';
 
 interface Props {
     shippingCost: number;
@@ -14,30 +14,34 @@ export default function OrderSummary({ shippingCost, estimatedDays }: Props) {
     const total = subtotal + shippingCost;
 
     return (
-        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm sticky top-24">
-            <h2 className="text-lg font-semibold text-gray-900 mb-5 flex items-center gap-2">
-                <ShoppingBag className="w-5 h-5 text-primary" />
+        <div className="bg-white rounded-2xl border border-primary-100 p-6 sticky top-24">
+            <h2 className="font-playfair text-xl font-semibold text-textPrimary mb-5">
                 Order Summary
             </h2>
 
             {/* Items */}
-            <div className="space-y-3 mb-5">
+            <div className="divide-y divide-primary-100 mb-5">
                 {items.map((item) => (
-                    <div key={item.id} className="flex items-center gap-3">
+                    <div key={item.id} className="flex items-center gap-3 py-3 first:pt-0">
                         {item.product.images?.[0] && (
+                            // eslint-disable-next-line @next/next/no-img-element
                             <img
                                 src={item.product.images[0]}
                                 alt={item.product.name}
-                                className="w-14 h-14 object-cover rounded-lg border border-gray-100 flex-shrink-0"
+                                className="w-14 aspect-[3/4] object-cover rounded-lg bg-primary-50 flex-shrink-0"
                             />
                         )}
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">{item.product.name}</p>
+                            <p className="font-playfair text-sm text-textPrimary leading-snug line-clamp-2">
+                                {item.product.name}
+                            </p>
                             {item.product.sku && (
-                                <p className="text-xs text-gray-400">{item.product.sku}</p>
+                                <p className="text-[10px] tracking-[0.1em] uppercase text-textSecondary/50 mt-0.5">
+                                    {item.product.sku}
+                                </p>
                             )}
                         </div>
-                        <p className="text-sm font-semibold text-primary-dark flex-shrink-0">
+                        <p className="text-sm font-semibold text-textPrimary flex-shrink-0">
                             ₹{item.product.price.toLocaleString('en-IN')}
                         </p>
                     </div>
@@ -45,34 +49,47 @@ export default function OrderSummary({ shippingCost, estimatedDays }: Props) {
             </div>
 
             {/* Totals */}
-            <div className="border-t border-gray-100 pt-4 space-y-2">
-                <div className="flex justify-between text-sm text-gray-600">
-                    <span>Subtotal ({items.length} {items.length === 1 ? 'item' : 'items'})</span>
-                    <span>₹{subtotal.toLocaleString('en-IN')}</span>
+            <div className="border-t border-primary-100 pt-4 space-y-2.5">
+                <div className="flex justify-between items-baseline">
+                    <span className="text-xs font-semibold tracking-[0.15em] uppercase text-textSecondary/60">
+                        Subtotal · {items.length} {items.length === 1 ? 'piece' : 'pieces'}
+                    </span>
+                    <span className="text-sm text-textPrimary">₹{subtotal.toLocaleString('en-IN')}</span>
                 </div>
-                <div className="flex justify-between text-sm text-gray-600">
-                    <span>Shipping</span>
-                    <span>
-                        {shippingCost === 0
-                            ? <span className="text-green-600 font-medium">To be calculated</span>
-                            : `₹${shippingCost.toLocaleString('en-IN')}`}
+                <div className="flex justify-between items-baseline">
+                    <span className="text-xs font-semibold tracking-[0.15em] uppercase text-textSecondary/60">
+                        Shipping
+                    </span>
+                    <span className="text-sm">
+                        {shippingCost === 0 ? (
+                            <span className="text-green-700 font-medium">To be calculated</span>
+                        ) : (
+                            <span className="text-textPrimary">₹{shippingCost.toLocaleString('en-IN')}</span>
+                        )}
                     </span>
                 </div>
                 {estimatedDays && (
-                    <div className="flex justify-between text-xs text-gray-400">
-                        <span>Estimated delivery</span>
-                        <span>{estimatedDays}</span>
+                    <div className="flex justify-between items-baseline">
+                        <span className="text-xs font-semibold tracking-[0.15em] uppercase text-textSecondary/60">
+                            Estimated delivery
+                        </span>
+                        <span className="text-xs text-textSecondary">{estimatedDays}</span>
                     </div>
                 )}
-                <div className="flex justify-between text-base font-bold text-gray-900 pt-2 border-t border-gray-100">
-                    <span>Total</span>
-                    <span className="text-primary-dark">₹{total.toLocaleString('en-IN')}</span>
+                <div className="flex justify-between items-baseline pt-3 border-t border-primary-100">
+                    <span className="text-xs font-semibold tracking-[0.15em] uppercase text-textPrimary">
+                        Total
+                    </span>
+                    <span className="text-xl font-semibold text-primary">
+                        ₹{total.toLocaleString('en-IN')}
+                    </span>
                 </div>
             </div>
 
-            <div className="mt-5 pt-4 border-t border-gray-100">
-                <p className="text-xs text-gray-400 text-center">
-                    🔒 Secure checkout · All sarees are authentic &amp; handcrafted
+            <div className="mt-5 pt-4 border-t border-primary-100">
+                <p className="flex items-center justify-center gap-1.5 text-xs text-textSecondary/60 text-center">
+                    <Lock className="w-3 h-3" aria-hidden="true" />
+                    Secure checkout · All sarees authentic &amp; handcrafted
                 </p>
             </div>
         </div>

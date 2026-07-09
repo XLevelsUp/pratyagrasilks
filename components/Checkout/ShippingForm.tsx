@@ -120,22 +120,25 @@ export default function ShippingForm({ onSubmit, initialEmail, savedAddresses, i
     };
 
     const selectClass =
-        'w-full px-4 py-2 border border-gray-300 rounded-md outline-none transition-colors focus:ring-2 focus:ring-primary focus:border-primary bg-white text-sm text-gray-900';
+        'w-full px-4 py-2 border border-primary-200 rounded-lg outline-none transition-colors focus:ring-1 focus:ring-primary focus:border-primary bg-white text-sm text-textPrimary';
 
     return (
-        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">Shipping Details</h2>
+        <div className="bg-white rounded-2xl border border-primary-100 p-6">
+            <h2 className="text-xs font-semibold tracking-[0.2em] uppercase text-textSecondary/60 mb-6">
+                <span className="font-playfair text-2xl font-bold text-primary/15 mr-3 normal-case tracking-normal align-middle" aria-hidden="true">02</span>
+                Shipping Details
+            </h2>
 
             {isAddressesLoading ? (
-                <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50 mb-6 animate-pulse">
+                <div className="flex flex-col items-center justify-center p-6 border border-dashed border-primary-200 rounded-xl bg-primary-50/40 mb-6 animate-pulse">
                     <Loader2 className="w-6 h-6 animate-spin text-primary mb-2" />
-                    <p className="text-xs text-gray-500 font-medium">Checking for saved addresses...</p>
+                    <p className="text-xs text-textSecondary font-medium">Checking for saved addresses...</p>
                 </div>
             ) : (
                 savedAddresses && savedAddresses.length > 0 && (
                     <div className="mb-6">
-                        <label className="block text-sm font-semibold text-gray-800 mb-3">
-                            Select Delivery Method
+                        <label className="block text-xs font-semibold tracking-[0.15em] uppercase text-textSecondary/60 mb-3">
+                            Delivery Address
                         </label>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {/* Option A: Saved Address */}
@@ -146,20 +149,18 @@ export default function ShippingForm({ onSubmit, initialEmail, savedAddresses, i
                                     const defaultAddress = savedAddresses.find((a) => a.is_default) || savedAddresses[0];
                                     setSelectedAddressId(defaultAddress.id);
                                 }}
-                                className={`flex items-start gap-3.5 p-4 rounded-xl border-2 text-left transition-all duration-200 ${
+                                className={`flex items-start gap-3.5 p-4 rounded-xl border text-left transition-all duration-200 ${
                                     selectedOption === 'saved'
-                                        ? 'border-accent bg-accent/5 ring-1 ring-accent'
-                                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50/50'
+                                        ? 'border-primary bg-primary-50/50 ring-1 ring-primary'
+                                        : 'border-primary-100 hover:border-primary-300'
                                 }`}
                             >
-                                <div className={`mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                                    selectedOption === 'saved' ? 'border-accent text-accent' : 'border-gray-300'
-                                }`}>
-                                    {selectedOption === 'saved' && <div className="w-2.5 h-2.5 rounded-full bg-accent" />}
-                                </div>
+                                <div className={`mt-0.5 w-4 h-4 rounded-full border flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
+                                    selectedOption === 'saved' ? 'border-[5px] border-primary' : 'border-primary-200'
+                                }`} />
                                 <div>
-                                    <span className="block font-bold text-gray-900 text-sm">Use Saved Address</span>
-                                    <span className="block text-xs text-gray-500 mt-0.5">Select a pre-saved location from your account</span>
+                                    <span className="block font-semibold text-textPrimary text-sm">Use Saved Address</span>
+                                    <span className="block text-xs text-textSecondary/70 mt-0.5">Select a pre-saved location from your account</span>
                                 </div>
                             </button>
 
@@ -170,20 +171,18 @@ export default function ShippingForm({ onSubmit, initialEmail, savedAddresses, i
                                     setSelectedOption('manual');
                                     setSelectedAddressId(undefined);
                                 }}
-                                className={`flex items-start gap-3.5 p-4 rounded-xl border-2 text-left transition-all duration-200 ${
+                                className={`flex items-start gap-3.5 p-4 rounded-xl border text-left transition-all duration-200 ${
                                     selectedOption === 'manual'
-                                        ? 'border-accent bg-accent/5 ring-1 ring-accent'
-                                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50/50'
+                                        ? 'border-primary bg-primary-50/50 ring-1 ring-primary'
+                                        : 'border-primary-100 hover:border-primary-300'
                                 }`}
                             >
-                                <div className={`mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                                    selectedOption === 'manual' ? 'border-accent text-accent' : 'border-gray-300'
-                                }`}>
-                                    {selectedOption === 'manual' && <div className="w-2.5 h-2.5 rounded-full bg-accent" />}
-                                </div>
+                                <div className={`mt-0.5 w-4 h-4 rounded-full border flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
+                                    selectedOption === 'manual' ? 'border-[5px] border-primary' : 'border-primary-200'
+                                }`} />
                                 <div>
-                                    <span className="block font-bold text-gray-900 text-sm">Enter a New Address</span>
-                                    <span className="block text-xs text-gray-500 mt-0.5">Type address details manually</span>
+                                    <span className="block font-semibold text-textPrimary text-sm">Enter a New Address</span>
+                                    <span className="block text-xs text-textSecondary/70 mt-0.5">Type address details manually</span>
                                 </div>
                             </button>
                         </div>
@@ -193,8 +192,8 @@ export default function ShippingForm({ onSubmit, initialEmail, savedAddresses, i
 
             {/* Selectable Saved Address List */}
             {!isAddressesLoading && selectedOption === 'saved' && savedAddresses && savedAddresses.length > 0 && (
-                <div className="mb-6 bg-gray-50/50 rounded-xl border border-gray-150 p-4">
-                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
+                <div className="mb-6 bg-primary-50/40 rounded-xl border border-primary-100 p-4">
+                    <label className="block text-xs font-semibold tracking-[0.15em] uppercase text-textSecondary/60 mb-3">
                         Available Addresses
                     </label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
@@ -204,39 +203,33 @@ export default function ShippingForm({ onSubmit, initialEmail, savedAddresses, i
                                 <div
                                     key={address.id}
                                     onClick={() => setSelectedAddressId(address.id)}
-                                    className={`cursor-pointer flex flex-col justify-between p-4 rounded-lg border-2 bg-white transition-all duration-200 select-none ${
+                                    className={`cursor-pointer flex flex-col justify-between p-4 rounded-xl border bg-white transition-all duration-200 select-none ${
                                         isSelected
-                                            ? 'border-accent ring-1 ring-accent shadow-sm'
-                                            : 'border-gray-200 hover:border-gray-350 hover:shadow-xs'
+                                            ? 'border-primary ring-1 ring-primary'
+                                            : 'border-primary-100 hover:border-primary-300'
                                     }`}
                                 >
                                     <div>
                                         <div className="flex items-center justify-between mb-2.5">
-                                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-semibold border ${
-                                                address.label === 'Home'
-                                                    ? 'bg-blue-50 text-blue-700 border-blue-100'
-                                                    : address.label === 'Work'
-                                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
-                                                    : 'bg-gray-50 text-gray-700 border-gray-150'
-                                            }`}>
+                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-[0.1em] uppercase bg-primary-50 text-primary border border-primary-100">
                                                 {address.label}
                                             </span>
                                             {isSelected && (
-                                                <span className="flex items-center text-xs font-bold text-accent gap-0.5">
+                                                <span className="flex items-center text-xs font-semibold text-primary gap-1">
                                                     <Check className="w-3.5 h-3.5" />
                                                     Selected
                                                 </span>
                                             )}
                                         </div>
-                                        <h4 className="font-bold text-gray-900 text-sm truncate">{address.full_name}</h4>
-                                        <p className="text-xs text-gray-500 font-medium truncate mb-2">{address.phone}</p>
-                                        <div className="text-xs text-gray-650 space-y-0.5 leading-relaxed">
-                                            <p className="font-medium text-gray-750 truncate">{address.address_line1}</p>
-                                            {address.address_line2 && <p className="truncate text-gray-500">{address.address_line2}</p>}
-                                            <p className="text-gray-750 font-medium font-medium">
+                                        <h4 className="font-semibold text-textPrimary text-sm truncate">{address.full_name}</h4>
+                                        <p className="text-xs text-textSecondary/70 truncate mb-2">{address.phone}</p>
+                                        <div className="text-xs text-textSecondary space-y-0.5 leading-relaxed">
+                                            <p className="truncate">{address.address_line1}</p>
+                                            {address.address_line2 && <p className="truncate text-textSecondary/70">{address.address_line2}</p>}
+                                            <p>
                                                 {address.city}, {address.state} - {address.postal_code}
                                             </p>
-                                            <p className="text-2xs text-gray-400 font-bold uppercase tracking-wide mt-1">{address.country}</p>
+                                            <p className="text-[10px] text-textSecondary/50 font-semibold uppercase tracking-[0.1em] mt-1">{address.country}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -376,9 +369,9 @@ export default function ShippingForm({ onSubmit, initialEmail, savedAddresses, i
                             type="checkbox"
                             checked={saveAddressToProfile}
                             onChange={(e) => setSaveAddressToProfile(e.target.checked)}
-                            className="w-4 h-4 text-accent border-gray-300 rounded focus:ring-accent focus:ring-2 cursor-pointer"
+                            className="w-4 h-4 accent-primary border-primary-200 rounded focus:ring-primary focus:ring-2 cursor-pointer"
                         />
-                        <label htmlFor="saveAddressToProfile" className="text-sm font-semibold text-gray-700 cursor-pointer select-none">
+                        <label htmlFor="saveAddressToProfile" className="text-sm font-medium text-textPrimary cursor-pointer select-none">
                             Save this address to my profile for future purchases
                         </label>
                     </div>
@@ -388,11 +381,11 @@ export default function ShippingForm({ onSubmit, initialEmail, savedAddresses, i
                     type="submit"
                     disabled={isSubmitting}
                     className="
-                        w-full py-3 px-6 rounded-lg font-semibold text-white text-sm
+                        w-full py-3.5 px-6 rounded-full font-semibold text-secondary text-base
                         bg-primary hover:bg-primary-light active:bg-primary-dark
                         disabled:opacity-60 disabled:cursor-not-allowed
-                        transition-colors duration-200 shadow-sm
-                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary
+                        transition-colors duration-200
+                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
                     "
                 >
                     {isSubmitting ? 'Calculating shipping…' : 'Confirm Address & Continue to Payment'}

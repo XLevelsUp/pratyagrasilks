@@ -10,14 +10,26 @@ import WishlistBadge from "@/components/Wishlist/WishlistBadge";
 import { User, LogOut, Package, Heart, ChevronDown } from "lucide-react";
 import { silkCategories } from "@/lib/seo-config";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import useScrolled from "@/hooks/useScrolled";
 
-export default function Header() {
+interface HeaderProps {
+    /** 'overlay' = transparent over the home hero, solidifies on scroll */
+    variant?: 'solid' | 'overlay';
+}
+
+export default function Header({ variant = 'solid' }: HeaderProps) {
     const { user, signOut } = useAuth();
     const router = useRouter();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [isSilkTypesMenuOpen, setIsSilkTypesMenuOpen] = useState(false);
     const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
+    const scrolled = useScrolled(24);
+    const overlayActive = variant === 'overlay' && !scrolled && !isMobileMenuOpen;
+    const navLinkClass = overlayActive
+        ? 'text-white/90 hover:text-secondary'
+        : 'hover:text-primary';
+    const badgeTone = overlayActive ? 'light' : 'dark';
 
     const openSignOutDialog = () => {
         setIsUserMenuOpen(false);
@@ -31,7 +43,12 @@ export default function Header() {
     };
 
     return (
-        <header className="sticky top-0 z-50 bg-white shadow-md">
+        <header
+            className={`${variant === 'overlay' ? 'fixed top-0 inset-x-0' : 'sticky top-0'} z-50 transition-colors duration-300 ${overlayActive
+                ? 'bg-gradient-to-b from-black/30 to-transparent text-white'
+                : 'bg-white shadow-md'
+                }`}
+        >
             <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16 md:h-20">
                     {/* Logo/Brand */}
@@ -41,7 +58,7 @@ export default function Header() {
                         </span> */}
 
                         <Image
-                            src="/Pratyagra_Silks_Logo.svg"
+                            src={overlayActive ? "/Pratyagra_Silks_Logo_White.svg" : "/Pratyagra_Silks_Logo.svg"}
                             alt="Pratyagra Silks Logo"
                             width={200}
                             height={36}
@@ -54,7 +71,7 @@ export default function Header() {
                     <div className="hidden lg:flex items-center space-x-8">
                         <Link
                             href="/collection"
-                            className="hover:text-primary transition-colors font-medium"
+                            className={`${navLinkClass} transition-colors font-medium`}
                         >
                             Collection
                         </Link>
@@ -64,7 +81,7 @@ export default function Header() {
                             <button
                                 onClick={() => setIsSilkTypesMenuOpen(!isSilkTypesMenuOpen)}
                                 onMouseEnter={() => setIsSilkTypesMenuOpen(true)}
-                                className="flex items-center gap-1 hover:text-primary transition-colors font-medium"
+                                className={`flex items-center gap-1 ${navLinkClass} transition-colors font-medium`}
                             >
                                 Shop by Silk Type
                                 <ChevronDown className="w-4 h-4" />
@@ -94,35 +111,35 @@ export default function Header() {
 
                         <Link
                             href="/about"
-                            className="hover:text-primary transition-colors font-medium"
+                            className={`${navLinkClass} transition-colors font-medium`}
                         >
                             About
                         </Link>
                         <Link
                             href="/contact"
-                            className="hover:text-primary transition-colors font-medium"
+                            className={`${navLinkClass} transition-colors font-medium`}
                         >
                             Contact
                         </Link>
 
                         {/* Wishlist & Cart Icons */}
-                        <WishlistBadge />
-                        <CartBadge />
+                        <WishlistBadge tone={badgeTone} />
+                        <CartBadge tone={badgeTone} />
 
                         {/* Auth Buttons / User Menu */}
                         {user ? (
                             <div className="relative">
                                 <button
                                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                                    className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${overlayActive ? 'hover:bg-white/10' : 'hover:bg-gray-100'}`}
                                 >
                                     <User className="w-5 h-5" />
-                                    <span className="font-medium">{user.user_metadata?.full_name || 'Account'}</span>
+                                    <span className="font-medium hidden xl:block">{user.user_metadata?.full_name || 'Account'}</span>
                                 </button>
 
                                 {/* Dropdown Menu */}
                                 {isUserMenuOpen && (
-                                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 border border-gray-200">
+                                    <div className="absolute right-0 mt-2 w-48 bg-white text-textPrimary rounded-lg shadow-lg py-2 border border-gray-200">
                                         <Link
                                             href="/profile"
                                             className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition-colors"
@@ -161,13 +178,13 @@ export default function Header() {
                             <div className="flex items-center gap-4">
                                 <Link
                                     href="/auth/login"
-                                    className="text-gray-700 hover:text-primary transition-colors font-medium"
+                                    className={`${overlayActive ? 'text-white/90 hover:text-secondary' : 'text-gray-700 hover:text-primary'} transition-colors font-medium`}
                                 >
                                     Login
                                 </Link>
                                 <Link
                                     href="/auth/signup"
-                                    className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-light transition-colors"
+                                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${overlayActive ? 'bg-secondary text-primary hover:bg-secondary/90' : 'bg-primary text-white hover:bg-primary-light'}`}
                                 >
                                     Sign Up
                                 </Link>
@@ -178,13 +195,13 @@ export default function Header() {
                     {/* Mobile Menu Button & Cart */}
                     <div className="flex lg:hidden items-center space-x-4">
                         {/* Mobile Wishlist & Cart Icons */}
-                        <WishlistBadge />
-                        <CartBadge />
+                        <WishlistBadge tone={badgeTone} />
+                        <CartBadge tone={badgeTone} />
 
                         {/* Hamburger Menu Button */}
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary rounded-md p-2"
+                            className={`focus:outline-none focus:ring-2 rounded-md p-2 ${overlayActive ? 'hover:text-secondary focus:ring-white' : 'hover:text-primary focus:ring-primary'}`}
                             aria-label="Toggle mobile menu"
                         >
                             {isMobileMenuOpen ? (

@@ -5,7 +5,6 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, Package, Home } from 'lucide-react';
 import Image from 'next/image';
-import { isSupabaseImage } from '@/lib/utils/image';
 import { trackPurchase } from '@/lib/analytics/gtag';
 
 interface OrderData {
@@ -110,26 +109,35 @@ export default function OrderConfirmationPage() {
     const orderNumber = order.id.substring(0, 8).toUpperCase();
 
     return (
-        <div className="min-h-screen bg-gray-50 py-12">
+        <div className="min-h-screen py-12">
             <div className="container mx-auto px-4 max-w-3xl">
                 {/* Success Message */}
-                <div className="bg-white rounded-lg shadow-md p-8 mb-6 text-center">
-                    <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Confirmed!</h1>
-                    <p className="text-textSecondary mb-4">
-                        Thank you for your order. We've sent a confirmation email to{' '}
-                        <span className="font-medium">{order.customer_email}</span>
+                <div className="bg-white rounded-2xl border border-primary-100 p-8 mb-6 text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-50 border border-primary-200 rounded-full mb-5">
+                        <CheckCircle className="w-8 h-8 text-primary" />
+                    </div>
+                    <p className="text-xs font-semibold tracking-[0.25em] uppercase text-accent-700 mb-3">
+                        Thank you for your order
                     </p>
-                    <div className="bg-gray-50 rounded-lg p-4 inline-block">
-                        <p className="text-sm text-textSecondary">Order Number</p>
-                        <p className="text-2xl font-bold text-gray-900">{orderNumber}</p>
+                    <h1 className="font-playfair text-3xl md:text-4xl font-bold text-primary mb-3">
+                        Order Confirmed
+                    </h1>
+                    <p className="text-textSecondary mb-6">
+                        We&apos;ve sent a confirmation email to{' '}
+                        <span className="font-medium text-textPrimary">{order.customer_email}</span>
+                    </p>
+                    <div className="bg-primary-50/60 border border-primary-100 rounded-xl px-6 py-3 inline-block">
+                        <p className="text-[10px] font-semibold tracking-[0.2em] uppercase text-textSecondary/60">
+                            Order Number
+                        </p>
+                        <p className="text-2xl font-semibold text-primary">{orderNumber}</p>
                     </div>
                 </div>
 
                 {/* Order Details */}
-                <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <Package className="w-5 h-5" />
+                <div className="bg-white rounded-2xl border border-primary-100 p-6 mb-6">
+                    <h2 className="text-xs font-semibold tracking-[0.2em] uppercase text-textSecondary/60 mb-5 flex items-center gap-2">
+                        <Package className="w-4 h-4" />
                         Order Details
                     </h2>
 
@@ -138,26 +146,27 @@ export default function OrderConfirmationPage() {
                         {order.items.map((item) => {
                             const imageUrl = item.products.images?.[0] || '/placeholder-product.jpg';
                             return (
-                                <div key={item.id} className="flex gap-4 pb-4 border-b last:border-0">
-                                    <div className="relative w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-gray-100">
+                                <div key={item.id} className="flex gap-4 pb-4 border-b border-primary-100 last:border-0">
+                                    <div className="relative w-16 aspect-[3/4] flex-shrink-0 rounded-lg overflow-hidden bg-primary-50">
                                         <Image
                                             src={imageUrl}
                                             alt={item.products.name}
                                             fill
                                             className="object-cover"
                                             sizes="80px"
-                                            unoptimized={isSupabaseImage(imageUrl)}
                                         />
                                     </div>
                                     <div className="flex-1">
-                                        <h3 className="font-medium text-gray-900">{item.products.name}</h3>
-                                        <p className="text-sm text-gray-500">SKU: {item.products.sku}</p>
+                                        <h3 className="font-playfair text-textPrimary leading-snug">{item.products.name}</h3>
+                                        <p className="text-[10px] tracking-[0.1em] uppercase text-textSecondary/50 mt-1">
+                                            SKU · {item.products.sku}
+                                        </p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="font-semibold text-gray-900">
+                                        <p className="font-semibold text-textPrimary">
                                             {formatPrice(item.unit_price || item.total_price || 0)}
                                         </p>
-                                        <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                                        <p className="text-sm text-textSecondary/60">Qty: {item.quantity}</p>
                                     </div>
                                 </div>
                             );
@@ -165,18 +174,18 @@ export default function OrderConfirmationPage() {
                     </div>
 
                     {/* Pricing Summary */}
-                    <div className="border-t pt-4 space-y-2">
-                        <div className="flex justify-between text-textSecondary">
-                            <span>Subtotal</span>
-                            <span>{formatPrice(order.subtotal)}</span>
+                    <div className="border-t border-primary-100 pt-4 space-y-2.5">
+                        <div className="flex justify-between items-baseline">
+                            <span className="text-xs font-semibold tracking-[0.15em] uppercase text-textSecondary/60">Subtotal</span>
+                            <span className="text-sm text-textPrimary">{formatPrice(order.subtotal)}</span>
                         </div>
-                        <div className="flex justify-between text-textSecondary">
-                            <span>Shipping *</span>
-                            <span>{formatPrice(order.shipping_charge)}</span>
+                        <div className="flex justify-between items-baseline">
+                            <span className="text-xs font-semibold tracking-[0.15em] uppercase text-textSecondary/60">Shipping *</span>
+                            <span className="text-sm text-textPrimary">{formatPrice(order.shipping_charge)}</span>
                         </div>
-                        <div className="flex justify-between text-lg font-semibold pt-2 border-t">
-                            <span className="text-gray-900">Total</span>
-                            <span className="text-accent-700">{formatPrice(order.total_amount)}</span>
+                        <div className="flex justify-between items-baseline pt-3 border-t border-primary-100">
+                            <span className="text-xs font-semibold tracking-[0.15em] uppercase text-textPrimary">Total Paid</span>
+                            <span className="text-xl font-semibold text-primary">{formatPrice(order.total_amount)}</span>
                         </div>
                         {order.shipping_charge > 0 && (
                             <p className="text-xs text-accent-700 pt-2">
@@ -187,9 +196,9 @@ export default function OrderConfirmationPage() {
                 </div>
 
                 {/* Shipping Address */}
-                <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <Home className="w-5 h-5" />
+                <div className="bg-white rounded-2xl border border-primary-100 p-6 mb-6">
+                    <h2 className="text-xs font-semibold tracking-[0.2em] uppercase text-textSecondary/60 mb-4 flex items-center gap-2">
+                        <Home className="w-4 h-4" />
                         Shipping Address
                     </h2>
                     <div className="">
@@ -205,8 +214,8 @@ export default function OrderConfirmationPage() {
                         <p className="mt-2">{order.customer_phone}</p>
                     </div>
                     {order.estimated_delivery_days && (
-                        <div className="mt-4 p-3 bg-accent-light rounded-md">
-                            <p className="text-sm text-accent-700">
+                        <div className="mt-4 p-3 bg-primary-50/60 border border-primary-100 rounded-xl">
+                            <p className="text-sm text-textPrimary">
                                 <span className="font-medium">Estimated Delivery:</span> {order.estimated_delivery_days}
                             </p>
                         </div>
@@ -214,16 +223,16 @@ export default function OrderConfirmationPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-4">
                     <Link
                         href="/collection"
-                        className="flex-1 bg-primary text-white text-center py-3 rounded-lg font-semibold hover:bg-primary-light transition-colors"
+                        className="flex-1 bg-primary text-secondary text-center py-3.5 rounded-full font-semibold hover:bg-primary-light transition-colors"
                     >
                         Continue Shopping
                     </Link>
                     <Link
                         href={`/orders/${order.id}`}
-                        className="flex-1 border-2 border-gray-300  text-center py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                        className="flex-1 border border-primary-200 text-textPrimary text-center py-3.5 rounded-full font-semibold hover:border-primary hover:text-primary transition-colors"
                     >
                         View Order Details
                     </Link>
