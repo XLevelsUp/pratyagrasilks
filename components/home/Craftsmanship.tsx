@@ -34,6 +34,17 @@ export default function Craftsmanship() {
                                 quality={60}
                                 className="object-cover"
                             />
+                            <video
+                                autoPlay
+                                muted
+                                loop
+                                playsInline
+                                preload="none"
+                                aria-hidden="true"
+                                className="absolute inset-0 h-full w-full object-cover animate-[fadeIn_1s_ease-in_1s_forwards] opacity-0"
+                            >
+                                <source src="/Heritage_of_silks.webm" type="video/webm" />
+                            </video>
                         </Parallax>
                     </div>
 
