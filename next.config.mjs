@@ -44,10 +44,13 @@ const nextConfig = {
                 hostname: 'lh3.googleusercontent.com',
             },
         ],
-        // Disable Next.js Image Optimization for Supabase images (already optimized to WebP)
-        // Allow unoptimized for large images to prevent timeout
+        // AVIF first for smaller high-fidelity variants; WebP fallback
+        formats: ['image/avif', 'image/webp'],
+        // Top bucket matches the 2560px upload masters (default 3840 would never be filled)
+        deviceSizes: [640, 750, 828, 1080, 1200, 1600, 1920, 2560],
+        imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+        // Dev skips optimization for fast HMR — blur/srcset/AVIF only observable in production builds
         unoptimized: process.env.NODE_ENV === 'production' ? false : true,
-        // Increase timeout for image optimization of large files
         minimumCacheTTL: 31536000, // 1 year
     },
     // Enable React strict mode for better development experience

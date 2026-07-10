@@ -6,16 +6,18 @@ import Image from 'next/image';
 import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import YouTubeSlide from '@/components/products/YouTubeSlide';
 import WatermarkOverlay from '@/components/WatermarkOverlay';
+import KandangiProductImage from '@/components/products/KandangiProductImage';
 import { getYouTubeThumbnailUrl } from '@/lib/utils/youtube';
-import { isSupabaseImage } from '@/lib/utils/image';
 
 interface ProductGalleryProps {
     images: string[];
+    /** Map of image URL -> base64 blurDataURL from product.blurMap */
+    blurMap?: Record<string, string>;
     yt_link?: string | null;
     productName?: string;
 }
 
-export default function ProductGallery({ images, yt_link, productName = 'Product' }: ProductGalleryProps) {
+export default function ProductGallery({ images, blurMap, yt_link, productName = 'Product' }: ProductGalleryProps) {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [mainViewportRef, emblaMainApi] = useEmblaCarousel({
         loop: true,
@@ -68,18 +70,16 @@ export default function ProductGallery({ images, yt_link, productName = 'Product
                         {/* Image Slides */}
                         {images.map((image, index) => (
                             <div key={`image-${index}`} className="flex-[0_0_100%] min-w-0">
-                                <div className="relative aspect-square bg-gray-100">
-                                    <Image
-                                        src={image}
-                                        alt={`${productName} - Image ${index + 1}`}
-                                        fill
-                                        className="object-cover"
-                                        sizes="(max-width: 768px) 100vw, 50vw"
-                                        priority={index === 0}
-                                        unoptimized={isSupabaseImage(image)}
-                                    />
-                                    <WatermarkOverlay />
-                                </div>
+                                <KandangiProductImage
+                                    src={image}
+                                    alt={`${productName} - Image ${index + 1}`}
+                                    blurDataURL={blurMap?.[image]}
+                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                    priority={index === 0}
+                                    className="bg-gray-100"
+                                >
+                                    {/* <WatermarkOverlay /> */}
+                                </KandangiProductImage>
                             </div>
                         ))}
 
@@ -142,7 +142,6 @@ export default function ProductGallery({ images, yt_link, productName = 'Product
                                     fill
                                     className="object-cover"
                                     sizes="20vw"
-                                    unoptimized={isSupabaseImage(image)}
                                 />
                             </button>
                         ))}

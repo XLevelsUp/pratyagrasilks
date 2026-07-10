@@ -1,8 +1,8 @@
 import { Product } from '@/lib/types';
-import Image from 'next/image';
 import Link from 'next/link';
-import { isSupabaseImage } from '@/lib/utils/image';
+import KandangiProductImage from '@/components/products/KandangiProductImage';
 import WishlistButton from '@/components/Wishlist/WishlistButton';
+import { BRAND_FULL_NAME } from '@/lib/constants/brand';
 
 interface ProductCardProps {
     product: Product;
@@ -37,16 +37,13 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
         <Link href={`/product/${product.id}`} className="group">
             <div className={`bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 ${isSold ? 'hover:shadow-md' : 'hover:shadow-xl hover:-translate-y-1'}`}>
                 {/* Product Image */}
-                <div className="relative aspect-square overflow-hidden bg-primary-50 silk-shimmer">
-                    <Image
-                        src={imageUrl}
-                        alt={product.name + ' Pure silk sarees online in India | Pratyagra Silks'}
-                        fill
-                        className={`object-cover transition-transform duration-300 ${isSold ? ' grayscale-[30%]' : 'group-hover:scale-105'}`}
-                        sizes="(max-width: 768px) 100vw, 296px"
-                        quality={60}
-                        unoptimized={isSupabaseImage(imageUrl)}
-                    />
+                <KandangiProductImage
+                    src={imageUrl}
+                    alt={`${product.name} Pure silk sarees online in India | ${BRAND_FULL_NAME}`}
+                    blurDataURL={product.blurMap?.[imageUrl]}
+                    sizes="(max-width: 768px) 100vw, 296px"
+                    imgClassName={`transition-transform duration-300 ${isSold ? ' grayscale-[30%]' : 'group-hover:scale-105'}`}
+                >
 
                     {/* Category Badge */}
                     <div className="absolute top-2 left-2">
@@ -74,7 +71,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
                     <div className="absolute top-2 right-2 z-10">
                         <WishlistButton product={product} variant="icon-only" />
                     </div>
-                </div>
+                </KandangiProductImage>
 
                 {/* Product Info */}
                 <div className="p-4">
@@ -82,9 +79,9 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
                         {product.name}
                     </h3>
 
-                    <p className="text-sm text-textSecondary mb-3 line-clamp-2">
+                    {/* <p className="text-sm text-textSecondary mb-3 line-clamp-2">
                         {product.description}
-                    </p>
+                    </p> */}
 
                     <div className="flex items-center justify-between">
                         <div>

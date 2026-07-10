@@ -29,6 +29,7 @@ export default function EditProductPage() {
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(true);
     const [productImages, setProductImages] = useState<string[]>([]);
+    const [blurMap, setBlurMap] = useState<Record<string, string>>({});
     const [vendors, setVendors] = useState<Vendor[]>([]);
     const [vendorsLoading, setVendorsLoading] = useState(true);
     const [formData, setFormData] = useState({
@@ -105,6 +106,7 @@ export default function EditProductPage() {
             });
             // Set product images separately
             setProductImages(Array.isArray(data.images) ? data.images : []);
+            setBlurMap(data.blur_map ?? {});
         }
         setFetching(false);
     }
@@ -151,6 +153,10 @@ export default function EditProductPage() {
                 dimensions: formData.dimensions || null,
                 weight: formData.weight || null,
                 images: productImages,
+                // Drop blur entries for images no longer on the product
+                blur_map: Object.fromEntries(
+                    Object.entries(blurMap).filter(([url]) => productImages.includes(url))
+                ),
                 yt_link: formData.yt_link || null,
                 is_online: formData.is_online,
                 color_families: formData.color_families,
@@ -507,7 +513,9 @@ export default function EditProductPage() {
                         </label>
                         <OptimizedUploader
                             onImagesChange={handleImagesChange}
+                            onBlurMapChange={setBlurMap}
                             existingImages={productImages}
+                            existingBlurMap={blurMap}
                             maxImages={10}
                         />
                     </div>

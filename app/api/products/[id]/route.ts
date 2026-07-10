@@ -34,6 +34,7 @@ export async function GET(
             price: product.price,
             category: product.category,
             images: product.images || [],
+            blurMap: product.blur_map ?? {},
             inStock: product.in_stock,
             stockQuantity: product.stock_quantity || 0,
             lowStockThreshold: product.low_stock_threshold || 5,

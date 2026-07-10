@@ -3,7 +3,16 @@ import sharp from 'sharp';
 // 50MB size limit
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
-export async function processImage(file: File): Promise<Buffer> {
+export interface ProcessedImage {
+    /** High-fidelity master: max 2560px, WebP q90 */
+    buffer: Buffer;
+    /** Inline LQIP: data:image/webp;base64,... (~300 bytes) */
+    blurDataURL: string;
+    width: number;
+    height: number;
+}
+
+export async function processImage(file: File): Promise<ProcessedImage> {
     // Validate file size
     if (file.size > MAX_FILE_SIZE) {
         throw new Error(`Image size (${(file.size / 1024 / 1024).toFixed(1)}MB) exceeds 50MB limit`);
@@ -24,24 +33,35 @@ export async function processImage(file: File): Promise<Buffer> {
         // Effort 4 is much faster than 6 for large files with minimal quality loss
         const effort = file.size > 20 * 1024 * 1024 ? 4 : 6;
 
-        // Use containment to fit within bounds while preserving aspect ratio
-        // This is better than resize for maintaining quality
-        const processed = await sharp(inputBuffer)
-            .resize({
-                width: 2048,
-                height: 2048,
-                fit: 'inside',
-                withoutEnlargement: true,
-            })
-            .webp({
-                quality: 82,
-                effort,
-                // Add alphaQuality for images with transparency
-                alphaQuality: 100,
-            })
-            .toBuffer();
+        // Sharp pipelines are single-use — run master and LQIP on separate instances
+        const [master, blurBuffer] = await Promise.all([
+            sharp(inputBuffer)
+                .resize({
+                    width: 2560,
+                    height: 2560,
+                    fit: 'inside',
+                    withoutEnlargement: true,
+                })
+                .webp({
+                    quality: 90,
+                    effort,
+                    // Sharper 4:2:0 chroma — preserves fine zari/weave detail
+                    smartSubsample: true,
+                    alphaQuality: 100,
+                })
+                .toBuffer({ resolveWithObject: true }),
+            sharp(inputBuffer)
+                .resize({ width: 20, height: 20, fit: 'inside' })
+                .webp({ quality: 30, effort: 2 })
+                .toBuffer(),
+        ]);
 
-        return processed;
+        return {
+            buffer: master.data,
+            blurDataURL: `data:image/webp;base64,${blurBuffer.toString('base64')}`,
+            width: master.info.width,
+            height: master.info.height,
+        };
     } catch (error) {
         if (error instanceof Error && error.message.includes('exceeds')) {
             throw error;

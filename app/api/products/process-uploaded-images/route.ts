@@ -6,6 +6,7 @@ interface ProcessResult {
     path: string;
     success: boolean;
     url?: string;
+    blurDataURL?: string;
     error?: string;
 }
 
@@ -50,7 +51,7 @@ export async function POST(req: NextRequest) {
                     // Process with sharp
                     const arrayBuffer = await blob.arrayBuffer();
                     const rawFile = new File([arrayBuffer], 'raw', { type: blob.type });
-                    const processedBuffer = await processImage(rawFile);
+                    const { buffer: processedBuffer, blurDataURL } = await processImage(rawFile);
 
                     // Upload the processed WebP
                     const finalPath = `${rawPath}.webp`;
@@ -77,7 +78,7 @@ export async function POST(req: NextRequest) {
                         .from('saree-images')
                         .getPublicUrl(finalPath);
 
-                    return { path: rawPath, success: true, url: publicUrl };
+                    return { path: rawPath, success: true, url: publicUrl, blurDataURL };
                 } catch (err) {
                     const errorMsg = err instanceof Error ? err.message : 'Unknown error';
                     console.error(`Processing ${rawPath} failed:`, errorMsg);
@@ -86,14 +87,18 @@ export async function POST(req: NextRequest) {
             })
         );
 
-        // Extract successful URLs and collect errors
+        // Extract successful URLs (with their LQIP placeholders) and collect errors
         const urls: string[] = [];
+        const blurMap: Record<string, string> = {};
         const errors: Record<string, string> = {};
 
         results.forEach((result, index) => {
             if (result.status === 'fulfilled') {
                 if (result.value.success && result.value.url) {
                     urls.push(result.value.url);
+                    if (result.value.blurDataURL) {
+                        blurMap[result.value.url] = result.value.blurDataURL;
+                    }
                 } else if (result.value.error) {
                     errors[result.value.path] = result.value.error;
                 }
@@ -115,7 +120,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Return partial success with warnings if some failed
-        const response: { urls: string[]; partialFailure?: string } = { urls };
+        const response: { urls: string[]; blurMap: Record<string, string>; partialFailure?: string } = { urls, blurMap };
         if (Object.keys(errors).length > 0) {
             response.partialFailure = Object.entries(errors)
                 .map(([path, err]) => `${path}: ${err}`)

@@ -15,6 +15,7 @@ export default function AddProductPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [productImages, setProductImages] = useState<string[]>([]);
+    const [blurMap, setBlurMap] = useState<Record<string, string>>({});
     const [formData, setFormData] = useState({
         name: '',
         sku: '',
@@ -57,6 +58,7 @@ export default function AddProductPage() {
                     dimensions: formData.dimensions || null,
                     weight: formData.weight || null,
                     images: productImages,
+                    blur_map: blurMap,
                 })
                 .select()
                 .single();
@@ -254,7 +256,9 @@ export default function AddProductPage() {
                         </label>
                         <OptimizedUploader
                             onImagesChange={handleImagesChange}
+                            onBlurMapChange={setBlurMap}
                             existingImages={productImages}
+                            existingBlurMap={blurMap}
                             maxImages={10}
                         />
                     </div>

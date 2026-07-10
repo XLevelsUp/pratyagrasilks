@@ -130,7 +130,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
 
                     {/* Gallery */}
                     <div>
-                        <ProductGallery images={product.images} yt_link={product.yt_link} productName={product.name} />
+                        <ProductGallery images={product.images} blurMap={product.blurMap} yt_link={product.yt_link} productName={product.name} />
                     </div>
 
                     {/* Info panel */}
