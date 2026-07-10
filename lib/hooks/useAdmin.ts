@@ -57,7 +57,10 @@ export function useAdmin(): UseAdminReturn {
                         pathname === '/admin/products' ||
                         pathname.startsWith('/admin/products/') ||
                         pathname === '/admin/vendors' ||
-                        pathname.startsWith('/admin/vendors/');
+                        pathname.startsWith('/admin/vendors/') ||
+                        // Customers list + detail (measurement profiles)
+                        pathname === '/admin/customers' ||
+                        pathname.startsWith('/admin/customers/');
 
                     const CASHIER_BLOCKED =
                         pathname.startsWith('/admin/settings') ||

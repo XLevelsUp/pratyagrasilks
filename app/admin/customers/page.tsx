@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Search, Users, ShoppingBag, DollarSign, Calendar } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface Customer {
     id: string;
@@ -24,6 +25,7 @@ interface CustomerStats {
 }
 
 export default function AdminCustomersPage() {
+    const router = useRouter();
     const [customers, setCustomers] = useState<Customer[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -276,9 +278,14 @@ export default function AdminCustomersPage() {
                                 {filteredCustomers.map((customer) => {
                                     const status = getCustomerStatus(customer);
                                     return (
-                                        <tr key={customer.id} className="hover:bg-gray-50">
+                                        <tr
+                                            key={customer.id}
+                                            onClick={() => router.push(`/admin/customers/${customer.id}`)}
+                                            className="hover:bg-amber-50/60 cursor-pointer transition-colors"
+                                        >
                                             <td className="px-6 py-4">
                                                 <div className="font-medium text-gray-900">{customer.full_name}</div>
+                                                <div className="text-xs text-amber-700 mt-0.5">Measurements →</div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="text-sm text-gray-900">{customer.email}</div>
