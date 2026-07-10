@@ -41,6 +41,7 @@ const CASHIER_NAV: NavItem[] = [
     { name: 'Settlement', href: '/admin/pos/settlement', icon: ReceiptText  },
     { name: 'Products',   href: '/admin/products',        icon: Package      },
     { name: 'Vendors',    href: '/admin/vendors',         icon: Building2    },
+    { name: 'Customers',  href: '/admin/customers',       icon: Users        },
 ];
 
 function navForRole(role: UserRole | null): NavItem[] {

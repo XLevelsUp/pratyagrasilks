@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { isSupabaseImage } from '@/lib/utils/image';
 import { Search, Trash2, CreditCard, X, ShoppingCart, Banknote, Smartphone, CheckCircle2, Loader2, User } from 'lucide-react';
@@ -442,6 +443,12 @@ export default function PosPage() {
                                         <p className="text-xs text-green-600">
                                             Previous Orders: <span className="font-semibold">{customer.total_orders}</span>
                                         </p>
+                                        <Link
+                                            href={`/admin/customers/${customer.id}`}
+                                            className="inline-block text-xs font-semibold text-amber-700 hover:text-amber-800 mt-2 underline underline-offset-2"
+                                        >
+                                            Measurements →
+                                        </Link>
                                     </div>
                                 )}
                             </div>
