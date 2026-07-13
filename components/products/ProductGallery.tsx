@@ -13,11 +13,13 @@ interface ProductGalleryProps {
     images: string[];
     /** Map of image URL -> base64 blurDataURL from product.blurMap */
     blurMap?: Record<string, string>;
+    /** Map of image URL -> { width: variantUrl } from product.imageVariants */
+    imageVariants?: Record<string, Record<number, string>>;
     yt_link?: string | null;
     productName?: string;
 }
 
-export default function ProductGallery({ images, blurMap, yt_link, productName = 'Product' }: ProductGalleryProps) {
+export default function ProductGallery({ images, blurMap, imageVariants, yt_link, productName = 'Product' }: ProductGalleryProps) {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [mainViewportRef, emblaMainApi] = useEmblaCarousel({
         loop: true,
@@ -74,6 +76,7 @@ export default function ProductGallery({ images, blurMap, yt_link, productName =
                                     src={image}
                                     alt={`${productName} - Image ${index + 1}`}
                                     blurDataURL={blurMap?.[image]}
+                                    variantMap={imageVariants?.[image]}
                                     sizes="(max-width: 768px) 100vw, 50vw"
                                     priority={index === 0}
                                     className="bg-gray-100"

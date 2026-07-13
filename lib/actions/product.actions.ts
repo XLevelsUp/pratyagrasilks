@@ -35,6 +35,7 @@ export async function getNewArrivals(): Promise<Product[]> {
         category: product.category,
         images: product.images || [],
         blurMap: product.blur_map ?? {},
+        imageVariants: product.image_variants ?? {},
         inStock: product.in_stock,
         isOnline: product.is_online ?? true,
         sku: product.sku,
@@ -94,6 +95,7 @@ export interface ProductUpdateInput {
     weight?: string | null;
     images?: string[];
     blur_map?: Record<string, string>;
+    image_variants?: Record<string, Record<number, string>>;
     yt_link?: string | null;
     is_online?: boolean;
     vendor_id?: string | null;
@@ -142,6 +144,9 @@ export async function updateProduct(id: string, data: ProductUpdateInput): Promi
     // Only set when provided so legacy callers don't clobber existing placeholders
     if (data.blur_map !== undefined) {
         patch.blur_map = data.blur_map;
+    }
+    if (data.image_variants !== undefined) {
+        patch.image_variants = data.image_variants;
     }
 
     // CASHIER cannot modify price or procurement data — silently strip them

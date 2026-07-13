@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Image from 'next/image';
 
 interface KandangiProductImageProps {
@@ -8,8 +8,13 @@ interface KandangiProductImageProps {
     alt: string;
     /** LQIP from product.blurMap[src]; undefined for legacy images (falls back to shimmer) */
     blurDataURL?: string;
+    /** Width(px) -> pre-generated variant public URL for this image, e.g.
+     *  product.imageVariants?.[src]. Undefined/empty for legacy images — every
+     *  requested width then falls back to `src` (the real canonical file). */
+    variantMap?: Record<number, string>;
     /** Required so every call site declares its rendered width for correct srcset selection */
     sizes: string;
+    /** No-op once variantMap resolves a match — variants are pre-baked at a fixed quality */
     quality?: number;
     priority?: boolean;
     /** Extra classes on the aspect-square wrapper */
@@ -23,15 +28,16 @@ interface KandangiProductImageProps {
 /**
  * High-fidelity 1:1 product image for Kandangi saree weave detail.
  *
- * Serves responsive AVIF/WebP variants at quality 90 through the Next.js
- * optimizer, with an inline blur placeholder generated at upload time.
- * Note: blur, srcset, and AVIF are invisible in `npm run dev` (images are
- * globally unoptimized in development) — verify with a production build.
+ * Serves self-hosted, pre-generated WebP width variants via a per-instance
+ * Next.js Image loader (never Vercel's /_next/image optimizer — see
+ * lib/image-loader.ts for why), with an inline blur placeholder generated at
+ * upload time.
  */
 export default function KandangiProductImage({
     src,
     alt,
     blurDataURL,
+    variantMap,
     sizes,
     quality = 100,
     priority = false,
@@ -46,6 +52,19 @@ export default function KandangiProductImage({
     // (no-blur) loading state, paired with the silk-shimmer background.
     const hasBlur = Boolean(blurDataURL);
 
+    // Picks the smallest pre-generated tier that's >= the width Next asks for.
+    // Falls back to `src` (the real, confirmed-existing canonical file) when no
+    // tier qualifies or variantMap is empty — always safe, never guesses a filename.
+    const loader = useMemo(() => {
+        const widths = variantMap
+            ? Object.keys(variantMap).map(Number).filter(Number.isFinite).sort((a, b) => a - b)
+            : [];
+        return ({ src: imgSrc, width }: { src: string; width: number; quality?: number }) => {
+            const match = widths.find((w) => w >= width);
+            return match !== undefined ? variantMap![match] : imgSrc;
+        };
+    }, [variantMap]);
+
     return (
         <div className={`relative aspect-square overflow-hidden bg-primary-50 ${!hasBlur ? 'silk-shimmer' : ''} ${className}`}>
             <Image
@@ -55,6 +74,7 @@ export default function KandangiProductImage({
                 quality={quality}
                 sizes={sizes}
                 priority={priority}
+                loader={loader}
                 placeholder={hasBlur ? 'blur' : 'empty'}
                 blurDataURL={blurDataURL}
                 onLoad={() => setLoaded(true)}

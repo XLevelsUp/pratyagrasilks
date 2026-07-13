@@ -41,6 +41,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
                     src={imageUrl}
                     alt={`${product.name} Pure silk sarees online in India | ${BRAND_FULL_NAME}`}
                     blurDataURL={product.blurMap?.[imageUrl]}
+                    variantMap={product.imageVariants?.[imageUrl]}
                     sizes="(max-width: 768px) 100vw, 296px"
                     imgClassName={`transition-transform duration-300 ${isSold ? ' grayscale-[30%]' : 'group-hover:scale-105'}`}
                 >

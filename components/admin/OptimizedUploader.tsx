@@ -10,16 +10,21 @@ interface OptimizedUploaderProps {
     onImagesChange: (urls: string[]) => void;
     /** Fires with the merged URL -> blurDataURL map whenever uploads add or removals prune entries */
     onBlurMapChange?: (map: Record<string, string>) => void;
+    /** Fires with the merged URL -> { width: variantUrl } map whenever uploads add or removals prune entries */
+    onImageVariantsChange?: (map: Record<string, Record<number, string>>) => void;
     existingImages?: string[];
     existingBlurMap?: Record<string, string>;
+    existingImageVariants?: Record<string, Record<number, string>>;
     maxImages?: number;
 }
 
 export default function OptimizedUploader({
     onImagesChange,
     onBlurMapChange,
+    onImageVariantsChange,
     existingImages = [],
     existingBlurMap = {},
+    existingImageVariants = {},
     maxImages = 10,
 }: OptimizedUploaderProps) {
     const [uploading, setUploading] = useState(false);
@@ -27,6 +32,7 @@ export default function OptimizedUploader({
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [images, setImages] = useState<string[]>(existingImages);
     const [blurMap, setBlurMap] = useState<Record<string, string>>(existingBlurMap);
+    const [imageVariants, setImageVariants] = useState<Record<string, Record<number, string>>>(existingImageVariants);
     const [urlInput, setUrlInput] = useState('');
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
     const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
@@ -40,6 +46,11 @@ export default function OptimizedUploader({
     const updateBlurMap = (newMap: Record<string, string>) => {
         setBlurMap(newMap);
         onBlurMapChange?.(newMap);
+    };
+
+    const updateImageVariants = (newMap: Record<string, Record<number, string>>) => {
+        setImageVariants(newMap);
+        onImageVariantsChange?.(newMap);
     };
 
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -143,6 +154,7 @@ export default function OptimizedUploader({
             const responseData = await res3.json() as {
                 urls: string[];
                 blurMap?: Record<string, string>;
+                variantMap?: Record<string, Record<string, string>>;
                 partialFailure?: string;
             };
             const { urls, partialFailure } = responseData;
@@ -155,6 +167,9 @@ export default function OptimizedUploader({
                 updateImages(newImages);
                 if (responseData.blurMap) {
                     updateBlurMap({ ...blurMap, ...responseData.blurMap });
+                }
+                if (responseData.variantMap) {
+                    updateImageVariants({ ...imageVariants, ...responseData.variantMap });
                 }
 
                 setProgress(100);
@@ -228,6 +243,10 @@ export default function OptimizedUploader({
         if (removedUrl in blurMap) {
             const { [removedUrl]: _removed, ...rest } = blurMap;
             updateBlurMap(rest);
+        }
+        if (removedUrl in imageVariants) {
+            const { [removedUrl]: _removedVariants, ...rest } = imageVariants;
+            updateImageVariants(rest);
         }
     };
 

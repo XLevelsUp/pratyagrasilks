@@ -24,6 +24,8 @@ export interface Product {
     images: string[];
     /** Map of image public URL -> base64 blurDataURL (LQIP). Empty/missing for legacy images. */
     blurMap?: Record<string, string>;
+    /** Map of image public URL -> { width(px): variant public URL }. Missing/partial for legacy images. */
+    imageVariants?: Record<string, Record<number, string>>;
     inStock: boolean;
     isOnline: boolean; // true = listed on website; false = physical POS only
     sku: string;
