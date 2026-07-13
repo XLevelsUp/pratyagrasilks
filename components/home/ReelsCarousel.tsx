@@ -166,6 +166,11 @@ export default function ReelsCarousel({ reels }: { reels: InstagramReel[] }) {
                                         fill
                                         sizes="270px"
                                         className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                        // Bypass Vercel image optimization: Instagram URLs are
+                                        // signed and rotate constantly, so each one counts as a
+                                        // new source image against the plan quota (402s once
+                                        // exhausted). The CDN already serves compressed JPEGs.
+                                        unoptimized
                                     />
                                     {/* Play hint on hover */}
                                     <span className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors">
