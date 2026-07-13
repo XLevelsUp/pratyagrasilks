@@ -104,14 +104,13 @@ export default function Home() {
                         </Suspense>
 
                         <SilkShowcase items={silkShowcaseItems} />
+                        <Craftsmanship />
+                        <StatsBand />
 
                         {/* Instagram reels — streamed so the page never waits on the API */}
                         <Suspense fallback={null}>
                             <InstagramReels />
                         </Suspense>
-
-                        <Craftsmanship />
-                        <StatsBand />
                         <CtaBand />
                     </div>
                 </SmoothScroll>
