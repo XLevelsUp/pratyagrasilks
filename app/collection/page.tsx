@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import CollectionClient from '@/components/CollectionClient';
+import InstagramReels from '@/components/home/InstagramReels';
 
 import { siteMetadata } from '@/lib/seo/config';
 
@@ -66,6 +67,17 @@ export default function CollectionPage() {
                 </div>
             }>
                 <CollectionClient />
+            </Suspense>
+
+            {/* Instagram reels — this page uses its own account token; the
+                site-wide slot in the layout skips /collection to avoid a
+                duplicate section */}
+            <Suspense fallback={null}>
+                <InstagramReels
+                    accessToken={process.env.INSTAGRAM_COLLECTION_ACCESS_TOKEN}
+                    profileUrl="https://www.instagram.com/pratyagra_designer/"
+                    handle="@pratyagra_designer"
+                />
             </Suspense>
         </div>
         </>

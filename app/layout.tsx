@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import ConditionalHeader from "@/components/ui/ConditionalHeader";
 import ConditionalFooter from "@/components/ui/ConditionalFooter";
+import ConditionalReels from "@/components/ui/ConditionalReels";
+import InstagramReels from "@/components/home/InstagramReels";
 import { CartProvider } from "@/lib/context/CartContext";
 import { AuthProvider } from "@/lib/context/AuthContext";
 import { WishlistProvider } from "@/lib/context/WishlistContext";
@@ -107,6 +110,15 @@ export default function RootLayout({
                         <CartProvider>
                             <ConditionalHeader />
                             <main className="min-h-screen">{children}</main>
+                            {/* Instagram reels — every page above the footer, except
+                                admin and the homepage (which has its own placement
+                                below the Silk Showcase). Suspense streams it in so
+                                no page waits on the Instagram API. */}
+                            <ConditionalReels>
+                                <Suspense fallback={null}>
+                                    <InstagramReels />
+                                </Suspense>
+                            </ConditionalReels>
                             <ConditionalFooter />
                             <CartSidebar />
                         </CartProvider>

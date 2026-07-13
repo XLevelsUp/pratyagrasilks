@@ -76,6 +76,15 @@ const nextConfig = {
             {
                 protocol: 'https',
                 hostname: 'lh3.googleusercontent.com',
+            },
+            {
+                // Instagram reel thumbnails (signed CDN URLs)
+                protocol: 'https',
+                hostname: '**.cdninstagram.com',
+            },
+            {
+                protocol: 'https',
+                hostname: '**.fbcdn.net',
             }
         ],
         // Skip optimization in dev only — production always optimizes

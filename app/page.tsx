@@ -5,6 +5,7 @@ import SmoothScroll from '@/components/motion/SmoothScroll';
 import Hero from '@/components/home/Hero';
 import NewArrivals from '@/components/home/NewArrivals';
 import SilkShowcase from '@/components/home/SilkShowcase';
+import InstagramReels from '@/components/home/InstagramReels';
 import Craftsmanship from '@/components/home/Craftsmanship';
 import StatsBand from '@/components/home/StatsBand';
 import CtaBand from '@/components/home/CtaBand';
@@ -103,6 +104,12 @@ export default function Home() {
                         </Suspense>
 
                         <SilkShowcase items={silkShowcaseItems} />
+
+                        {/* Instagram reels — streamed so the page never waits on the API */}
+                        <Suspense fallback={null}>
+                            <InstagramReels />
+                        </Suspense>
+
                         <Craftsmanship />
                         <StatsBand />
                         <CtaBand />
