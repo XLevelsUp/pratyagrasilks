@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { fieldsByGroup, MeasurementKey } from '@/lib/constants/measurements';
 import { MeasurementProfile } from '@/lib/validations/measurement.schema';
 
@@ -76,6 +78,16 @@ function MeasurementTile({ label, value }: { label: string; value: number | null
  */
 export default function MeasurementSheetPrint({ customerName, customerPhone, profile }: MeasurementSheetPrintProps) {
     const groups = fieldsByGroup();
+    const sheetRef = useRef<HTMLDivElement>(null);
+
+    // Self-heal: if a stale copy of the sheet is ever left in <body> (e.g. a
+    // hot-reload orphan), both copies share this id and BOTH would print —
+    // remove every node that isn't the one this instance owns.
+    useEffect(() => {
+        document.querySelectorAll('#measurement-sheet-print').forEach((el) => {
+            if (el !== sheetRef.current) el.remove();
+        });
+    }, []);
 
     /** Inline meta item; missing values print as a dotted hand-fill segment */
     const metaItem = (label: string, value: string | null | undefined) => (
@@ -91,22 +103,30 @@ export default function MeasurementSheetPrint({ customerName, customerPhone, pro
         </span>
     );
 
-    return (
+    // Portal to <body>: in print, everything except this sheet is display:none,
+    // so the document is exactly one sheet tall. The sheet itself must NOT be
+    // position:fixed while printing — paged media repeats fixed elements on
+    // every page, which printed the same sheet twice.
+    return createPortal(
         <>
             <style>{`
                 @media print {
-                    body > * { visibility: hidden !important; }
-                    #measurement-sheet-print,
-                    #measurement-sheet-print * { visibility: visible !important; }
+                    body > *:not(#measurement-sheet-print) { display: none !important; }
+                    html, body {
+                        height: auto !important;
+                        overflow: visible !important;
+                        background: #fff !important;
+                    }
                     #measurement-sheet-print {
-                        position: fixed !important;
+                        position: static !important;
                         left: 0 !important;
                         top: 0 !important;
                         width: 100% !important;
                         max-width: 100% !important;
                         padding: 8px !important;
                         margin: 0 auto !important;
-                        min-height: 100vh !important;
+                        min-height: 0 !important;
+                        height: auto !important;
                         display: flex !important;
                         flex-direction: column !important;
                         -webkit-print-color-adjust: exact;
@@ -121,6 +141,7 @@ export default function MeasurementSheetPrint({ customerName, customerPhone, pro
 
             <div
                 id="measurement-sheet-print"
+                ref={sheetRef}
                 style={{
                     position: 'fixed',
                     left: '-9999px',
@@ -132,7 +153,6 @@ export default function MeasurementSheetPrint({ customerName, customerPhone, pro
                     background: '#fff',
                     display: 'flex',
                     flexDirection: 'column',
-                    minHeight: '100vh',
                 }}
             >
                 {/* Watermark logo */}
@@ -274,6 +294,7 @@ export default function MeasurementSheetPrint({ customerName, customerPhone, pro
                     </div>
                 </div>
             </div>
-        </>
+        </>,
+        document.body
     );
 }
