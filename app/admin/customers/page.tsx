@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { Search, Users, ShoppingBag, DollarSign, Calendar } from 'lucide-react';
+import { Search, Users, ShoppingBag, DollarSign, Calendar, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import CustomerFormModal from '@/components/admin/customers/CustomerFormModal';
 
 interface Customer {
     id: string;
-    email: string;
+    email: string | null;
     full_name: string;
     phone: string | null;
     created_at: string;
@@ -29,6 +30,7 @@ export default function AdminCustomersPage() {
     const [customers, setCustomers] = useState<Customer[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [showWalkInModal, setShowWalkInModal] = useState(false);
     const [stats, setStats] = useState<CustomerStats>({
         totalCustomers: 0,
         newThisMonth: 0,
@@ -153,7 +155,7 @@ export default function AdminCustomersPage() {
         const searchLower = searchTerm.toLowerCase();
         return (
             customer.full_name.toLowerCase().includes(searchLower) ||
-            customer.email.toLowerCase().includes(searchLower) ||
+            (customer.email ?? '').toLowerCase().includes(searchLower) ||
             (customer.phone && customer.phone.toLowerCase().includes(searchLower))
         );
     });
@@ -162,9 +164,18 @@ export default function AdminCustomersPage() {
         <div>
             <div className="flex items-center justify-between mb-8">
                 <h1 className="text-3xl font-bold text-gray-900">Customers</h1>
-                <div className="flex items-center gap-2 text-sm text-textSecondary">
-                    <Users className="w-4 h-4" />
-                    <span>{filteredCustomers.length} customers</span>
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 text-sm text-textSecondary">
+                        <Users className="w-4 h-4" />
+                        <span>{filteredCustomers.length} customers</span>
+                    </div>
+                    <button
+                        onClick={() => setShowWalkInModal(true)}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 transition-colors"
+                    >
+                        <UserPlus className="w-4 h-4" />
+                        Walk-in Customer
+                    </button>
                 </div>
             </div>
 
@@ -288,7 +299,7 @@ export default function AdminCustomersPage() {
                                                 <div className="text-xs text-amber-700 mt-0.5">Measurements →</div>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <div className="text-sm text-gray-900">{customer.email}</div>
+                                                <div className="text-sm text-gray-900">{customer.email ?? '—'}</div>
                                                 {customer.phone && (
                                                     <div className="text-sm text-gray-500">{customer.phone}</div>
                                                 )}
@@ -322,6 +333,11 @@ export default function AdminCustomersPage() {
                     </div>
                 )}
             </div>
+
+            <CustomerFormModal
+                isOpen={showWalkInModal}
+                onClose={() => setShowWalkInModal(false)}
+            />
         </div>
     );
 }

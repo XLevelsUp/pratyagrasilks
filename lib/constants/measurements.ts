@@ -43,14 +43,17 @@ export const MEASUREMENT_FIELDS = [
     { key: 'lowerBust', column: 'lower_bust', label: 'Lower Bust', group: 'Torso' },
     { key: 'waist', column: 'waist', label: 'Waist', group: 'Torso' },
     { key: 'hip', column: 'hip', label: 'Hip', group: 'Torso' },
+    { key: 'seat', column: 'seat', label: 'Seat', group: 'Torso' },
     // ── Lower Body ────────────────────────────────────────────────
     { key: 'upperThighRound', column: 'upper_thigh_round', label: 'Upper Thigh Round', group: 'Lower Body' },
     { key: 'midThighRound', column: 'mid_thigh_round', label: 'Mid Thigh Round', group: 'Lower Body' },
+    { key: 'knee', column: 'knee', label: 'Knee', group: 'Lower Body' },
     { key: 'calf', column: 'calf', label: 'Calf', group: 'Lower Body' },
     { key: 'ankle', column: 'ankle', label: 'Ankle', group: 'Lower Body' },
     { key: 'crotch', column: 'crotch', label: 'Crotch', group: 'Lower Body' },
     // ── Garment Lengths ───────────────────────────────────────────
     { key: 'blouseLength', column: 'blouse_length', label: 'Blouse Length', group: 'Garment Lengths' },
+    { key: 'shirtLength', column: 'shirt_length', label: 'Shirt Length', group: 'Garment Lengths' },
     { key: 'pantLength', column: 'pant_length', label: 'Pant Length', group: 'Garment Lengths' },
     { key: 'topLength', column: 'top_length', label: 'Top / Kurta Length', group: 'Garment Lengths' },
 ] as const satisfies readonly MeasurementField[];

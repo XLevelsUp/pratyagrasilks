@@ -1,12 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { Suspense, useCallback, useEffect, useState } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Loader2, Mail, Phone, Ruler } from 'lucide-react';
+import { ArrowLeft, Loader2, Mail, Pencil, Phone, Ruler } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useAdmin } from '@/lib/hooks/useAdmin';
+import CustomerFormModal from '@/components/admin/customers/CustomerFormModal';
 import MeasurementProfileForm from '@/components/admin/measurements/MeasurementProfileForm';
 import CustomerProfilesList from '@/components/admin/measurements/CustomerProfilesList';
 import { getMeasurementProfiles } from '@/lib/actions/measurement.actions';
@@ -18,21 +19,36 @@ interface CustomerRow {
     email: string | null;
     phone: string | null;
     source: string | null;
+    is_guest: boolean | null;
     total_orders: number | null;
     total_spent: number | null;
     created_at: string;
 }
 
-export default function CustomerDetailPage() {
+function CustomerDetailInner() {
     const params = useParams();
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const customerId = params.id as string;
     const { isAdmin, loading: roleLoading } = useAdmin();
 
     const [customer, setCustomer] = useState<CustomerRow | null>(null);
     const [profiles, setProfiles] = useState<MeasurementProfile[]>([]);
     const [loading, setLoading] = useState(true);
-    /** null = form closed; 'new' = create; profile = edit */
-    const [formState, setFormState] = useState<'new' | MeasurementProfile | null>(null);
+    /** null = form closed; 'new' = create; profile = edit.
+     *  ?newProfile=1 (set by the walk-in creation flow) opens the create form immediately. */
+    const [formState, setFormState] = useState<'new' | MeasurementProfile | null>(
+        searchParams.get('newProfile') ? 'new' : null
+    );
+    const [showEditModal, setShowEditModal] = useState(false);
+
+    // Strip ?newProfile=1 so a refresh doesn't force the form open again
+    useEffect(() => {
+        if (searchParams.get('newProfile')) {
+            router.replace(`/admin/customers/${customerId}`, { scroll: false });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const load = useCallback(async () => {
         setLoading(true);
@@ -41,7 +57,7 @@ export default function CustomerDetailPage() {
             const [{ data: customerData, error }, profilesResult] = await Promise.all([
                 supabase
                     .from('customers')
-                    .select('id, full_name, email, phone, source, total_orders, total_spent, created_at')
+                    .select('id, full_name, email, phone, source, is_guest, total_orders, total_spent, created_at')
                     .eq('id', customerId)
                     .single(),
                 getMeasurementProfiles(customerId),
@@ -108,7 +124,19 @@ export default function CustomerDetailPage() {
             <div className="bg-white rounded-lg shadow p-6">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">{customer.full_name}</h1>
+                        <div className="flex items-center gap-2">
+                            <h1 className="text-2xl font-bold text-gray-900">{customer.full_name}</h1>
+                            {isAdmin && (
+                                <button
+                                    onClick={() => setShowEditModal(true)}
+                                    className="p-1.5 text-gray-400 hover:text-amber-700 hover:bg-amber-50 rounded-md transition-colors"
+                                    title="Edit customer details"
+                                    aria-label="Edit customer details"
+                                >
+                                    <Pencil className="w-4 h-4" />
+                                </button>
+                            )}
+                        </div>
                         <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-600">
                             {customer.phone && (
                                 <span className="flex items-center gap-1.5">
@@ -177,6 +205,45 @@ export default function CustomerDetailPage() {
                     onAddNew={() => setFormState('new')}
                 />
             )}
+
+            <CustomerFormModal
+                isOpen={showEditModal}
+                onClose={() => setShowEditModal(false)}
+                customer={{
+                    id: customer.id,
+                    fullName: customer.full_name,
+                    phone: customer.phone ?? '',
+                    email: customer.email ?? '',
+                    isGuest: customer.is_guest ?? false,
+                }}
+                onUpdated={(updated) =>
+                    setCustomer((prev) =>
+                        prev
+                            ? {
+                                  ...prev,
+                                  full_name: updated.fullName,
+                                  phone: updated.phone,
+                                  email: updated.email,
+                              }
+                            : prev
+                    )
+                }
+            />
         </div>
+    );
+}
+
+export default function CustomerDetailPage() {
+    // useSearchParams requires a Suspense boundary in Next 14 client pages
+    return (
+        <Suspense
+            fallback={
+                <div className="flex items-center justify-center min-h-[50vh]">
+                    <Loader2 className="w-8 h-8 animate-spin text-amber-600" aria-hidden="true" />
+                </div>
+            }
+        >
+            <CustomerDetailInner />
+        </Suspense>
     );
 }

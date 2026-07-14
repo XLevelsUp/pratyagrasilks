@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 // ── Shared field definitions ──────────────────────────────────────────────────
 
-const fullNameField = z
+export const fullNameField = z
     .string()
     .trim()
     .min(2, 'Name must be at least 2 characters')
