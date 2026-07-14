@@ -2,14 +2,17 @@
 
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { Pencil, Ruler, Trash2 } from 'lucide-react';
+import { Pencil, Printer, Ruler, Trash2 } from 'lucide-react';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import MeasurementSheetPrint from '@/components/admin/measurements/MeasurementSheetPrint';
 import { fieldsByGroup, MEASUREMENT_COUNT, MeasurementKey } from '@/lib/constants/measurements';
 import { MeasurementProfile } from '@/lib/validations/measurement.schema';
 import { deleteMeasurementProfile } from '@/lib/actions/measurement.actions';
 
 interface Props {
     customerId: string;
+    customerName: string;
+    customerPhone?: string | null;
     profiles: MeasurementProfile[];
     canDelete: boolean;
     onEdit: (profile: MeasurementProfile) => void;
@@ -30,6 +33,8 @@ function formatDate(iso: string): string {
 
 export default function CustomerProfilesList({
     customerId,
+    customerName,
+    customerPhone,
     profiles,
     canDelete,
     onEdit,
@@ -38,6 +43,20 @@ export default function CustomerProfilesList({
 }: Props) {
     const [deleteTarget, setDeleteTarget] = useState<MeasurementProfile | null>(null);
     const [deleting, setDeleting] = useState(false);
+    const [printTarget, setPrintTarget] = useState<MeasurementProfile | null>(null);
+
+    // Same mount → print → afterprint-cleanup sequence as the POS receipt
+    const handlePrint = (profile: MeasurementProfile) => {
+        setPrintTarget(profile);
+        setTimeout(() => {
+            const cleanup = () => {
+                setPrintTarget(null);
+                window.removeEventListener('afterprint', cleanup);
+            };
+            window.addEventListener('afterprint', cleanup);
+            window.print();
+        }, 400);
+    };
 
     const handleDelete = async () => {
         if (!deleteTarget) return;
@@ -104,6 +123,14 @@ export default function CustomerProfilesList({
                             </span>
                             <div className="flex items-center gap-1">
                                 <button
+                                    onClick={() => handlePrint(profile)}
+                                    className="p-2 rounded-md text-gray-500 hover:text-amber-700 hover:bg-amber-50 transition-colors"
+                                    aria-label={`Print ${profile.profileLabel} measurement sheet`}
+                                    title="Print measurement sheet (A5)"
+                                >
+                                    <Printer className="w-4 h-4" />
+                                </button>
+                                <button
                                     onClick={() => onEdit(profile)}
                                     className="p-2 rounded-md text-gray-500 hover:text-amber-700 hover:bg-amber-50 transition-colors"
                                     aria-label={`Edit ${profile.profileLabel}`}
@@ -159,6 +186,14 @@ export default function CustomerProfilesList({
                     </div>
                 );
             })}
+
+            {printTarget && (
+                <MeasurementSheetPrint
+                    customerName={customerName}
+                    customerPhone={customerPhone}
+                    profile={printTarget}
+                />
+            )}
 
             <ConfirmDialog
                 isOpen={deleteTarget !== null}

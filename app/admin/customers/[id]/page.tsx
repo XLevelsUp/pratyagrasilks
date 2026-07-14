@@ -198,6 +198,8 @@ function CustomerDetailInner() {
             ) : (
                 <CustomerProfilesList
                     customerId={customerId}
+                    customerName={customer.full_name}
+                    customerPhone={customer.phone}
                     profiles={profiles}
                     canDelete={isAdmin}
                     onEdit={(p) => setFormState(p)}
