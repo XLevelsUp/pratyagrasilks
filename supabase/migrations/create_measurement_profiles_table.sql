@@ -6,7 +6,7 @@
 --
 -- Design notes:
 --   * 1-to-many: customers → measurement_profiles (e.g. "Self", "Daughter").
---   * All 24 measurements are NULLABLE DECIMAL(5,2) — partial entry is a
+--   * All 27 measurements are NULLABLE DECIMAL(5,2) — partial entry is a
 --     first-class state for rapid shop-floor sessions. CHECK bounds 1–100
 --     inches mirror the app-side Zod validation.
 --   * RLS is STAFF-ROLE based (profiles.role IN ADMIN/CASHIER), never
@@ -41,16 +41,19 @@ CREATE TABLE IF NOT EXISTS public.measurement_profiles (
     lower_bust             DECIMAL(5,2) CHECK (lower_bust             IS NULL OR (lower_bust             >= 1 AND lower_bust             <= 100)),
     waist                  DECIMAL(5,2) CHECK (waist                  IS NULL OR (waist                  >= 1 AND waist                  <= 100)),
     hip                    DECIMAL(5,2) CHECK (hip                    IS NULL OR (hip                    >= 1 AND hip                    <= 100)),
+    seat                   DECIMAL(5,2) CHECK (seat                   IS NULL OR (seat                   >= 1 AND seat                   <= 100)),
 
     -- ── Lower Body ─────────────────────────────────────────────
     upper_thigh_round DECIMAL(5,2) CHECK (upper_thigh_round IS NULL OR (upper_thigh_round >= 1 AND upper_thigh_round <= 100)),
     mid_thigh_round   DECIMAL(5,2) CHECK (mid_thigh_round   IS NULL OR (mid_thigh_round   >= 1 AND mid_thigh_round   <= 100)),
+    knee              DECIMAL(5,2) CHECK (knee              IS NULL OR (knee              >= 1 AND knee              <= 100)),
     calf              DECIMAL(5,2) CHECK (calf              IS NULL OR (calf              >= 1 AND calf              <= 100)),
     ankle             DECIMAL(5,2) CHECK (ankle             IS NULL OR (ankle             >= 1 AND ankle             <= 100)),
     crotch            DECIMAL(5,2) CHECK (crotch            IS NULL OR (crotch            >= 1 AND crotch            <= 100)),
 
     -- ── Garment Lengths ────────────────────────────────────────
     blouse_length DECIMAL(5,2) CHECK (blouse_length IS NULL OR (blouse_length >= 1 AND blouse_length <= 100)),
+    shirt_length  DECIMAL(5,2) CHECK (shirt_length  IS NULL OR (shirt_length  >= 1 AND shirt_length  <= 100)),
     pant_length   DECIMAL(5,2) CHECK (pant_length   IS NULL OR (pant_length   >= 1 AND pant_length   <= 100)),
     top_length    DECIMAL(5,2) CHECK (top_length    IS NULL OR (top_length    >= 1 AND top_length    <= 100)),
 

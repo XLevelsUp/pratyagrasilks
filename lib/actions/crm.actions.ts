@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@supabase/supabase-js';
+import { normalizeToE164 } from '@/lib/utils/phone';
 
 export interface PosCustomer {
     id: string;
@@ -34,13 +35,13 @@ export async function lookupOrCreateCustomer(
 ): Promise<CustomerLookupResult> {
     try {
         const supabase = getServiceClient();
-        const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+        const cleanPhone = normalizeToE164(phone);
 
-        if (cleanPhone.length !== 10) {
-            return { success: false, error: 'Phone must be 10 digits' };
+        if (!cleanPhone) {
+            return { success: false, error: 'Enter a valid 10-digit mobile number' };
         }
 
-        // Lookup existing customer by phone
+        // Lookup existing customer by phone (stored as E.164)
         const { data: existing, error: lookupError } = await supabase
             .from('customers')
             .select('*')
@@ -64,9 +65,24 @@ export async function lookupOrCreateCustomer(
                 full_name: name?.trim() || 'Walk-in Customer',
                 email: null,
                 source: 'POS',
+                is_guest: true,
             })
             .select()
             .single();
+
+        if (insertError?.code === '23505') {
+            // Race on uq_customers_guest_phone — another terminal created this
+            // customer between our lookup and insert. Return the winner.
+            const { data: raced } = await supabase
+                .from('customers')
+                .select('*')
+                .eq('phone', cleanPhone)
+                .limit(1)
+                .maybeSingle();
+            if (raced) {
+                return { success: true, customer: raced as PosCustomer };
+            }
+        }
 
         if (insertError || !created) {
             return { success: false, error: insertError?.message || 'Failed to create customer' };
@@ -82,7 +98,11 @@ export async function lookupOrCreateCustomer(
 export async function getCustomerByPhone(phone: string): Promise<CustomerLookupResult> {
     try {
         const supabase = getServiceClient();
-        const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+        const cleanPhone = normalizeToE164(phone);
+
+        if (!cleanPhone) {
+            return { success: false, error: 'Customer not found' };
+        }
 
         const { data: customer, error } = await supabase
             .from('customers')
