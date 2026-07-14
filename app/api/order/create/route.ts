@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
 import { createClient } from '@supabase/supabase-js';
 import { shippingAddressSchema } from '@/lib/validations/form.schemas';
+import { sendSaleWhatsAppNotification } from '@/lib/utils/whatsapp';
 
 export const dynamic = 'force-dynamic';
 
@@ -179,6 +180,25 @@ export async function POST(req: NextRequest) {
             await supabaseAdmin.from('orders').delete().eq('id', order.id);
             return NextResponse.json({ error: 'Failed to save order items' }, { status: 500 });
         }
+
+        // Internal WhatsApp sale alert — fires as soon as address + items are confirmed,
+        // regardless of whether the Razorpay payment that follows succeeds or fails.
+        (async () => {
+            try {
+                const itemsSummary = orderItems
+                    .map((oi: { quantity: number; product_name: string }) => `${oi.quantity}x ${oi.product_name}`)
+                    .join(', ');
+                await sendSaleWhatsAppNotification({
+                    orderId: orderNumber,
+                    customerName: validatedAddress.fullName,
+                    totalAmount: new Intl.NumberFormat('en-IN').format(totalAmount),
+                    items: itemsSummary,
+                });
+                console.log(`[/api/order/create] WhatsApp sale alert sent for ${orderNumber}`);
+            } catch (waErr) {
+                console.error('[/api/order/create] WhatsApp send failed (non-fatal):', waErr);
+            }
+        })();
 
         // ── 8. Create Razorpay order ──────────────────────────────────────────────
         const razorpay = new Razorpay({
