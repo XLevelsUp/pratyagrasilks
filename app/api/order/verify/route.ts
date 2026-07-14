@@ -72,28 +72,30 @@ export async function POST(req: NextRequest) {
 
         console.log(`[/api/order/verify] Payment verified — order ${order.order_number}`);
 
-        // ── 5. Send confirmation email (non-blocking) ────────────────────────────
+        // ── 5. Send confirmation email (non-blocking) ─────────────────────────────
+        // Note: the internal WhatsApp sale alert fires earlier, in /api/order/create,
+        // as soon as the address + items are confirmed — not gated on payment success.
         void (async () => {
+            const { data: customer } = await supabaseAdmin
+                .from('customers')
+                .select('full_name, email')
+                .eq('id', order.customer_id)
+                .single();
+
+            if (!customer?.email) return;
+
+            const { data: items } = await supabaseAdmin
+                .from('order_items')
+                .select('product_name, product_sku, quantity, unit_price, total_price')
+                .eq('order_id', order.id);
+
+            const { data: address } = await supabaseAdmin
+                .from('addresses')
+                .select('full_name, address_line1, address_line2, city, state, postal_code')
+                .eq('id', order.shipping_address_id)
+                .single();
+
             try {
-                const { data: customer } = await supabaseAdmin
-                    .from('customers')
-                    .select('full_name, email')
-                    .eq('id', order.customer_id)
-                    .single();
-
-                if (!customer?.email) return;
-
-                const { data: items } = await supabaseAdmin
-                    .from('order_items')
-                    .select('product_name, product_sku, quantity, unit_price, total_price')
-                    .eq('order_id', order.id);
-
-                const { data: address } = await supabaseAdmin
-                    .from('addresses')
-                    .select('full_name, address_line1, address_line2, city, state, postal_code')
-                    .eq('id', order.shipping_address_id)
-                    .single();
-
                 const emailData: OrderEmailData = {
                     orderNumber: order.order_number,
                     customerName: address?.full_name || customer.full_name || 'Valued Customer',

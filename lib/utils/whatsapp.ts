@@ -105,3 +105,74 @@ export function generateWhatsAppMessage(
         body: receiptText,
     };
 }
+
+export interface SaleNotificationPayload {
+    orderId: string;
+    customerName: string;
+    totalAmount: string | number;
+    items: string;
+}
+
+/**
+ * Sends an internal "sale completed" alert via Meta's WhatsApp Cloud API using an
+ * approved message template (works regardless of the 24h customer-session window,
+ * unlike a freeform text message).
+ *
+ * Template must be pre-approved in Meta Business Manager with a body that has
+ * 3 named variables: {{customer}}, {{amount}}, {{items}} (matched via parameter_name below).
+ * orderId is kept in the payload for logging/tracking only — it is not sent to the template.
+ */
+export async function sendSaleWhatsAppNotification({
+    orderId,
+    customerName,
+    totalAmount,
+    items,
+}: SaleNotificationPayload): Promise<any> {
+    const phoneId = process.env.WHATSAPP_PHONE_ID;
+    const token = process.env.WHATSAPP_API_TOKEN;
+    const to = process.env.WHATSAPP_SALES_RECIPIENT_NUMBER || process.env.WHATSAPP_TEST_NUMBER;
+    const templateName = process.env.WHATSAPP_SALE_TEMPLATE_NAME || 'pratyagra_sale_alerts';
+
+    if (!phoneId || !token || !to) {
+        throw new Error(
+            'WhatsApp sale notification is not configured (missing WHATSAPP_PHONE_ID, WHATSAPP_API_TOKEN, or WHATSAPP_SALES_RECIPIENT_NUMBER)'
+        );
+    }
+
+    const res = await fetch(`https://graph.facebook.com/v20.0/${phoneId}/messages`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            messaging_product: 'whatsapp',
+            to: to.replace(/[^\d]/g, ''),
+            type: 'template',
+            template: {
+                name: templateName,
+                language: { code: 'en' },
+                components: [
+                    {
+                        type: 'body',
+                        parameters: [
+                            { type: 'text', parameter_name: 'customer', text: String(customerName) },
+                            { type: 'text', parameter_name: 'amount', text: String(totalAmount) },
+                            { type: 'text', parameter_name: 'items', text: String(items) },
+                        ],
+                    },
+                ],
+            },
+        }),
+    });
+
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok) {
+        console.error('[whatsapp] Sale notification failed:', data ?? res.statusText);
+        throw new Error(data?.error?.message || `WhatsApp API error (${res.status})`);
+    }
+
+    console.log(`[whatsapp] Sale notification sent for order ${orderId}:`, data);
+    return data;
+}
