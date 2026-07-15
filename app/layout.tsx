@@ -90,6 +90,11 @@ export const metadata: Metadata = {
             "max-snippet": -1,
         },
     },
+    verification: {
+        other: {
+            "p:domain_verify": "d71a5f24c0280eaaae286631f0425917",
+        },
+    },
     alternates: {
         canonical: siteMetadata.baseUrl,
     },
