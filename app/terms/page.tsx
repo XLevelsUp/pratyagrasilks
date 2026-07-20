@@ -4,6 +4,7 @@ export const metadata: Metadata = {
     title: "Terms of Service | Kandangi Sarees",
     description: "Read Kandangi Sarees's Terms of Service. Learn about our policies, user agreements, and terms and conditions.",
     keywords: ["terms of service", "user agreement", "terms and conditions"],
+    alternates: { canonical: "https://kandangisarees.com/terms" },
 };
 
 export default function TermsPage() {

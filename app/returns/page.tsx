@@ -5,6 +5,7 @@ export const metadata: Metadata = {
     title: "Returns & Exchanges | Kandangi Sarees",
     description: "Kandangi Sarees Returns & Exchange Policy. We do not accept returns. Exchanges are available only for damage or missing items, raised within 7 days of delivery. Learn about our quality commitment.",
     keywords: ["returns policy", "exchanges", "defects", "handloom quality", "Kandangi Sarees returns"],
+    alternates: { canonical: "https://kandangisarees.com/returns" },
 };
 
 export default function ReturnsPage() {
