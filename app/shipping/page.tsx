@@ -5,6 +5,7 @@ export const metadata: Metadata = {
     title: "Shipping & Delivery | Kandangi Sarees",
     description: "Kandangi Sarees Shipping Policy. We deliver globally with secure packaging. India: 2-7 days. International: 10-14 days. DDU terms apply internationally.",
     keywords: ["shipping", "delivery", "international delivery", "shipping policy", "customs duties"],
+    alternates: { canonical: "https://kandangisarees.com/shipping" },
 };
 
 export default function ShippingPage() {

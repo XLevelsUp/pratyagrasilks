@@ -4,6 +4,7 @@ export const metadata: Metadata = {
     title: "Privacy Policy | Kandangi Sarees",
     description: "Read Kandangi Sarees's Privacy Policy. Learn how we collect, use, and protect your personal information.",
     keywords: ["privacy policy", "data protection", "personal information"],
+    alternates: { canonical: "https://kandangisarees.com/privacy" },
 };
 
 export default function PrivacyPage() {

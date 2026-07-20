@@ -6,6 +6,7 @@ export const metadata: Metadata = {
     title: "Our Story — Kandangi Sarees",
     description: "Learn why we started Kandangi Sarees — to simplify saree shopping by handpicking the finest handlooms from weavers across India. Discover our commitment to authentic weaves and artisan communities.",
     keywords: ["about Kandangi Sarees", "handloom sarees", "weaver-direct sarees", "artisan support", "authentic sarees"],
+    alternates: { canonical: "https://kandangisarees.com/about" },
 };
 
 const values = [
