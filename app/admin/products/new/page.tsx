@@ -25,6 +25,8 @@ function NewProductForm() {
 
     const [loading, setLoading] = useState(false);
     const [productImages, setProductImages] = useState<string[]>([]);
+    const [blurMap, setBlurMap] = useState<Record<string, string>>({});
+    const [imageVariants, setImageVariants] = useState<Record<string, Record<number, string>>>({});
     const [vendors, setVendors] = useState<Vendor[]>([]);
     const [vendorsLoading, setVendorsLoading] = useState(true);
     const [formData, setFormData] = useState({
@@ -113,6 +115,8 @@ function NewProductForm() {
                     dimensions: formData.dimensions || null,
                     weight: formData.weight || null,
                     images: productImages,
+                    blur_map: blurMap,
+                    image_variants: imageVariants,
                     yt_link: formData.yt_link || null,
                     is_online: formData.is_online,
                     color_families: formData.color_families,
@@ -469,7 +473,11 @@ function NewProductForm() {
                         </label>
                         <OptimizedUploader
                             onImagesChange={handleImagesChange}
+                            onBlurMapChange={setBlurMap}
+                            onImageVariantsChange={setImageVariants}
                             existingImages={productImages}
+                            existingBlurMap={blurMap}
+                            existingImageVariants={imageVariants}
                             maxImages={10}
                         />
                     </div>

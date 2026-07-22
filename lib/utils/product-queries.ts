@@ -16,6 +16,8 @@ export function transformProduct(p: any): Product {
         price: p.price,
         category: p.category,
         images: p.images || [],
+        blurMap: p.blur_map ?? {},
+        imageVariants: p.image_variants ?? {},
         inStock: p.in_stock,
         isOnline: p.is_online ?? true,
         sku: p.sku,
