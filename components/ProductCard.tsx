@@ -2,7 +2,6 @@ import { Product } from '@/lib/types';
 import Link from 'next/link';
 import KandangiProductImage from '@/components/products/KandangiProductImage';
 import WishlistButton from '@/components/Wishlist/WishlistButton';
-import { BRAND_FULL_NAME } from '@/lib/constants/brand';
 
 interface ProductCardProps {
     product: Product;
@@ -39,7 +38,7 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
                 {/* Product Image */}
                 <KandangiProductImage
                     src={imageUrl}
-                    alt={`${product.name} Pure silk sarees online in India | ${BRAND_FULL_NAME}`}
+                    alt={product.name}
                     blurDataURL={product.blurMap?.[imageUrl]}
                     variantMap={product.imageVariants?.[imageUrl]}
                     sizes="(max-width: 768px) 100vw, 296px"
