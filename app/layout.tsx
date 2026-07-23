@@ -12,6 +12,7 @@ import { WishlistProvider } from "@/lib/context/WishlistContext";
 import CartSidebar from "@/components/Cart/CartSidebar";
 import { Analytics } from "@vercel/analytics/react";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import GoogleTagManager from "@/components/GoogleTagManager";
 import MetaPixel from "@/components/MetaPixel";
 import { Toaster } from "react-hot-toast";
 import OrganizationSchema from "@/components/seo/OrganizationSchema";
@@ -107,7 +108,18 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
+            <head>
+                <GoogleTagManager />
+            </head>
             <body className="antialiased"> {/* fixed: vertical scroll restored — removed hide-scrollbar from body */}
+                <noscript>
+                    <iframe
+                        src="https://www.googletagmanager.com/ns.html?id=GTM-KZVJ66DS"
+                        height="0"
+                        width="0"
+                        style={{ display: 'none', visibility: 'hidden' }}
+                    />
+                </noscript>
                 <OrganizationSchema />
 
                 <AuthProvider>
