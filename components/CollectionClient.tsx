@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import ProductCard from '@/components/ProductCard';
 import FilterSidebar, { FilterState } from '@/components/FilterSidebar';
+import MaintenanceNotice from '@/components/ui/MaintenanceNotice';
 import { Product } from '@/lib/types';
 
 export default function CollectionClient() {
@@ -65,15 +66,20 @@ export default function CollectionClient() {
     return (
         <div className="container mx-auto px-4 py-4 md:py-0 md:pb-8">
             {/* Filter bar (md+) + bottom-sheet drawer (mobile) */}
-            <FilterSidebar
-                currentFilters={filters}
-                resultCount={products.length}
-                loading={loading}
-            />
+            <div data-maint="listing">
+                <FilterSidebar
+                    currentFilters={filters}
+                    resultCount={products.length}
+                    loading={loading}
+                />
+            </div>
+
+            {/* Shown only during a maintenance break (see app/maintenance.css) */}
+            <MaintenanceNotice />
 
             {/* Product Grid — height floor so result changes (including zero
                 results) never collapse the page and jolt the scroll position */}
-            <main className="flex flex-col min-h-[50vh] pt-2 md:pt-8">
+            <main data-maint="listing" className="flex flex-col min-h-[50vh] pt-2 md:pt-8">
                     {/* Results count — mobile only; the bar owns it on md+ */}
                     <div className="mb-6 md:hidden">
                         <p className="text-xs font-semibold tracking-[0.2em] uppercase text-textSecondary/70">

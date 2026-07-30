@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
+// ⚠ MAINTENANCE BREAK — delete this one line to bring all product listings back.
+import "./maintenance.css";
 import ConditionalHeader from "@/components/ui/ConditionalHeader";
 import ConditionalFooter from "@/components/ui/ConditionalFooter";
 import ConditionalReels from "@/components/ui/ConditionalReels";
