@@ -2,6 +2,7 @@ import { Product } from '@/lib/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import WishlistButton from '@/components/Wishlist/WishlistButton';
+import { hasDiscount, getEffectivePrice, getDiscountPercent } from '@/lib/utils/discount';
 
 interface ProductCardProps {
     product: Product;
@@ -34,6 +35,8 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
 
     const displayNewBadge = (showNewBadge || isNewArrival) && product.inStock;
     const isSold = !product.inStock;
+    const isDiscounted = hasDiscount(product) && !isSold;
+    const percentOff = isDiscounted ? getDiscountPercent(product) : 0;
 
     return (
         <Link href={`/product/${product.id}`} className="group block">
@@ -59,6 +62,13 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
                     </span>
                 ) : null}
 
+                {/* Offer badge — bottom-left, clear of the status chip above */}
+                {isDiscounted && (
+                    <span className="absolute bottom-3 left-3 z-10 bg-accent-700 text-white text-[10px] font-bold tracking-[0.12em] uppercase px-2.5 py-1 rounded-full shadow-sm">
+                        {percentOff}% Off
+                    </span>
+                )}
+
                 {/* Wishlist — hover-revealed on desktop, always present on touch */}
                 <div className="absolute top-3 right-3 z-10 lg:opacity-0 lg:group-hover:opacity-100 lg:focus-within:opacity-100 transition-opacity duration-300">
                     <WishlistButton product={product} variant="icon-only" />
@@ -83,9 +93,20 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
                 <h3 className={`font-playfair text-lg leading-snug line-clamp-2 transition-colors duration-300 ${isSold ? 'text-gray-500' : 'text-textPrimary group-hover:text-primary'}`}>
                     {product.name}
                 </h3>
-                <p className={`text-lg font-semibold mt-1 ${isSold ? 'text-gray-400' : 'text-textPrimary'}`}>
-                    {formatPrice(product.price)}
-                </p>
+                {isDiscounted ? (
+                    <p className="mt-1 flex items-baseline gap-2 flex-wrap">
+                        <span className="text-lg font-semibold text-textPrimary">
+                            {formatPrice(getEffectivePrice(product))}
+                        </span>
+                        <span className="text-sm text-gray-400 line-through">
+                            {formatPrice(product.price)}
+                        </span>
+                    </p>
+                ) : (
+                    <p className={`text-lg font-semibold mt-1 ${isSold ? 'text-gray-400' : 'text-textPrimary'}`}>
+                        {formatPrice(product.price)}
+                    </p>
+                )}
             </div>
         </Link>
     );

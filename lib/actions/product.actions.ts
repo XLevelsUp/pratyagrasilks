@@ -32,6 +32,9 @@ export async function getNewArrivals(): Promise<Product[]> {
         name: product.name,
         description: product.description,
         price: product.price,
+        discountType: product.discount_type ?? null,
+        discountValue: product.discount_value != null ? Number(product.discount_value) : null,
+        salePrice: product.sale_price != null ? Number(product.sale_price) : null,
         category: product.category,
         images: product.images || [],
         inStock: product.in_stock,
@@ -102,6 +105,10 @@ export interface ProductUpdateInput {
     profit_margin_percent?: number;
     selling_tax_percent?: number;
     is_price_overridden?: boolean;
+    // Per-product discount
+    discount_type?: 'AMT' | 'PCT' | null;
+    discount_value?: number;
+    sale_price?: number | null;
 }
 
 export async function deleteProduct(id: string): Promise<void> {
@@ -145,6 +152,10 @@ export async function updateProduct(id: string, data: ProductUpdateInput): Promi
         if (data.profit_margin_percent !== undefined) patch.profit_margin_percent = data.profit_margin_percent;
         if (data.selling_tax_percent !== undefined)  patch.selling_tax_percent = data.selling_tax_percent;
         if (data.is_price_overridden !== undefined)  patch.is_price_overridden = data.is_price_overridden;
+        // Discount is pricing — same ADMIN-only guard
+        if (data.discount_type !== undefined)  patch.discount_type = data.discount_type;
+        if (data.discount_value !== undefined) patch.discount_value = data.discount_value;
+        if (data.sale_price !== undefined)     patch.sale_price = data.sale_price;
     }
 
     const { error } = await supabase.from('products').update(patch).eq('id', id);

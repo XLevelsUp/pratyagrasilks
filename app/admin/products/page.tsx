@@ -13,12 +13,16 @@ import { deleteProduct } from '@/lib/actions/product.actions';
 import BulkQrWrapper from '@/components/admin/BulkQrWrapper';
 import PrinterCalibration from '@/components/admin/PrinterCalibration';
 import ResponsiveDataTable, { Column } from '@/components/admin/ResponsiveDataTable';
+import { hasDiscount, getEffectivePrice, getDiscountPercent } from '@/lib/utils/discount';
 
 interface Product {
     id: string;
     name: string;
     sku: string;
     price: number;
+    sale_price?: number | null;
+    discount_type?: 'AMT' | 'PCT' | null;
+    discount_value?: number | null;
     stock_quantity: number;
     category: string;
     material: string;
@@ -42,10 +46,11 @@ export default function AdminProductsPage() {
     const [vendorFilter, setVendorFilter] = useState('all');
     const [stockFilter, setStockFilter] = useState('all');
     const [listingFilter, setListingFilter] = useState('all');
+    const [offerFilter, setOfferFilter] = useState('all');
 
     useEffect(() => {
         fetchProducts();
-    }, [categoryFilter, vendorFilter, stockFilter, listingFilter]);
+    }, [categoryFilter, vendorFilter, stockFilter, listingFilter, offerFilter]);
 
     useEffect(() => {
         async function fetchVendors() {
@@ -80,6 +85,8 @@ export default function AdminProductsPage() {
         if (stockFilter === 'sold_out')  query = query.eq('stock_quantity', 0);
         if (listingFilter === 'online')   query = query.eq('is_online', true);
         if (listingFilter === 'pos_only') query = query.eq('is_online', false);
+        if (offerFilter === 'discounted')  query = query.not('sale_price', 'is', null);
+        if (offerFilter === 'no_discount') query = query.is('sale_price', null);
 
         const { data, error } = await query;
 
@@ -258,7 +265,19 @@ export default function AdminProductsPage() {
             header: 'Price',
             className: 'whitespace-nowrap',
             render: (product) => (
-                <span className="text-gray-900 font-medium">{formatPrice(product.price)}</span>
+                hasDiscount(product) ? (
+                    <span className="flex flex-col gap-0.5">
+                        <span className="flex items-baseline gap-1.5">
+                            <span className="text-xs text-gray-400 line-through">{formatPrice(product.price)}</span>
+                            <span className="text-gray-900 font-semibold">{formatPrice(getEffectivePrice(product))}</span>
+                        </span>
+                        <span className="inline-flex w-fit items-center px-1.5 py-0.5 text-[10px] font-bold text-green-700 bg-green-50 border border-green-200 rounded">
+                            {getDiscountPercent(product)}% OFF
+                        </span>
+                    </span>
+                ) : (
+                    <span className="text-gray-900 font-medium">{formatPrice(product.price)}</span>
+                )
             ),
         },
         {
@@ -359,7 +378,17 @@ export default function AdminProductsPage() {
 
             {/* Middle row: price + stock */}
             <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-amber-700">{formatPrice(product.price)}</span>
+                {hasDiscount(product) ? (
+                    <span className="flex items-baseline gap-1.5 flex-wrap">
+                        <span className="text-sm text-gray-400 line-through">{formatPrice(product.price)}</span>
+                        <span className="text-lg font-bold text-amber-700">{formatPrice(getEffectivePrice(product))}</span>
+                        <span className="px-1.5 py-0.5 text-[10px] font-bold text-green-700 bg-green-50 border border-green-200 rounded">
+                            {getDiscountPercent(product)}% OFF
+                        </span>
+                    </span>
+                ) : (
+                    <span className="text-lg font-bold text-amber-700">{formatPrice(product.price)}</span>
+                )}
                 <span
                     className={`px-3 py-1 rounded-full text-xs font-medium ${
                         product.stock_quantity > 10
@@ -435,7 +464,7 @@ export default function AdminProductsPage() {
                 </div>
 
                 {/* Dropdown filters */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                     <select
                         value={categoryFilter}
                         onChange={(e) => setCategoryFilter(e.target.value)}
@@ -478,16 +507,26 @@ export default function AdminProductsPage() {
                         <option value="online">Online</option>
                         <option value="pos_only">POS Only</option>
                     </select>
+
+                    <select
+                        value={offerFilter}
+                        onChange={(e) => setOfferFilter(e.target.value)}
+                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 min-h-[44px]"
+                    >
+                        <option value="all">All Offers</option>
+                        <option value="discounted">Discounted</option>
+                        <option value="no_discount">No Discount</option>
+                    </select>
                 </div>
 
                 {/* Active filter indicator */}
-                {[categoryFilter, vendorFilter, stockFilter, listingFilter].filter(f => f !== 'all').length > 0 && (
+                {[categoryFilter, vendorFilter, stockFilter, listingFilter, offerFilter].filter(f => f !== 'all').length > 0 && (
                     <div className="mt-3 flex items-center gap-2">
                         <span className="text-xs text-gray-500">
-                            {[categoryFilter, vendorFilter, stockFilter, listingFilter].filter(f => f !== 'all').length} filter{[categoryFilter, vendorFilter, stockFilter, listingFilter].filter(f => f !== 'all').length > 1 ? 's' : ''} active
+                            {[categoryFilter, vendorFilter, stockFilter, listingFilter, offerFilter].filter(f => f !== 'all').length} filter{[categoryFilter, vendorFilter, stockFilter, listingFilter, offerFilter].filter(f => f !== 'all').length > 1 ? 's' : ''} active
                         </span>
                         <button
-                            onClick={() => { setCategoryFilter('all'); setVendorFilter('all'); setStockFilter('all'); setListingFilter('all'); }}
+                            onClick={() => { setCategoryFilter('all'); setVendorFilter('all'); setStockFilter('all'); setListingFilter('all'); setOfferFilter('all'); }}
                             className="text-xs text-amber-600 hover:text-amber-700 underline"
                         >
                             Clear all

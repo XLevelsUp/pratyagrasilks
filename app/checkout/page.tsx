@@ -13,6 +13,7 @@ import { trackBeginCheckout } from '@/lib/analytics/gtag';
 import EmailVerificationForm from '@/components/Auth/EmailVerificationForm';
 import { useAuth } from '@/lib/context/AuthContext';
 import { Address } from '@/components/profile/AddressCard';
+import { getEffectivePrice } from '@/lib/utils/discount';
 
 interface ShippingZone {
     id: string;
@@ -114,7 +115,7 @@ export default function CheckoutPage() {
     // Track begin checkout in GA4
     useEffect(() => {
         if (items.length > 0) {
-            const subtotal = items.reduce((sum, item) => sum + item.product.price, 0);
+            const subtotal = items.reduce((sum, item) => sum + getEffectivePrice(item.product), 0);
             trackBeginCheckout(items, subtotal);
         }
     }, []); // Only fire once on mount
@@ -335,6 +336,7 @@ export default function CheckoutPage() {
                                                 product: {
                                                     name: i.product.name,
                                                     price: i.product.price,
+                                                    salePrice: i.product.salePrice ?? null,
                                                     sku: i.product.sku,
                                                 },
                                             }))}

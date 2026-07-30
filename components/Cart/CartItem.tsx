@@ -4,6 +4,7 @@ import { CartItem } from '@/lib/context/CartContext';
 import Image from 'next/image';
 import Link from 'next/link';
 import { X } from 'lucide-react';
+import { hasDiscount, getEffectivePrice } from '@/lib/utils/discount';
 
 interface CartItemComponentProps {
     item: CartItem;
@@ -55,9 +56,16 @@ export default function CartItemComponent({
                         </h3>
                     </Link>
                 </div>
-                <p className="text-sm font-semibold text-textPrimary">
-                    {formatPrice(item.product.price)}
-                </p>
+                {hasDiscount(item.product) ? (
+                    <p className="text-sm font-semibold text-textPrimary flex items-baseline gap-2 flex-wrap justify-end">
+                        <span className="text-xs text-gray-400 line-through">{formatPrice(item.product.price)}</span>
+                        <span>{formatPrice(getEffectivePrice(item.product))}</span>
+                    </p>
+                ) : (
+                    <p className="text-sm font-semibold text-textPrimary">
+                        {formatPrice(item.product.price)}
+                    </p>
+                )}
             </div>
 
             {/* Remove */}

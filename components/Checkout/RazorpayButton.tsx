@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Script from 'next/script';
 import toast from 'react-hot-toast';
 import { ShieldCheck } from 'lucide-react';
+import { getEffectivePrice } from '@/lib/utils/discount';
 
 declare global {
     interface Window {
@@ -14,7 +15,7 @@ declare global {
 
 interface CartItem {
     productId: string;
-    product: { name: string; price: number; sku: string };
+    product: { name: string; price: number; salePrice?: number | null; sku: string };
 }
 
 interface ShippingAddress {
@@ -55,7 +56,7 @@ export default function RazorpayButton({
     const [loading, setLoading] = useState(false);
 
     const totalAmount =
-        cartItems.reduce((sum, i) => sum + i.product.price, 0) + shippingCost;
+        cartItems.reduce((sum, i) => sum + getEffectivePrice(i.product), 0) + shippingCost;
 
     const handlePayment = async () => {
         if (!scriptReady) {

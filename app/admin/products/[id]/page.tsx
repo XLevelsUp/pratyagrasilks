@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { ArrowLeft, Save, Youtube, Calculator } from 'lucide-react';
+import { ArrowLeft, Save, Youtube, Calculator, Tag, X, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import OptimizedUploader from '@/components/admin/OptimizedUploader';
@@ -11,6 +11,7 @@ import ColorFamilyPicker from '@/components/ui/ColorFamilyPicker';
 import QrLabel from '@/components/admin/QrLabel';
 import { isValidYouTubeUrl, getYouTubeThumbnailUrl } from '@/lib/utils/youtube';
 import { calculateMrp } from '@/lib/utils/pricing';
+import { calculateSalePrice, DiscountType } from '@/lib/utils/discount';
 import Image from 'next/image';
 import { getVendors } from '@/lib/actions/vendor.actions';
 import { Vendor } from '@/lib/types';
@@ -63,8 +64,50 @@ export default function EditProductPage() {
         profit_margin_percent: '35',
         selling_tax_percent: '5',
         is_price_overridden: false,
+        discount_type: null as DiscountType | null,
+        discount_value: 0,
+        sale_price: null as number | null,
     });
     const [ytLinkError, setYtLinkError] = useState('');
+
+    // ── Per-product discount dialog ──────────────────────────────────────────
+    const [showDiscountDialog, setShowDiscountDialog] = useState(false);
+    const [draftDiscountType, setDraftDiscountType] = useState<DiscountType>('PCT');
+    const [draftDiscountValue, setDraftDiscountValue] = useState('');
+
+    const mrpNum = parseFloat(formData.price) || 0;
+    const draftSalePrice = calculateSalePrice(
+        mrpNum,
+        draftDiscountType,
+        parseFloat(draftDiscountValue) || 0,
+    );
+    const landingCost =
+        (parseFloat(formData.purchase_price) || 0) *
+        (1 + (parseFloat(formData.purchase_tax_percent) || 0) / 100);
+    const isBelowCost = draftSalePrice !== null && landingCost > 0 && draftSalePrice < landingCost;
+
+    const openDiscountDialog = () => {
+        setDraftDiscountType(formData.discount_type ?? 'PCT');
+        setDraftDiscountValue(formData.discount_value ? formData.discount_value.toString() : '');
+        setShowDiscountDialog(true);
+    };
+
+    const saveDiscount = () => {
+        const value = parseFloat(draftDiscountValue) || 0;
+        setFormData(prev => ({
+            ...prev,
+            discount_type: draftSalePrice !== null ? draftDiscountType : null,
+            discount_value: draftSalePrice !== null ? value : 0,
+            sale_price: draftSalePrice,
+        }));
+        setShowDiscountDialog(false);
+    };
+
+    const removeDiscount = () => {
+        setFormData(prev => ({ ...prev, discount_type: null, discount_value: 0, sale_price: null }));
+        setDraftDiscountValue('');
+        setShowDiscountDialog(false);
+    };
 
     useEffect(() => {
         fetchProduct();
@@ -115,6 +158,9 @@ export default function EditProductPage() {
                 profit_margin_percent: data.profit_margin_percent?.toString() ?? '35',
                 selling_tax_percent: data.selling_tax_percent?.toString() ?? '5',
                 is_price_overridden: data.is_price_overridden ?? false,
+                discount_type: (data.discount_type as DiscountType | null) ?? null,
+                discount_value: Number(data.discount_value) || 0,
+                sale_price: data.sale_price != null ? Number(data.sale_price) : null,
             });
             // Set product images separately
             setProductImages(Array.isArray(data.images) ? data.images : []);
@@ -135,6 +181,20 @@ export default function EditProductPage() {
         );
         setFormData(prev => ({ ...prev, price: mrp.toString() }));
     }, [formData.purchase_price, formData.purchase_tax_percent, formData.profit_margin_percent, formData.selling_tax_percent, formData.is_price_overridden]);
+
+    // Keep sale_price in step with MRP — otherwise editing margin after setting
+    // a discount would leave a stale sale price attached to a new MRP.
+    useEffect(() => {
+        setFormData(prev => {
+            if (!prev.discount_type || !prev.discount_value) return prev;
+            const next = calculateSalePrice(
+                parseFloat(prev.price) || 0,
+                prev.discount_type,
+                prev.discount_value,
+            );
+            return next === prev.sale_price ? prev : { ...prev, sale_price: next };
+        });
+    }, [formData.price]);
 
     const handleImagesChange = (urls: string[]) => {
         setProductImages(urls);
@@ -173,6 +233,9 @@ export default function EditProductPage() {
                 profit_margin_percent: parseFloat(formData.profit_margin_percent) || 0,
                 selling_tax_percent: parseFloat(formData.selling_tax_percent) || 0,
                 is_price_overridden: formData.is_price_overridden,
+                discount_type: formData.discount_type,
+                discount_value: formData.discount_value,
+                sale_price: formData.sale_price,
             });
 
             toast.success('Product updated successfully!');
@@ -345,6 +408,34 @@ export default function EditProductPage() {
                         </div>
                         {role === 'CASHIER' && (
                             <p className="mt-1 text-xs text-amber-600">Price modification requires Admin access.</p>
+                        )}
+
+                        {/* Offer — pricing, so ADMIN only (server strips these for CASHIER) */}
+                        {role === 'ADMIN' && (
+                            <>
+                                <div className="mt-2 flex items-center gap-2 flex-wrap">
+                                    <button
+                                        type="button"
+                                        onClick={openDiscountDialog}
+                                        disabled={mrpNum <= 0}
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#550c72] bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                    >
+                                        <Tag className="w-3.5 h-3.5" />
+                                        {formData.sale_price !== null ? 'Edit Discount' : 'Apply Discount'}
+                                    </button>
+                                    {formData.sale_price !== null && (
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-green-700 bg-green-50 border border-green-200 rounded-lg">
+                                            {formData.discount_type === 'PCT'
+                                                ? `${formData.discount_value}% OFF`
+                                                : `₹${formData.discount_value.toLocaleString('en-IN')} OFF`}
+                                            <span className="text-green-600">→ ₹{formData.sale_price.toLocaleString('en-IN')}</span>
+                                        </span>
+                                    )}
+                                </div>
+                                {mrpNum <= 0 && (
+                                    <p className="mt-1.5 text-xs text-gray-400">Set an MRP first to apply a discount</p>
+                                )}
+                            </>
                         )}
                     </div>
 
@@ -598,6 +689,133 @@ export default function EditProductPage() {
                         sku={formData.sku}
                         price={Number(formData.price) || 0}
                     />
+                </div>
+            )}
+
+            {/* Apply Discount Dialog */}
+            {showDiscountDialog && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+                        <div className="flex items-center justify-between mb-5">
+                            <h3 className="flex items-center gap-2 text-lg font-bold text-gray-900">
+                                <Tag className="w-5 h-5 text-[#550c72]" />
+                                Apply Discount
+                            </h3>
+                            <button
+                                type="button"
+                                onClick={() => setShowDiscountDialog(false)}
+                                className="text-gray-400 hover:text-gray-600"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {/* MRP reference */}
+                        <div className="bg-gray-50 rounded-xl p-4 mb-5 flex justify-between items-center">
+                            <span className="text-sm text-gray-600 font-medium">Product MRP</span>
+                            <span className="text-lg font-bold text-gray-900">
+                                ₹{mrpNum.toLocaleString('en-IN')}
+                            </span>
+                        </div>
+
+                        {/* Discount input with ₹ / % toggle */}
+                        <div className="mb-5">
+                            <label className="block text-xs font-semibold text-gray-600 uppercase mb-2">
+                                Discount
+                            </label>
+                            <div className="flex gap-2">
+                                <div className="flex rounded-lg border-2 border-gray-200 overflow-hidden flex-shrink-0">
+                                    {(['AMT', 'PCT'] as DiscountType[]).map(mode => (
+                                        <button
+                                            key={mode}
+                                            type="button"
+                                            onClick={() => setDraftDiscountType(mode)}
+                                            className={`px-4 py-2 text-sm font-bold transition-colors ${
+                                                draftDiscountType === mode
+                                                    ? 'bg-[#550c72] text-white'
+                                                    : 'bg-white text-gray-500 hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            {mode === 'AMT' ? '₹' : '%'}
+                                        </button>
+                                    ))}
+                                </div>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max={draftDiscountType === 'PCT' ? 100 : mrpNum}
+                                    step={draftDiscountType === 'PCT' ? 0.5 : 1}
+                                    value={draftDiscountValue}
+                                    onChange={e => setDraftDiscountValue(e.target.value)}
+                                    placeholder={draftDiscountType === 'PCT' ? 'e.g. 10' : 'e.g. 2000'}
+                                    className="flex-1 px-3 py-2 border-2 border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#550c72] transition-colors"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Sale price preview */}
+                        {draftSalePrice !== null && (
+                            <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-5">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm text-green-800 font-medium">Sale Price</span>
+                                    <span className="flex items-baseline gap-2">
+                                        <span className="text-sm text-gray-400 line-through">
+                                            ₹{mrpNum.toLocaleString('en-IN')}
+                                        </span>
+                                        <span className="text-xl font-bold text-green-700">
+                                            ₹{draftSalePrice.toLocaleString('en-IN')}
+                                        </span>
+                                    </span>
+                                </div>
+                                <p className="text-xs text-green-700 mt-1.5">
+                                    Customer saves ₹{(mrpNum - draftSalePrice).toLocaleString('en-IN')}
+                                    {mrpNum > 0 && ` (${Math.round(((mrpNum - draftSalePrice) / mrpNum) * 100)}%)`}
+                                </p>
+                            </div>
+                        )}
+
+                        {/* Below-cost warning */}
+                        {isBelowCost && draftSalePrice !== null && (
+                            <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-5 flex gap-3">
+                                <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                                <div>
+                                    <p className="text-sm font-semibold text-red-800">Selling below cost</p>
+                                    <p className="text-xs text-red-700 mt-1">
+                                        Landing cost is ₹{Math.round(landingCost).toLocaleString('en-IN')}. You lose{' '}
+                                        ₹{Math.round(landingCost - draftSalePrice).toLocaleString('en-IN')} per sale.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Actions */}
+                        <div className="flex gap-3">
+                            {formData.sale_price !== null && (
+                                <button
+                                    type="button"
+                                    onClick={removeDiscount}
+                                    className="px-4 py-3 border-2 border-red-200 text-red-600 rounded-xl font-semibold text-sm hover:bg-red-50 transition-colors whitespace-nowrap"
+                                >
+                                    Remove
+                                </button>
+                            )}
+                            <button
+                                type="button"
+                                onClick={() => setShowDiscountDialog(false)}
+                                className="flex-1 py-3 border-2 border-gray-200 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={saveDiscount}
+                                disabled={draftSalePrice === null}
+                                className="flex-[2] py-3 bg-[#550c72] hover:bg-[#8430AB] disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl font-bold transition-colors"
+                            >
+                                Save Discount
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

@@ -12,6 +12,7 @@ import toast from 'react-hot-toast';
 import { trackViewItem, trackAddToCart } from '@/lib/analytics/gtag';
 import { COLOR_FAMILIES, LIGHT_COLOR_IDS } from '@/lib/constants/colors';
 import { siteMetadata } from '@/lib/seo/config';
+import { hasDiscount, getEffectivePrice, getDiscountPercent, getDiscountSavings } from '@/lib/utils/discount';
 
 interface ProductDetailClientProps {
     product: Product;
@@ -120,9 +121,26 @@ export default function ProductDetailClient({ product, productId }: ProductDetai
 
                         {/* Price + stock */}
                         <div className="flex items-baseline gap-4 flex-wrap mb-8">
-                            <p className="text-3xl font-semibold text-textPrimary">
-                                {formatPrice(product.price)}
-                            </p>
+                            {hasDiscount(product) ? (
+                                <>
+                                    <p className="text-3xl font-semibold text-textPrimary">
+                                        {formatPrice(getEffectivePrice(product))}
+                                    </p>
+                                    <p className="text-xl text-gray-400 line-through">
+                                        {formatPrice(product.price)}
+                                    </p>
+                                    <span className="bg-accent-700 text-white text-[11px] font-bold tracking-[0.12em] uppercase px-2.5 py-1 rounded-full">
+                                        {getDiscountPercent(product)}% Off
+                                    </span>
+                                    <span className="w-full text-sm font-semibold text-green-700">
+                                        You save {formatPrice(getDiscountSavings(product))}
+                                    </span>
+                                </>
+                            ) : (
+                                <p className="text-3xl font-semibold text-textPrimary">
+                                    {formatPrice(product.price)}
+                                </p>
+                            )}
                             {product.inStock ? (
                                 <span className="flex items-center gap-2 text-xs font-semibold tracking-[0.15em] uppercase text-green-700">
                                     <span className="w-2 h-2 rounded-full bg-green-500" aria-hidden="true" />

@@ -3,6 +3,7 @@ import Razorpay from 'razorpay';
 import { createClient } from '@supabase/supabase-js';
 import { shippingAddressSchema } from '@/lib/validations/form.schemas';
 import { sendSaleWhatsAppNotification } from '@/lib/utils/whatsapp';
+import { getEffectivePrice } from '@/lib/utils/discount';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,7 +38,7 @@ export async function POST(req: NextRequest) {
         const productIds: string[] = items.map((i: any) => i.productId);
         const { data: products, error: productErr } = await supabaseAdmin
             .from('products')
-            .select('id, name, price, in_stock, sku')
+            .select('id, name, price, sale_price, in_stock, sku')
             .in('id', productIds);
 
         if (productErr || !products || products.length !== items.length) {
@@ -56,9 +57,11 @@ export async function POST(req: NextRequest) {
         const productMap = new Map(products.map((p) => [p.id, p]));
 
         // ── 3. Server-side total calculation ─────────────────────────────────────
+        // Discounted products charge sale_price — resolved here from the DB, never
+        // from the client, so a tampered cart cannot invent its own offer.
         const subtotal = items.reduce((sum: number, item: any) => {
             const p = productMap.get(item.productId);
-            return sum + (p ? p.price : 0);
+            return sum + (p ? getEffectivePrice(p) : 0);
         }, 0);
         const totalAmount = subtotal + shippingCost;
 
@@ -168,8 +171,8 @@ export async function POST(req: NextRequest) {
                 product_name: p.name,
                 product_sku: p.sku,
                 quantity: 1,
-                unit_price: p.price,
-                total_price: p.price,
+                unit_price: getEffectivePrice(p),
+                total_price: getEffectivePrice(p),
             };
         });
 
