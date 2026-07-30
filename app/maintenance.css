@@ -1,0 +1,27 @@
+/* ============================================================
+   MAINTENANCE BREAK — product listings hidden
+   ------------------------------------------------------------
+   Visually hides every product listing (collection grid, filter
+   bar, home New Arrivals rail, silk category grids) while leaving
+   the markup — and therefore the JSON-LD, metadata and indexed
+   HTML — completely untouched. Purely cosmetic: nothing is
+   unpublished, no URL changes, no SEO impact.
+
+   TO END THE BREAK:
+     delete the `import "./maintenance.css";` line in app/layout.tsx
+   That single line is the whole switch. The `data-maint`
+   attributes left in the components are inert without this file.
+
+   Individual product pages (/product/[id]) stay fully working
+   and buyable throughout — by design.
+   ============================================================ */
+
+/* Listings — hidden while this file is loaded */
+[data-maint="listing"] {
+  display: none !important;
+}
+
+/* Notice — markup ships with Tailwind's `hidden`, revealed here only */
+[data-maint="notice"] {
+  display: block !important;
+}
