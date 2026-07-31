@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import Reveal from '@/components/motion/Reveal';
 import NewArrivalsRail from '@/components/home/NewArrivalsRail';
-import MaintenanceNotice from '@/components/ui/MaintenanceNotice';
 import { getNewArrivalsPublic } from '@/lib/data/public-products';
 import { siteMetadata } from '@/lib/seo/config';
 
@@ -51,7 +50,6 @@ export default async function NewArrivals() {
                         </div>
                         <Link
                             href="/collection"
-                            data-maint="listing"
                             className="hidden md:inline-flex items-center gap-2 text-primary font-semibold hover:text-primary-light transition-colors group pb-1 border-b-2 border-primary/20 hover:border-primary-light"
                         >
                             View the Full Collection
@@ -61,23 +59,18 @@ export default async function NewArrivals() {
                         </Link>
                     </div>
                     {/* Subtle scarcity copy */}
-                    <p data-maint="listing" className="text-sm text-accent-700 font-medium mt-4">
+                    <p className="text-sm text-accent-700 font-medium mt-4">
                         Each piece handpicked — limited quantities available
                     </p>
                 </Reveal>
 
-                {/* Shown only during a maintenance break (see app/maintenance.css) */}
-                <MaintenanceNotice />
-
                 {/* Product rail — entrance triggers when 30% visible */}
-                <div data-maint="listing">
-                    <Reveal amount={0.3} y={32}>
-                        <NewArrivalsRail products={products} />
-                    </Reveal>
-                </div>
+                <Reveal amount={0.3} y={32}>
+                    <NewArrivalsRail products={products} />
+                </Reveal>
 
                 {/* Mobile CTA (desktop has the header link) */}
-                <div data-maint="listing" className="text-center mt-10 md:hidden">
+                <div className="text-center mt-10 md:hidden">
                     <Link
                         href="/collection"
                         className="inline-block bg-primary text-secondary font-semibold px-8 py-4 rounded-full text-lg hover:bg-primary-light transition-all duration-300 transform hover:scale-105 shadow-lg"

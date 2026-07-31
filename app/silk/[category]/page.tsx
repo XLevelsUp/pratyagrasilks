@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getCategoryBySlug, generateCollectionSchema, silkCategories } from '@/lib/seo-config';
 import ProductCard from '@/components/ProductCard';
-import MaintenanceNotice from '@/components/ui/MaintenanceNotice';
 import { Product } from '@/lib/types';
 
 interface CategoryPageProps {
@@ -187,7 +186,6 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                             </h2>
                             <Link
                                 href={`/collection?category=${params.category}`}
-                                data-maint="listing"
                                 className="text-accent hover:text-accent-hover font-medium flex items-center ml-auto"
                             >
                                 View All
@@ -207,17 +205,14 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                             </Link>
                         </div>
 
-                        {/* Shown only during a maintenance break (see app/maintenance.css) */}
-                        <MaintenanceNotice />
-
                         {products.length > 0 ? (
-                            <div data-maint="listing" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                 {products.slice(0, 8).map((product) => (
                                     <ProductCard key={product.id} product={product} />
                                 ))}
                             </div>
                         ) : (
-                            <div data-maint="listing" className="bg-white rounded-lg shadow-md p-12 text-center">
+                            <div className="bg-white rounded-lg shadow-md p-12 text-center">
                                 <p className="text-textSecondary text-lg mb-4">
                                     No {category.name} sarees are currently available.
                                 </p>
