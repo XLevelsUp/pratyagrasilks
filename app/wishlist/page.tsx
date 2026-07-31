@@ -10,6 +10,7 @@ import { ShoppingCart, Trash2, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Product } from '@/lib/types';
 import toast from 'react-hot-toast';
+import { hasDiscount, getEffectivePrice } from '@/lib/utils/discount';
 
 export default function WishlistPage() {
     const { items, loading, removeFromWishlist } = useWishlist();
@@ -171,9 +172,20 @@ export default function WishlistPage() {
                                                 {product.name}
                                             </h3>
                                         </Link>
-                                        <p className="text-lg font-semibold mt-1 text-textPrimary">
-                                            {formatPrice(product.price)}
-                                        </p>
+                                        {hasDiscount(product) ? (
+                                            <p className="mt-1 flex items-baseline gap-2 flex-wrap">
+                                                <span className="text-lg font-semibold text-textPrimary">
+                                                    {formatPrice(getEffectivePrice(product))}
+                                                </span>
+                                                <span className="text-sm text-gray-400 line-through">
+                                                    {formatPrice(product.price)}
+                                                </span>
+                                            </p>
+                                        ) : (
+                                            <p className="text-lg font-semibold mt-1 text-textPrimary">
+                                                {formatPrice(product.price)}
+                                            </p>
+                                        )}
                                     </div>
 
                                     {/* Actions */}

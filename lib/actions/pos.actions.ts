@@ -88,12 +88,16 @@ async function resolveWalkInCustomer(
 export async function processOfflineSale(
     cartItems: PosActionItem[],
     paymentMethod: 'CASH' | 'UPI' | 'CARD',
-    customerId?: string
+    customerId?: string,
+    discountAmount?: number
 ): Promise<PosOrderResult> {
     try {
         const supabase = getServiceClient();
 
-        const grandTotal = cartItems.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
+        const subtotal = cartItems.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
+        // Never trust the client with money — clamp to 0…subtotal
+        const discount = Math.min(Math.max(discountAmount || 0, 0), subtotal);
+        const grandTotal = subtotal - discount;
         const orderNumber = `POS-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
 
         // If customerId provided, use it; otherwise fallback to generic walk-in customer
@@ -143,6 +147,8 @@ export async function processOfflineSale(
             .insert({
                 customer_id: finalCustomerId,
                 order_number: orderNumber,
+                subtotal,
+                discount_amount: discount,
                 total_amount: grandTotal,
                 shipping_cost: 0,
                 shipping_address_id: addressId || null,

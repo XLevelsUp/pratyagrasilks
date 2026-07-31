@@ -2,6 +2,7 @@
 
 import { useCart } from '@/lib/context/CartContext';
 import { Lock } from 'lucide-react';
+import { hasDiscount, getEffectivePrice } from '@/lib/utils/discount';
 
 interface Props {
     shippingCost: number;
@@ -10,7 +11,7 @@ interface Props {
 
 export default function OrderSummary({ shippingCost, estimatedDays }: Props) {
     const { items } = useCart();
-    const subtotal = items.reduce((sum, item) => sum + item.product.price, 0);
+    const subtotal = items.reduce((sum, item) => sum + getEffectivePrice(item.product), 0);
     const total = subtotal + shippingCost;
 
     return (
@@ -41,8 +42,13 @@ export default function OrderSummary({ shippingCost, estimatedDays }: Props) {
                                 </p>
                             )}
                         </div>
-                        <p className="text-sm font-semibold text-textPrimary flex-shrink-0">
-                            ₹{item.product.price.toLocaleString('en-IN')}
+                        <p className="text-sm font-semibold text-textPrimary flex-shrink-0 flex items-baseline gap-1.5">
+                            {hasDiscount(item.product) && (
+                                <span className="text-xs text-gray-400 line-through">
+                                    ₹{item.product.price.toLocaleString('en-IN')}
+                                </span>
+                            )}
+                            <span>₹{getEffectivePrice(item.product).toLocaleString('en-IN')}</span>
                         </p>
                     </div>
                 ))}

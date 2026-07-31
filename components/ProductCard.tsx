@@ -2,6 +2,7 @@ import { Product } from '@/lib/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import WishlistButton from '@/components/Wishlist/WishlistButton';
+import { hasDiscount, getEffectivePrice, getDiscountPercent } from '@/lib/utils/discount';
 
 interface ProductCardProps {
     product: Product;
@@ -34,6 +35,8 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
 
     const displayNewBadge = (showNewBadge || isNewArrival) && product.inStock;
     const isSold = !product.inStock;
+    const isDiscounted = hasDiscount(product) && !isSold;
+    const percentOff = isDiscounted ? getDiscountPercent(product) : 0;
 
     return (
         <Link href={`/product/${product.id}`} className="group block">
@@ -59,6 +62,15 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
                     </span>
                 ) : null}
 
+                {/* Offer badge — bottom-right. Solid brand purple with beige
+                    type: the dark fill separates hard from pale gold and cream
+                    silks, where a light badge would sink into the photograph. */}
+                {isDiscounted && (
+                    <span className="absolute bottom-3 right-3 z-10 bg-primary text-secondary font-bold text-sm tracking-[0.04em] px-3.5 py-1.5 rounded-full shadow-xl shadow-primary-900/40">
+                        {percentOff}% OFF
+                    </span>
+                )}
+
                 {/* Wishlist — hover-revealed on desktop, always present on touch */}
                 <div className="absolute top-3 right-3 z-10 lg:opacity-0 lg:group-hover:opacity-100 lg:focus-within:opacity-100 transition-opacity duration-300">
                     <WishlistButton product={product} variant="icon-only" />
@@ -83,9 +95,20 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
                 <h3 className={`font-playfair text-lg leading-snug line-clamp-2 transition-colors duration-300 ${isSold ? 'text-gray-500' : 'text-textPrimary group-hover:text-primary'}`}>
                     {product.name}
                 </h3>
-                <p className={`text-lg font-semibold mt-1 ${isSold ? 'text-gray-400' : 'text-textPrimary'}`}>
-                    {formatPrice(product.price)}
-                </p>
+                {isDiscounted ? (
+                    <p className="mt-1 flex items-baseline gap-2.5 flex-wrap">
+                        <span className="text-xl font-bold text-accent-700 tracking-tight">
+                            {formatPrice(getEffectivePrice(product))}
+                        </span>
+                        <span className="text-base text-stone-500 line-through decoration-stone-400 decoration-[1.5px]">
+                            {formatPrice(product.price)}
+                        </span>
+                    </p>
+                ) : (
+                    <p className={`text-lg font-semibold mt-1 ${isSold ? 'text-gray-400' : 'text-textPrimary'}`}>
+                        {formatPrice(product.price)}
+                    </p>
+                )}
             </div>
         </Link>
     );

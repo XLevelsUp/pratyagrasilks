@@ -19,7 +19,11 @@ export interface Product {
     id: string;
     name: string;
     description: string;
-    price: number;
+    price: number; // MRP — never reduced by an offer
+    discountType?: 'AMT' | 'PCT' | null;
+    discountValue?: number | null;
+    salePrice?: number | null; // what the customer pays; null = no offer
+    excludeFromSales?: boolean; // held at full price during bulk sales
     category: string;
     images: string[];
     inStock: boolean;

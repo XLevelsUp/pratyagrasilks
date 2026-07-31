@@ -9,6 +9,8 @@ export interface PosReceiptData {
         unitPrice: number;
     }>;
     grandTotal: number;
+    subtotal?: number;
+    discount?: number;
     taxableValue: number;
     cgst: number;
     sgst: number;
@@ -200,8 +202,14 @@ export default function PosReceipt({ data, forBulkPrint }: PosReceiptProps) {
                     <div style={{ width: '360px', fontSize: '22px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid #eee' }}>
                             <span style={{ color: '#555' }}>Total MRP (Incl. GST)</span>
-                            <span style={{ fontWeight: 600 }}>{fmtR(data.grandTotal)}</span>
+                            <span style={{ fontWeight: 600 }}>{fmtR(data.subtotal ?? data.grandTotal)}</span>
                         </div>
+                        {!!data.discount && data.discount > 0 && (
+                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid #eee' }}>
+                                <span style={{ color: '#555' }}>Discount</span>
+                                <span style={{ fontWeight: 600 }}>− {fmtR(data.discount)}</span>
+                            </div>
+                        )}
                         <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid #eee' }}>
                             <span style={{ color: '#555' }}>Taxable Value</span>
                             <span>{fmtR(data.taxableValue)}</span>

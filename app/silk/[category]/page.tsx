@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation';
 import { getCategoryBySlug, generateCollectionSchema, silkCategories } from '@/lib/seo-config';
 import ProductCard from '@/components/ProductCard';
 import { Product } from '@/lib/types';
+import { getActiveCampaignPublic } from '@/lib/data/public-products';
+import { applyCampaignToProducts } from '@/lib/utils/applyCampaign';
 
 interface CategoryPageProps {
     params: {
@@ -98,13 +100,18 @@ async function getCategoryProducts(categorySlug: string): Promise<Product[]> {
         }
 
         const products = [...(available ?? []), ...(sold ?? [])];
+        const campaign = await getActiveCampaignPublic();
 
         // Transform snake_case to camelCase
-        return products.map(product => ({
+        return applyCampaignToProducts(products.map(product => ({
             id: product.id,
             name: product.name,
             description: product.description,
             price: product.price,
+            discountType: product.discount_type ?? null,
+            discountValue: product.discount_value != null ? Number(product.discount_value) : null,
+            salePrice: product.sale_price != null ? Number(product.sale_price) : null,
+            excludeFromSales: product.exclude_from_sales ?? false,
             category: product.category,
             images: product.images || [],
             inStock: product.in_stock,
@@ -117,7 +124,7 @@ async function getCategoryProducts(categorySlug: string): Promise<Product[]> {
             colorFamilies: product.color_families ?? [],
             createdAt: product.created_at,
             updatedAt: product.updated_at,
-        })) as Product[];
+        })), campaign) as Product[];
     } catch (error) {
         console.error('Error fetching category products:', error);
         return [];

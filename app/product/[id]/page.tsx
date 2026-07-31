@@ -4,6 +4,9 @@ import { createClient } from '@/lib/supabase/server';
 import { Product } from '@/lib/types';
 import { siteMetadata } from '@/lib/seo/config';
 import ProductDetailClient from './ProductDetailClient';
+import { hasDiscount, getEffectivePrice } from '@/lib/utils/discount';
+import { getActiveCampaignPublic } from '@/lib/data/public-products';
+import { applyCampaignToProduct } from '@/lib/utils/applyCampaign';
 
 async function getProduct(id: string): Promise<Product | null> {
     const supabase = createClient();
@@ -16,11 +19,17 @@ async function getProduct(id: string): Promise<Product | null> {
 
     if (!data) return null;
 
-    return {
+    const campaign = await getActiveCampaignPublic();
+
+    return applyCampaignToProduct({
         id: data.id,
         name: data.name,
         description: data.description,
         price: data.price,
+        discountType: data.discount_type ?? null,
+        discountValue: data.discount_value != null ? Number(data.discount_value) : null,
+        salePrice: data.sale_price != null ? Number(data.sale_price) : null,
+        excludeFromSales: data.exclude_from_sales ?? false,
         category: data.category,
         images: data.images ?? [],
         inStock: data.in_stock,
@@ -33,7 +42,7 @@ async function getProduct(id: string): Promise<Product | null> {
         colorFamilies: data.color_families ?? [],
         createdAt: new Date(data.created_at),
         updatedAt: new Date(data.updated_at),
-    };
+    }, campaign);
 }
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
@@ -79,6 +88,13 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 }
 
 function ProductSchema({ product }: { product: Product }) {
+    const discounted = hasDiscount(product);
+    // Google needs an end date before it renders sale pricing. Offers run until
+    // an admin removes them, so this rolls forward instead of going stale.
+    const priceValidUntil = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0];
+
     const schema = {
         '@context': 'https://schema.org',
         '@type': 'Product',
@@ -96,12 +112,22 @@ function ProductSchema({ product }: { product: Product }) {
         offers: {
             '@type': 'Offer',
             priceCurrency: 'INR',
-            price: product.price,
+            price: getEffectivePrice(product),
+            priceValidUntil,
             availability: product.inStock
                 ? 'https://schema.org/InStock'
                 : 'https://schema.org/OutOfStock',
             itemCondition: 'https://schema.org/NewCondition',
             url: `${siteMetadata.baseUrl}/product/${product.id}`,
+            // Original MRP — what renders the struck-through price in results
+            ...(discounted && {
+                priceSpecification: {
+                    '@type': 'UnitPriceSpecification',
+                    priceType: 'https://schema.org/ListPrice',
+                    price: product.price,
+                    priceCurrency: 'INR',
+                },
+            }),
         },
     };
 

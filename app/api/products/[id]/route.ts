@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getActiveCampaignPublic } from '@/lib/data/public-products';
+import { applyCampaignToProduct } from '@/lib/utils/applyCampaign';
 
 // Ensure this route is always treated as dynamic (uses cookies / auth)
 export const dynamic = 'force-dynamic';
@@ -26,12 +28,18 @@ export async function GET(
             );
         }
 
+        const campaign = await getActiveCampaignPublic();
+
         // Transform snake_case to camelCase for frontend
-        const transformedProduct = {
+        const transformedProduct = applyCampaignToProduct({
             id: product.id,
             name: product.name,
             description: product.description,
             price: product.price,
+            discountType: product.discount_type ?? null,
+            discountValue: product.discount_value != null ? Number(product.discount_value) : null,
+            salePrice: product.sale_price != null ? Number(product.sale_price) : null,
+            excludeFromSales: product.exclude_from_sales ?? false,
             category: product.category,
             images: product.images || [],
             inStock: product.in_stock,
@@ -45,7 +53,7 @@ export async function GET(
             yt_link: product.yt_link,
             createdAt: product.created_at,
             updatedAt: product.updated_at,
-        };
+        }, campaign);
 
         return NextResponse.json({ product: transformedProduct });
     } catch (error) {

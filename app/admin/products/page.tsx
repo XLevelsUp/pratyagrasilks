@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { Search, Plus, Edit, Trash2, Package, Printer } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Package, Printer, Tag } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
@@ -13,17 +13,28 @@ import { deleteProduct } from '@/lib/actions/product.actions';
 import BulkQrWrapper from '@/components/admin/BulkQrWrapper';
 import PrinterCalibration from '@/components/admin/PrinterCalibration';
 import ResponsiveDataTable, { Column } from '@/components/admin/ResponsiveDataTable';
+import { hasDiscount, getEffectivePrice, getDiscountPercent } from '@/lib/utils/discount';
+import BulkDiscountDialog from '@/components/admin/BulkDiscountDialog';
+import { getActiveCampaign } from '@/lib/actions/campaign.actions';
+import { DiscountCampaign, isCampaignLive, isCampaignScheduled, getFinalPrice, hasAnyDiscount, getFinalDiscountPercent, getCampaignPrice } from '@/lib/utils/campaign';
 
 interface Product {
     id: string;
     name: string;
     sku: string;
     price: number;
+    sale_price?: number | null;
+    discount_type?: 'AMT' | 'PCT' | null;
+    discount_value?: number | null;
     stock_quantity: number;
     category: string;
     material: string;
     images: string[];
     in_stock: boolean;
+    is_online?: boolean;
+    exclude_from_sales?: boolean;
+    purchase_price?: number | null;
+    purchase_tax_percent?: number | null;
 }
 
 export default function AdminProductsPage() {
@@ -42,10 +53,25 @@ export default function AdminProductsPage() {
     const [vendorFilter, setVendorFilter] = useState('all');
     const [stockFilter, setStockFilter] = useState('all');
     const [listingFilter, setListingFilter] = useState('all');
+    const [offerFilter, setOfferFilter] = useState('all');
+    const [campaign, setCampaign] = useState<DiscountCampaign | null>(null);
+    const [showBulkDialog, setShowBulkDialog] = useState(false);
 
     useEffect(() => {
         fetchProducts();
-    }, [categoryFilter, vendorFilter, stockFilter, listingFilter]);
+    }, [categoryFilter, vendorFilter, stockFilter, listingFilter, offerFilter]);
+
+    const loadCampaign = async () => {
+        try {
+            setCampaign(await getActiveCampaign());
+        } catch (err) {
+            console.error('Failed to load campaign:', err);
+        }
+    };
+
+    useEffect(() => {
+        loadCampaign();
+    }, []);
 
     useEffect(() => {
         async function fetchVendors() {
@@ -80,6 +106,9 @@ export default function AdminProductsPage() {
         if (stockFilter === 'sold_out')  query = query.eq('stock_quantity', 0);
         if (listingFilter === 'online')   query = query.eq('is_online', true);
         if (listingFilter === 'pos_only') query = query.eq('is_online', false);
+        if (offerFilter === 'discounted')  query = query.not('sale_price', 'is', null);
+        if (offerFilter === 'no_discount') query = query.is('sale_price', null);
+        if (offerFilter === 'excluded')    query = query.eq('exclude_from_sales', true);
 
         const { data, error } = await query;
 
@@ -137,11 +166,18 @@ export default function AdminProductsPage() {
 
     const filteredProducts = products.filter((product) => {
         const searchLower = searchTerm.toLowerCase();
-        return (
+        const matchesSearch =
             product.name.toLowerCase().includes(searchLower) ||
             product.sku.toLowerCase().includes(searchLower) ||
-            product.category.toLowerCase().includes(searchLower)
-        );
+            product.category.toLowerCase().includes(searchLower);
+
+        // Campaign pricing is computed, not stored, so "on sale" can't be a DB
+        // filter — it has to be evaluated here against the live campaign.
+        if (offerFilter === 'on_sale') {
+            return matchesSearch && getCampaignPrice(product, campaign) !== null;
+        }
+
+        return matchesSearch;
     });
 
     const allSelected = filteredProducts.length > 0 && filteredProducts.every(p => selectedIds.has(p.id));
@@ -258,7 +294,20 @@ export default function AdminProductsPage() {
             header: 'Price',
             className: 'whitespace-nowrap',
             render: (product) => (
-                <span className="text-gray-900 font-medium">{formatPrice(product.price)}</span>
+                hasAnyDiscount(product, campaign) ? (
+                    <span className="flex flex-col gap-0.5">
+                        <span className="flex items-baseline gap-1.5">
+                            <span className="text-xs text-gray-400 line-through">{formatPrice(product.price)}</span>
+                            <span className="text-gray-900 font-semibold">{formatPrice(getFinalPrice(product, campaign))}</span>
+                        </span>
+                        <span className="inline-flex w-fit items-center px-1.5 py-0.5 text-[10px] font-bold text-green-700 bg-green-50 border border-green-200 rounded">
+                            {getFinalDiscountPercent(product, campaign)}% OFF
+                            {!hasDiscount(product) && <span className="ml-1 font-normal">· bulk sale</span>}
+                        </span>
+                    </span>
+                ) : (
+                    <span className="text-gray-900 font-medium">{formatPrice(product.price)}</span>
+                )
             ),
         },
         {
@@ -359,7 +408,17 @@ export default function AdminProductsPage() {
 
             {/* Middle row: price + stock */}
             <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-amber-700">{formatPrice(product.price)}</span>
+                {hasAnyDiscount(product, campaign) ? (
+                    <span className="flex items-baseline gap-1.5 flex-wrap">
+                        <span className="text-sm text-gray-400 line-through">{formatPrice(product.price)}</span>
+                        <span className="text-lg font-bold text-amber-700">{formatPrice(getFinalPrice(product, campaign))}</span>
+                        <span className="px-1.5 py-0.5 text-[10px] font-bold text-green-700 bg-green-50 border border-green-200 rounded">
+                            {getFinalDiscountPercent(product, campaign)}% OFF
+                        </span>
+                    </span>
+                ) : (
+                    <span className="text-lg font-bold text-amber-700">{formatPrice(product.price)}</span>
+                )}
                 <span
                     className={`px-3 py-1 rounded-full text-xs font-medium ${
                         product.stock_quantity > 10
@@ -409,6 +468,28 @@ export default function AdminProductsPage() {
                 <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Products</h1>
                 <div className="flex items-center gap-2 lg:gap-3">
                     <PrinterCalibration />
+                    {isAdmin && (
+                        <button
+                            onClick={() => setShowBulkDialog(true)}
+                            className={`flex items-center gap-2 px-4 min-h-[44px] rounded-lg font-medium transition-colors text-sm lg:text-base border-2 ${
+                                isCampaignLive(campaign)
+                                    ? 'bg-green-50 border-green-300 text-green-800 hover:bg-green-100'
+                                    : isCampaignScheduled(campaign)
+                                    ? 'bg-blue-50 border-blue-300 text-blue-800 hover:bg-blue-100'
+                                    : 'bg-purple-50 border-purple-200 text-[#550c72] hover:bg-purple-100'
+                            }`}
+                        >
+                            <Tag className="w-4 h-4 flex-shrink-0" />
+                            <span className="hidden sm:inline">
+                                {isCampaignLive(campaign)
+                                    ? `Sale live — ${campaign?.name}`
+                                    : isCampaignScheduled(campaign)
+                                    ? `Sale scheduled`
+                                    : 'Bulk Discount'}
+                            </span>
+                            <span className="sm:hidden">Sale</span>
+                        </button>
+                    )}
                     <Link
                         href="/admin/products/new"
                         className="flex items-center gap-2 px-4 min-h-[44px] bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors text-sm lg:text-base"
@@ -435,7 +516,7 @@ export default function AdminProductsPage() {
                 </div>
 
                 {/* Dropdown filters */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                     <select
                         value={categoryFilter}
                         onChange={(e) => setCategoryFilter(e.target.value)}
@@ -478,16 +559,28 @@ export default function AdminProductsPage() {
                         <option value="online">Online</option>
                         <option value="pos_only">POS Only</option>
                     </select>
+
+                    <select
+                        value={offerFilter}
+                        onChange={(e) => setOfferFilter(e.target.value)}
+                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 min-h-[44px]"
+                    >
+                        <option value="all">All Offers</option>
+                        <option value="discounted">Individual Discount</option>
+                        <option value="on_sale">Bulk Sale</option>
+                        <option value="excluded">Excluded from Bulk Sale</option>
+                        <option value="no_discount">No Discount</option>
+                    </select>
                 </div>
 
                 {/* Active filter indicator */}
-                {[categoryFilter, vendorFilter, stockFilter, listingFilter].filter(f => f !== 'all').length > 0 && (
+                {[categoryFilter, vendorFilter, stockFilter, listingFilter, offerFilter].filter(f => f !== 'all').length > 0 && (
                     <div className="mt-3 flex items-center gap-2">
                         <span className="text-xs text-gray-500">
-                            {[categoryFilter, vendorFilter, stockFilter, listingFilter].filter(f => f !== 'all').length} filter{[categoryFilter, vendorFilter, stockFilter, listingFilter].filter(f => f !== 'all').length > 1 ? 's' : ''} active
+                            {[categoryFilter, vendorFilter, stockFilter, listingFilter, offerFilter].filter(f => f !== 'all').length} filter{[categoryFilter, vendorFilter, stockFilter, listingFilter, offerFilter].filter(f => f !== 'all').length > 1 ? 's' : ''} active
                         </span>
                         <button
-                            onClick={() => { setCategoryFilter('all'); setVendorFilter('all'); setStockFilter('all'); setListingFilter('all'); }}
+                            onClick={() => { setCategoryFilter('all'); setVendorFilter('all'); setStockFilter('all'); setListingFilter('all'); setOfferFilter('all'); }}
                             className="text-xs text-amber-600 hover:text-amber-700 underline"
                         >
                             Clear all
@@ -577,6 +670,18 @@ export default function AdminProductsPage() {
 
             {/* Bulk label print wrapper — rendered off-screen, revealed by print CSS */}
             {isPrinting && <BulkQrWrapper products={selectedProducts} />}
+
+            {/* Bulk / festival sale */}
+            {showBulkDialog && (
+                <BulkDiscountDialog
+                    isOpen={showBulkDialog}
+                    onClose={() => setShowBulkDialog(false)}
+                    products={products}
+                    campaign={campaign}
+                    categories={categories}
+                    onSaved={() => { loadCampaign(); fetchProducts(); }}
+                />
+            )}
         </div>
     );
 }

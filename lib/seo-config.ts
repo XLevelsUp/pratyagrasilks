@@ -360,11 +360,22 @@ export function generateProductSchema(product: {
     name: string;
     description: string;
     price: number;
+    salePrice?: number | null;
     sku: string;
     category: string;
     images: string[];
     inStock: boolean;
 }) {
+    const isDiscounted = product.salePrice != null && product.salePrice < product.price;
+    const effectivePrice = isDiscounted ? product.salePrice! : product.price;
+
+    // Google wants an end date before it will render sale pricing in results.
+    // Offers here have no fixed expiry — they run until an admin removes them —
+    // so this rolls forward on every render rather than going stale.
+    const priceValidUntil = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0];
+
     return {
         '@context': 'https://schema.org',
         '@type': 'Product',
@@ -374,12 +385,22 @@ export function generateProductSchema(product: {
         image: product.images,
         offers: {
             '@type': 'Offer',
-            price: product.price,
+            price: effectivePrice,
             priceCurrency: 'INR',
+            priceValidUntil,
             availability: product.inStock
                 ? 'https://schema.org/InStock'
                 : 'https://schema.org/OutOfStock',
             url: `https://pratyagrasilks.com/product/${product.sku}`,
+            // Original MRP — what renders the struck-through price in results
+            ...(isDiscounted && {
+                priceSpecification: {
+                    '@type': 'UnitPriceSpecification',
+                    priceType: 'https://schema.org/ListPrice',
+                    price: product.price,
+                    priceCurrency: 'INR',
+                },
+            }),
         },
         brand: {
             '@type': 'Brand',

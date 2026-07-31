@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { isSupabaseImage } from '@/lib/utils/image';
-import { Search, Trash2, CreditCard, X, ShoppingCart, Banknote, Smartphone, CheckCircle2, Loader2, User } from 'lucide-react';
+import { Search, Trash2, CreditCard, X, ShoppingCart, Banknote, Smartphone, CheckCircle2, Loader2, User, Tag, RotateCcw } from 'lucide-react';
 import { Product } from '@/lib/types';
 import { useQrScanner } from '@/hooks/useQrScanner';
 import { processOfflineSale, PosActionItem } from '@/lib/actions/pos.actions';
@@ -13,6 +13,7 @@ import { lookupOrCreateCustomer, getCustomerByPhone, PosCustomer } from '@/lib/a
 import PosReceipt, { PosReceiptData } from '@/components/admin/PosReceipt';
 import TestBillPrint from '@/components/admin/TestBillPrint';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { hasDiscount, getEffectivePrice, getDiscountPercent } from '@/lib/utils/discount';
 
 interface PosCartItem {
     product: Product;
@@ -20,6 +21,7 @@ interface PosCartItem {
 }
 
 type PaymentMethod = 'CASH' | 'UPI' | 'CARD';
+type DiscountMode = 'AMT' | 'PCT';
 
 const fmt = (n: number) =>
     new Intl.NumberFormat('en-IN', {
@@ -51,6 +53,26 @@ export default function PosPage() {
     const [isScanProcessing, setIsScanProcessing] = useState(false);
     const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+    // ── Offer / Discount ─────────────────────────────────────────────────────
+    // Draft state lives in the dialog; only Confirm commits to appliedDiscount,
+    // so Order Summary never flickers while the cashier is still typing.
+    const [showOfferDialog, setShowOfferDialog] = useState(false);
+    const [discountMode, setDiscountMode] = useState<DiscountMode>('AMT');
+    const [discountValue, setDiscountValue] = useState('');
+    const [finalAmount, setFinalAmount] = useState('');
+    const [isAmountOverridden, setIsAmountOverridden] = useState(false);
+    const [appliedDiscount, setAppliedDiscount] = useState(0);
+
+    // Discounts never survive a cart change — an offer is negotiated against a
+    // specific basket, so it must not outlive the items it was given for.
+    const clearDiscount = useCallback(() => {
+        setAppliedDiscount(0);
+        setDiscountValue('');
+        setFinalAmount('');
+        setIsAmountOverridden(false);
+        setDiscountMode('AMT');
+    }, []);
+
     // ── Cart Operations ──────────────────────────────────────────────────────
     const addToCart = useCallback((product: Product) => {
         setCartItems(prev => {
@@ -64,13 +86,20 @@ export default function PosPage() {
             }
             return [...prev, { product, quantity: 1 }];
         });
-    }, []);
+        if (appliedDiscount > 0) toast('Offer removed — cart changed', { icon: '🏷️' });
+        clearDiscount();
+    }, [appliedDiscount, clearDiscount]);
 
     const removeFromCart = useCallback((productId: string) => {
         setCartItems(prev => prev.filter(item => item.product.id !== productId));
-    }, []);
+        if (appliedDiscount > 0) toast('Offer removed — cart changed', { icon: '🏷️' });
+        clearDiscount();
+    }, [appliedDiscount, clearDiscount]);
 
-    const clearCart = useCallback(() => setCartItems([]), []);
+    const clearCart = useCallback(() => {
+        setCartItems([]);
+        clearDiscount();
+    }, [clearDiscount]);
 
     const resetForNewSale = useCallback(() => {
         setCartItems([]);
@@ -81,7 +110,8 @@ export default function PosPage() {
         setReceiptData(null);
         setSearchQuery('');
         setSearchResults([]);
-    }, []);
+        clearDiscount();
+    }, [clearDiscount]);
 
     // ── QR Scanner ───────────────────────────────────────────────────────────
     const handleQrScan = useCallback(async (sku: string) => {
@@ -149,7 +179,7 @@ export default function PosPage() {
         }
     };
 
-    useQrScanner({ onScan: handleQrScan, enabled: !showPaymentModal });
+    useQrScanner({ onScan: handleQrScan, enabled: !showPaymentModal && !showOfferDialog });
 
     // ── Debounced Search ─────────────────────────────────────────────────────
     useEffect(() => {
@@ -173,18 +203,70 @@ export default function PosPage() {
     }, [searchQuery]);
 
     // ── Tax Math (reverse-calculate from GST-inclusive prices) ───────────────
+    // grandTotal is the pre-discount MRP; payableTotal is what's actually
+    // collected, and GST is derived from that so tax follows the discount.
+    // Product-level website offers apply in-store too, so the counter price
+    // always matches what the customer saw online.
     const grandTotal = useMemo(
-        () => cartItems.reduce((s, i) => s + i.product.price * i.quantity, 0),
+        () => cartItems.reduce((s, i) => s + getEffectivePrice(i.product) * i.quantity, 0),
         [cartItems]
     );
-    const taxableValue = useMemo(
-        () => Math.round((grandTotal / 1.05) * 100) / 100,
-        [grandTotal]
+    const payableTotal = useMemo(
+        () => Math.max(grandTotal - appliedDiscount, 0),
+        [grandTotal, appliedDiscount]
     );
-    const totalGst = useMemo(() => grandTotal - taxableValue, [grandTotal, taxableValue]);
+    const taxableValue = useMemo(
+        () => Math.round((payableTotal / 1.05) * 100) / 100,
+        [payableTotal]
+    );
+    const totalGst = useMemo(() => payableTotal - taxableValue, [payableTotal, taxableValue]);
     const cgst = useMemo(() => Math.round((totalGst / 2) * 100) / 100, [totalGst]);
     const sgst = useMemo(() => Math.round((totalGst / 2) * 100) / 100, [totalGst]);
     const itemCount = useMemo(() => cartItems.reduce((s, i) => s + i.quantity, 0), [cartItems]);
+
+    // ── Offer Dialog Math ────────────────────────────────────────────────────
+    // Draft discount from the ₹/% input, clamped to the cart total.
+    const draftDiscount = useMemo(() => {
+        const v = parseFloat(discountValue) || 0;
+        if (v <= 0) return 0;
+        const raw = discountMode === 'PCT' ? (grandTotal * v) / 100 : v;
+        return Math.min(Math.round(raw), grandTotal);
+    }, [discountValue, discountMode, grandTotal]);
+
+    // Auto-fill Final Amount unless the cashier has typed over it (the latch).
+    useEffect(() => {
+        if (isAmountOverridden) return;
+        setFinalAmount(Math.max(grandTotal - draftDiscount, 0).toString());
+    }, [draftDiscount, grandTotal, isAmountOverridden]);
+
+    // What Confirm will commit — derived from the final amount either way, so a
+    // manual override and a typed discount both resolve to a single number.
+    const draftFinal = useMemo(() => {
+        const v = parseFloat(finalAmount);
+        if (isNaN(v)) return grandTotal;
+        return Math.min(Math.max(Math.round(v), 0), grandTotal);
+    }, [finalAmount, grandTotal]);
+
+    const draftSavings = useMemo(() => Math.max(grandTotal - draftFinal, 0), [grandTotal, draftFinal]);
+
+    const openOfferDialog = () => {
+        // Re-seed the draft from whatever is currently applied
+        if (appliedDiscount > 0) {
+            setDiscountMode('AMT');
+            setDiscountValue(appliedDiscount.toString());
+            setFinalAmount((grandTotal - appliedDiscount).toString());
+        } else {
+            setDiscountValue('');
+            setFinalAmount(grandTotal.toString());
+        }
+        setIsAmountOverridden(false);
+        setShowOfferDialog(true);
+    };
+
+    const confirmOffer = () => {
+        setAppliedDiscount(draftSavings);
+        setShowOfferDialog(false);
+    };
 
     // ── Payment Flow ─────────────────────────────────────────────────────────
     const handleConfirmPayment = async () => {
@@ -195,10 +277,10 @@ export default function PosPage() {
                 name: i.product.name,
                 sku: i.product.sku,
                 quantity: i.quantity,
-                unitPrice: i.product.price,
+                unitPrice: getEffectivePrice(i.product),
             }));
 
-            const result = await processOfflineSale(actionItems, selectedPayment, customer?.id);
+            const result = await processOfflineSale(actionItems, selectedPayment, customer?.id, appliedDiscount);
 
             if (!result.success || !result.orderNumber) {
                 toast.error(result.error || 'Sale failed. Please try again.');
@@ -210,7 +292,9 @@ export default function PosPage() {
                 orderId: result.orderId!,
                 invoiceNumber: result.invoiceNumber,
                 items: actionItems,
-                grandTotal,
+                grandTotal: payableTotal,
+                subtotal: grandTotal,
+                discount: appliedDiscount,
                 taxableValue,
                 cgst,
                 sgst,
@@ -329,7 +413,12 @@ export default function PosPage() {
                                                 <p className="text-sm font-semibold text-gray-900 truncate">{product.name}</p>
                                                 <p className="text-xs text-gray-500">SKU: {product.sku}</p>
                                             </div>
-                                            <span className="text-sm font-bold text-[#550c72] flex-shrink-0">{fmt(product.price)}</span>
+                                            <span className="text-sm font-bold text-[#550c72] flex-shrink-0 flex items-baseline gap-1.5">
+                                                {hasDiscount(product) && (
+                                                    <span className="text-xs font-normal text-gray-400 line-through">{fmt(product.price)}</span>
+                                                )}
+                                                {fmt(getEffectivePrice(product))}
+                                            </span>
                                         </button>
                                     ))}
                                 </div>
@@ -371,14 +460,26 @@ export default function PosPage() {
                                         <div className="flex-1 min-w-0">
                                             <p className="font-semibold text-gray-900 truncate">{product.name}</p>
                                             <p className="text-xs text-gray-500 mt-0.5">SKU: {product.sku}</p>
-                                            <p className="text-sm font-bold text-[#550c72] mt-1">{fmt(product.price)}</p>
+                                            <p className="text-sm font-bold text-[#550c72] mt-1 flex items-baseline gap-1.5 flex-wrap">
+                                                {hasDiscount(product) ? (
+                                                    <>
+                                                        <span className="text-xs font-normal text-gray-400 line-through">{fmt(product.price)}</span>
+                                                        <span>{fmt(getEffectivePrice(product))}</span>
+                                                        <span className="px-1.5 py-0.5 text-[10px] font-bold text-green-700 bg-green-50 border border-green-200 rounded">
+                                                            {getDiscountPercent(product)}% OFF
+                                                        </span>
+                                                    </>
+                                                ) : (
+                                                    fmt(product.price)
+                                                )}
+                                            </p>
                                         </div>
                                         <div className="flex items-center gap-3 flex-shrink-0">
                                             <span className="bg-[#550c72] text-white text-sm font-bold rounded-full w-8 h-8 flex items-center justify-center">
                                                 {quantity}
                                             </span>
                                             <span className="text-sm font-semibold text-gray-700 w-20 text-right">
-                                                {fmt(product.price * quantity)}
+                                                {fmt(getEffectivePrice(product) * quantity)}
                                             </span>
                                             <button
                                                 onClick={() => removeFromCart(product.id)}
@@ -456,7 +557,17 @@ export default function PosPage() {
 
                         {/* Order Summary Card */}
                         <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 flex-1 overflow-y-auto">
-                            <h2 className="text-lg font-bold text-gray-900 mb-5">Order Summary</h2>
+                            <div className="flex items-center justify-between mb-5">
+                                <h2 className="text-lg font-bold text-gray-900">Order Summary</h2>
+                                <button
+                                    onClick={openOfferDialog}
+                                    disabled={cartItems.length === 0}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#550c72] bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    <Tag className="w-3.5 h-3.5" />
+                                    Apply Offer
+                                </button>
+                            </div>
 
                             <div className="space-y-3 border-b border-gray-100 pb-4 mb-4">
                                 <div className="flex justify-between items-center">
@@ -466,6 +577,15 @@ export default function PosPage() {
                                     </span>
                                     <span className="font-semibold text-gray-900">{fmt(grandTotal)}</span>
                                 </div>
+                                {appliedDiscount > 0 && (
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-green-700 flex items-center gap-1.5">
+                                            <Tag className="w-3.5 h-3.5" />
+                                            Discount
+                                        </span>
+                                        <span className="font-semibold text-green-700">− {fmt(appliedDiscount)}</span>
+                                    </div>
+                                )}
                                 <div className="flex justify-between items-center">
                                     <span className="text-gray-600">Taxable Value</span>
                                     <span className="font-semibold text-gray-700">{fmt(taxableValue)}</span>
@@ -488,7 +608,12 @@ export default function PosPage() {
 
                             <div className="flex justify-between items-center mb-5">
                                 <span className="text-lg font-bold text-gray-900">Grand Total</span>
-                                <span className="text-2xl font-bold text-[#550c72]">{fmt(grandTotal)}</span>
+                                <span className="flex items-baseline gap-2">
+                                    {appliedDiscount > 0 && (
+                                        <span className="text-sm text-gray-400 line-through">{fmt(grandTotal)}</span>
+                                    )}
+                                    <span className="text-2xl font-bold text-[#550c72]">{fmt(payableTotal)}</span>
+                                </span>
                             </div>
 
                             {cartItems.length > 0 && (
@@ -496,7 +621,7 @@ export default function PosPage() {
                                     {cartItems.map(({ product, quantity }) => (
                                         <div key={product.id} className="flex justify-between text-xs text-gray-500">
                                             <span className="truncate flex-1 mr-2">{product.name} ×{quantity}</span>
-                                            <span className="flex-shrink-0">{fmt(product.price * quantity)}</span>
+                                            <span className="flex-shrink-0">{fmt(getEffectivePrice(product) * quantity)}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -531,6 +656,148 @@ export default function PosPage() {
                 </div>
             </div>
 
+            {/* Apply Offer Dialog */}
+            {showOfferDialog && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                    <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6 max-h-[90vh] overflow-y-auto">
+                        <div className="flex items-center justify-between mb-5">
+                            <h3 className="flex items-center gap-2 text-lg font-bold text-gray-900">
+                                <Tag className="w-5 h-5 text-[#550c72]" />
+                                Apply Offer
+                            </h3>
+                            <button
+                                onClick={() => setShowOfferDialog(false)}
+                                className="text-gray-400 hover:text-gray-600"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {/* Item breakdown */}
+                        <div className="bg-gray-50 rounded-xl p-4 mb-5">
+                            <div className="space-y-2">
+                                {cartItems.map(({ product, quantity }) => (
+                                    <div key={product.id} className="flex justify-between text-sm">
+                                        <span className="text-gray-600 truncate flex-1 mr-3">
+                                            {product.name}
+                                            {quantity > 1 && <span className="text-gray-400"> ×{quantity}</span>}
+                                        </span>
+                                        <span className="text-gray-900 font-medium flex-shrink-0">
+                                            {fmt(getEffectivePrice(product) * quantity)}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                            {cartItems.length > 1 && (
+                                <div className="flex justify-between items-center pt-3 mt-3 border-t border-gray-200">
+                                    <span className="text-sm font-semibold text-gray-700">
+                                        Total ({itemCount} items)
+                                    </span>
+                                    <span className="text-base font-bold text-gray-900">{fmt(grandTotal)}</span>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Discount input with ₹ / % toggle */}
+                        <div className="mb-5">
+                            <label className="block text-xs font-semibold text-gray-600 uppercase mb-2">
+                                Discount
+                            </label>
+                            <div className="flex gap-2">
+                                <div className="flex rounded-lg border-2 border-gray-200 overflow-hidden flex-shrink-0">
+                                    {(['AMT', 'PCT'] as DiscountMode[]).map(mode => (
+                                        <button
+                                            key={mode}
+                                            type="button"
+                                            onClick={() => setDiscountMode(mode)}
+                                            className={`px-4 py-2 text-sm font-bold transition-colors ${
+                                                discountMode === mode
+                                                    ? 'bg-[#550c72] text-white'
+                                                    : 'bg-white text-gray-500 hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            {mode === 'AMT' ? '₹' : '%'}
+                                        </button>
+                                    ))}
+                                </div>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max={discountMode === 'PCT' ? 100 : grandTotal}
+                                    step={discountMode === 'PCT' ? 0.5 : 1}
+                                    value={discountValue}
+                                    onChange={e => setDiscountValue(e.target.value)}
+                                    placeholder={discountMode === 'PCT' ? 'e.g. 10' : 'e.g. 2000'}
+                                    className="flex-1 px-3 py-2 border-2 border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#550c72] transition-colors"
+                                />
+                            </div>
+                            {draftSavings > 0 && (
+                                <p className="mt-2 text-xs text-green-700 font-medium">
+                                    Customer saves {fmt(draftSavings)}
+                                    {grandTotal > 0 && ` (${((draftSavings / grandTotal) * 100).toFixed(1)}%)`}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Final amount — editable, with override latch */}
+                        <div className="mb-6">
+                            <label className="flex items-center justify-between text-xs font-semibold text-gray-600 uppercase mb-2">
+                                <span>Final Amount</span>
+                                {isAmountOverridden && (
+                                    <span className="text-[10px] font-medium text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded normal-case">
+                                        Manual override
+                                    </span>
+                                )}
+                            </label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max={grandTotal}
+                                    step="1"
+                                    value={finalAmount}
+                                    onChange={e => {
+                                        setFinalAmount(e.target.value);
+                                        setIsAmountOverridden(true);
+                                    }}
+                                    className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-lg text-lg font-bold text-[#550c72] focus:outline-none focus:border-[#550c72] transition-colors"
+                                />
+                                {isAmountOverridden && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsAmountOverridden(false)}
+                                        className="flex-shrink-0 flex items-center gap-1.5 px-3 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-300 rounded-lg hover:bg-amber-100 whitespace-nowrap"
+                                    >
+                                        <RotateCcw className="w-3.5 h-3.5" />
+                                        Reset to calculated
+                                    </button>
+                                )}
+                            </div>
+                            <p className="mt-2 text-xs text-gray-400">
+                                Cannot exceed {fmt(grandTotal)}
+                            </p>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setShowOfferDialog(false)}
+                                className="flex-1 py-3 border-2 border-gray-200 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={confirmOffer}
+                                className="flex-[2] py-3 bg-[#550c72] hover:bg-[#8430AB] text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-colors"
+                            >
+                                <CheckCircle2 className="w-4 h-4" />
+                                Confirm — {fmt(draftFinal)}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Payment Modal */}
             {showPaymentModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
@@ -553,9 +820,19 @@ export default function PosPage() {
                         </div>
 
                         {/* Total summary */}
-                        <div className="bg-gray-50 rounded-xl p-4 mb-5 flex justify-between items-center">
-                            <span className="text-gray-600 font-medium">Amount to Collect</span>
-                            <span className="text-2xl font-bold text-[#550c72]">{fmt(grandTotal)}</span>
+                        <div className="bg-gray-50 rounded-xl p-4 mb-5">
+                            <div className="flex justify-between items-center">
+                                <span className="text-gray-600 font-medium">Amount to Collect</span>
+                                <span className="text-2xl font-bold text-[#550c72]">{fmt(payableTotal)}</span>
+                            </div>
+                            {appliedDiscount > 0 && (
+                                <div className="flex justify-between items-center mt-1.5 text-xs">
+                                    <span className="text-green-700 font-medium">Offer applied</span>
+                                    <span className="text-green-700 font-semibold">
+                                        − {fmt(appliedDiscount)} off {fmt(grandTotal)}
+                                    </span>
+                                </div>
+                            )}
                         </div>
 
                         {/* Payment options */}
@@ -587,7 +864,7 @@ export default function PosPage() {
                             {isProcessing ? (
                                 <><Loader2 className="w-5 h-5 animate-spin" />Processing...</>
                             ) : (
-                                <><CheckCircle2 className="w-5 h-5" />Confirm {selectedPayment} — {fmt(grandTotal)}</>
+                                <><CheckCircle2 className="w-5 h-5" />Confirm {selectedPayment} — {fmt(payableTotal)}</>
                             )}
                         </button>
                     </div>
@@ -599,7 +876,11 @@ export default function PosPage() {
                 onClose={() => setShowOrderConfirm(false)}
                 onConfirm={() => { setShowOrderConfirm(false); handleConfirmPayment(); }}
                 title="Confirm Sale"
-                message={`Finalise ${selectedPayment} payment of ${fmt(grandTotal)} for ${customerName || 'this customer'}?`}
+                message={
+                    appliedDiscount > 0
+                        ? `Finalise ${selectedPayment} payment of ${fmt(payableTotal)} for ${customerName || 'this customer'}? A discount of ${fmt(appliedDiscount)} has been applied to ${fmt(grandTotal)}.`
+                        : `Finalise ${selectedPayment} payment of ${fmt(payableTotal)} for ${customerName || 'this customer'}?`
+                }
                 confirmText="Yes, Complete Sale"
                 cancelText="Go Back"
                 variant="warning"

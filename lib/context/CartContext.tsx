@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Product } from '@/lib/types';
 import { useAuth } from './AuthContext';
+import { getEffectivePrice } from '@/lib/utils/discount';
 
 export interface CartItem {
     id: string;
@@ -96,7 +97,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     // Simple calculations - just count items and sum prices
     const itemCount = items.length;
-    const totalPrice = items.reduce((total, item) => total + item.product.price, 0);
+    const totalPrice = items.reduce((total, item) => total + getEffectivePrice(item.product), 0);
 
     return (
         <CartContext.Provider
