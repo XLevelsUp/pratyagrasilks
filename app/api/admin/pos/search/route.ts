@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 
 import { createClient } from '@/lib/supabase/server';
+import { getActiveCampaignPublic } from '@/lib/data/public-products';
+import { applyCampaignToProduct, applyCampaignToProducts } from '@/lib/utils/applyCampaign';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function transformProduct(product: Record<string, any>) {
@@ -14,6 +16,7 @@ function transformProduct(product: Record<string, any>) {
         discountType: product.discount_type ?? null,
         discountValue: product.discount_value != null ? Number(product.discount_value) : null,
         salePrice: product.sale_price != null ? Number(product.sale_price) : null,
+        excludeFromSales: product.exclude_from_sales ?? false,
         category: product.category,
         images: product.images || [],
         inStock: product.in_stock,
@@ -57,7 +60,12 @@ export async function GET(request: NextRequest) {
                 return NextResponse.json({ error: 'Product not found' }, { status: 404 });
             }
 
-            return NextResponse.json({ product: transformProduct(product) });
+            // Festival sale applies in-store too — the counter price must match
+            // what the customer saw online.
+            const campaign = await getActiveCampaignPublic();
+            return NextResponse.json({
+                product: applyCampaignToProduct(transformProduct(product), campaign),
+            });
         }
 
         const { data: products, error } = await supabase
@@ -75,7 +83,10 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        return NextResponse.json({ products: (products || []).map(transformProduct) });
+        const campaign = await getActiveCampaignPublic();
+        return NextResponse.json({
+            products: applyCampaignToProducts((products || []).map(transformProduct), campaign),
+        });
     } catch (error) {
         console.error('POS search error:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

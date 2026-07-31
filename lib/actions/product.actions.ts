@@ -109,6 +109,7 @@ export interface ProductUpdateInput {
     discount_type?: 'AMT' | 'PCT' | null;
     discount_value?: number;
     sale_price?: number | null;
+    exclude_from_sales?: boolean;
 }
 
 export async function deleteProduct(id: string): Promise<void> {
@@ -120,6 +121,9 @@ export async function deleteProduct(id: string): Promise<void> {
     if (error) throw new Error(error.message);
 
     revalidatePath('/admin/products');
+    revalidatePath('/');
+    revalidatePath('/collection');
+    revalidatePath(`/product/${id}`);
 }
 
 export async function updateProduct(id: string, data: ProductUpdateInput): Promise<void> {
@@ -156,11 +160,33 @@ export async function updateProduct(id: string, data: ProductUpdateInput): Promi
         if (data.discount_type !== undefined)  patch.discount_type = data.discount_type;
         if (data.discount_value !== undefined) patch.discount_value = data.discount_value;
         if (data.sale_price !== undefined)     patch.sale_price = data.sale_price;
+        if (data.exclude_from_sales !== undefined) patch.exclude_from_sales = data.exclude_from_sales;
     }
 
-    const { error } = await supabase.from('products').update(patch).eq('id', id);
+    // .select() makes the update return the rows it touched. Without it, an
+    // update blocked by RLS reports success with 0 rows changed — which is how
+    // saves silently did nothing while the UI said they had worked.
+    const { data: updated, error } = await supabase
+        .from('products')
+        .update(patch)
+        .eq('id', id)
+        .select('id');
+
     if (error) throw new Error(error.message);
+    if (!updated || updated.length === 0) {
+        throw new Error(
+            'Save was rejected by the database — no rows were updated. ' +
+            'Your account may lack permission to edit products.'
+        );
+    }
 
     revalidatePath('/admin/products');
     revalidatePath(`/admin/products/${id}`);
+
+    // Storefront caches too — without these, a price or discount change stays
+    // invisible to customers until the page happens to rebuild.
+    revalidatePath('/');
+    revalidatePath('/collection');
+    revalidatePath(`/product/${id}`);
+    if (patch.category) revalidatePath(`/silk/${patch.category}`);
 }

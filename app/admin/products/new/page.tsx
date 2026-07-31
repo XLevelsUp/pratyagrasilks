@@ -208,6 +208,7 @@ function NewProductForm() {
             } else {
                 toast.success('Product created successfully!');
                 router.push('/admin/products');
+                router.refresh();
             }
         } catch (error) {
             console.error('Error:', error);
@@ -738,7 +739,7 @@ function NewProductForm() {
                                     onClick={removeDiscount}
                                     className="px-4 py-3 border-2 border-red-200 text-red-600 rounded-xl font-semibold text-sm hover:bg-red-50 transition-colors whitespace-nowrap"
                                 >
-                                    Remove
+                                    Clear
                                 </button>
                             )}
                             <button

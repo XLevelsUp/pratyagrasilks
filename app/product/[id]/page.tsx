@@ -5,6 +5,8 @@ import { Product } from '@/lib/types';
 import { siteMetadata } from '@/lib/seo/config';
 import ProductDetailClient from './ProductDetailClient';
 import { hasDiscount, getEffectivePrice } from '@/lib/utils/discount';
+import { getActiveCampaignPublic } from '@/lib/data/public-products';
+import { applyCampaignToProduct } from '@/lib/utils/applyCampaign';
 
 async function getProduct(id: string): Promise<Product | null> {
     const supabase = createClient();
@@ -17,7 +19,9 @@ async function getProduct(id: string): Promise<Product | null> {
 
     if (!data) return null;
 
-    return {
+    const campaign = await getActiveCampaignPublic();
+
+    return applyCampaignToProduct({
         id: data.id,
         name: data.name,
         description: data.description,
@@ -25,6 +29,7 @@ async function getProduct(id: string): Promise<Product | null> {
         discountType: data.discount_type ?? null,
         discountValue: data.discount_value != null ? Number(data.discount_value) : null,
         salePrice: data.sale_price != null ? Number(data.sale_price) : null,
+        excludeFromSales: data.exclude_from_sales ?? false,
         category: data.category,
         images: data.images ?? [],
         inStock: data.in_stock,
@@ -37,7 +42,7 @@ async function getProduct(id: string): Promise<Product | null> {
         colorFamilies: data.color_families ?? [],
         createdAt: new Date(data.created_at),
         updatedAt: new Date(data.updated_at),
-    };
+    }, campaign);
 }
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {

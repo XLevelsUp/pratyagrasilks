@@ -62,10 +62,12 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
                     </span>
                 ) : null}
 
-                {/* Offer badge — bottom-left, clear of the status chip above */}
+                {/* Offer badge — bottom-right. Solid brand purple with beige
+                    type: the dark fill separates hard from pale gold and cream
+                    silks, where a light badge would sink into the photograph. */}
                 {isDiscounted && (
-                    <span className="absolute bottom-3 left-3 z-10 bg-accent-700 text-white text-[10px] font-bold tracking-[0.12em] uppercase px-2.5 py-1 rounded-full shadow-sm">
-                        {percentOff}% Off
+                    <span className="absolute bottom-3 right-3 z-10 bg-primary text-secondary font-bold text-sm tracking-[0.04em] px-3.5 py-1.5 rounded-full shadow-xl shadow-primary-900/40">
+                        {percentOff}% OFF
                     </span>
                 )}
 
@@ -94,11 +96,11 @@ export default function ProductCard({ product, showNewBadge = false }: ProductCa
                     {product.name}
                 </h3>
                 {isDiscounted ? (
-                    <p className="mt-1 flex items-baseline gap-2 flex-wrap">
-                        <span className="text-lg font-semibold text-textPrimary">
+                    <p className="mt-1 flex items-baseline gap-2.5 flex-wrap">
+                        <span className="text-xl font-bold text-accent-700 tracking-tight">
                             {formatPrice(getEffectivePrice(product))}
                         </span>
-                        <span className="text-sm text-gray-400 line-through">
+                        <span className="text-base text-stone-500 line-through decoration-stone-400 decoration-[1.5px]">
                             {formatPrice(product.price)}
                         </span>
                     </p>

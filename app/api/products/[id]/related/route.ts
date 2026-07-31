@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getActiveCampaignPublic } from '@/lib/data/public-products';
+import { applyCampaignToProducts } from '@/lib/utils/applyCampaign';
 
 // Ensure this route is always treated as dynamic (uses cookies / auth)
 export const dynamic = 'force-dynamic';
@@ -39,8 +41,10 @@ export async function GET(
             return NextResponse.json({ products: [] });
         }
 
+        const campaign = await getActiveCampaignPublic();
+
         // Transform to camelCase
-        const transformedProducts = products?.map(product => ({
+        const transformedProducts = applyCampaignToProducts(products?.map(product => ({
             id: product.id,
             name: product.name,
             description: product.description,
@@ -48,12 +52,13 @@ export async function GET(
             discountType: product.discount_type ?? null,
             discountValue: product.discount_value != null ? Number(product.discount_value) : null,
             salePrice: product.sale_price != null ? Number(product.sale_price) : null,
+            excludeFromSales: product.exclude_from_sales ?? false,
             category: product.category,
             images: product.images || [],
             inStock: product.in_stock,
             sku: product.sku,
             material: product.material,
-        })) || [];
+        })) || [], campaign);
 
         return NextResponse.json({ products: transformedProducts });
     } catch (error) {

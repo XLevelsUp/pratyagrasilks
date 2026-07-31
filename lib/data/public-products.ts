@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { Product } from '@/lib/types';
+import { DiscountCampaign } from '@/lib/utils/campaign';
+import { applyCampaignToProducts } from '@/lib/utils/applyCampaign';
 
 // Cookie-free anon client for public catalog data. Using this (instead of the
 // cookie-bound server client) keeps pages that only read public data eligible
@@ -10,6 +12,42 @@ function publicClient() {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         { auth: { persistSession: false } }
     );
+}
+
+/**
+ * The running festival sale, or null. Uses the same cookie-free client so
+ * pages that call it stay eligible for static rendering.
+ */
+export async function getActiveCampaignPublic(): Promise<DiscountCampaign | null> {
+    const supabase = publicClient();
+
+    const { data, error } = await supabase
+        .from('discount_campaigns')
+        .select('*, discount_campaign_bands(*)')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+    // A missing table (migration not yet run) must not break the storefront
+    if (error || !data) return null;
+
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    return {
+        id: data.id,
+        name: data.name,
+        isActive: data.is_active,
+        startsAt: data.starts_at ?? null,
+        endsAt: data.ends_at ?? null,
+        bands: (data.discount_campaign_bands ?? []).map((b: any) => ({
+            id: b.id,
+            minPrice: b.min_price != null ? Number(b.min_price) : null,
+            maxPrice: b.max_price != null ? Number(b.max_price) : null,
+            category: b.category ?? null,
+            discountType: b.discount_type,
+            discountValue: Number(b.discount_value),
+        })),
+    };
 }
 
 /**
@@ -33,7 +71,9 @@ export async function getNewArrivalsPublic(): Promise<Product[]> {
     }
     if (!data) return [];
 
-    return data.map((product) => ({
+    const campaign = await getActiveCampaignPublic();
+
+    return applyCampaignToProducts(data.map((product) => ({
         id: product.id,
         name: product.name,
         description: product.description,
@@ -41,6 +81,7 @@ export async function getNewArrivalsPublic(): Promise<Product[]> {
         discountType: product.discount_type ?? null,
         discountValue: product.discount_value != null ? Number(product.discount_value) : null,
         salePrice: product.sale_price != null ? Number(product.sale_price) : null,
+        excludeFromSales: product.exclude_from_sales ?? false,
         category: product.category,
         images: product.images || [],
         inStock: product.in_stock,
@@ -52,5 +93,5 @@ export async function getNewArrivalsPublic(): Promise<Product[]> {
         yt_link: product.yt_link,
         createdAt: product.created_at,
         updatedAt: product.updated_at,
-    }));
+    })), campaign);
 }

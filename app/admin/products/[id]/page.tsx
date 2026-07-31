@@ -67,6 +67,7 @@ export default function EditProductPage() {
         discount_type: null as DiscountType | null,
         discount_value: 0,
         sale_price: null as number | null,
+        exclude_from_sales: false,
     });
     const [ytLinkError, setYtLinkError] = useState('');
 
@@ -74,6 +75,9 @@ export default function EditProductPage() {
     const [showDiscountDialog, setShowDiscountDialog] = useState(false);
     const [draftDiscountType, setDraftDiscountType] = useState<DiscountType>('PCT');
     const [draftDiscountValue, setDraftDiscountValue] = useState('');
+    // What the database currently holds, so the form can distinguish a pending
+    // change from one that has actually been persisted.
+    const [savedSalePrice, setSavedSalePrice] = useState<number | null>(null);
 
     const mrpNum = parseFloat(formData.price) || 0;
     const draftSalePrice = calculateSalePrice(
@@ -85,6 +89,10 @@ export default function EditProductPage() {
         (parseFloat(formData.purchase_price) || 0) *
         (1 + (parseFloat(formData.purchase_tax_percent) || 0) / 100);
     const isBelowCost = draftSalePrice !== null && landingCost > 0 && draftSalePrice < landingCost;
+
+    // A removal is pending when the form has cleared the discount but the saved
+    // product still carries one — nothing is written until Update Product.
+    const discountRemovalPending = formData.sale_price === null && savedSalePrice !== null;
 
     const openDiscountDialog = () => {
         setDraftDiscountType(formData.discount_type ?? 'PCT');
@@ -106,6 +114,12 @@ export default function EditProductPage() {
     const removeDiscount = () => {
         setFormData(prev => ({ ...prev, discount_type: null, discount_value: 0, sale_price: null }));
         setDraftDiscountValue('');
+        setShowDiscountDialog(false);
+    };
+
+    // Cancel must leave formData untouched — including undoing a Remove made
+    // earlier in this session but not yet saved.
+    const cancelDiscountDialog = () => {
         setShowDiscountDialog(false);
     };
 
@@ -161,7 +175,9 @@ export default function EditProductPage() {
                 discount_type: (data.discount_type as DiscountType | null) ?? null,
                 discount_value: Number(data.discount_value) || 0,
                 sale_price: data.sale_price != null ? Number(data.sale_price) : null,
+                exclude_from_sales: data.exclude_from_sales ?? false,
             });
+            setSavedSalePrice(data.sale_price != null ? Number(data.sale_price) : null);
             // Set product images separately
             setProductImages(Array.isArray(data.images) ? data.images : []);
         }
@@ -236,10 +252,17 @@ export default function EditProductPage() {
                 discount_type: formData.discount_type,
                 discount_value: formData.discount_value,
                 sale_price: formData.sale_price,
+                exclude_from_sales: formData.exclude_from_sales,
             });
+
+            // The save is now the source of truth — clears any pending-removal notice
+            setSavedSalePrice(formData.sale_price);
 
             toast.success('Product updated successfully!');
             router.push('/admin/products');
+            // Drop the client router cache so the list shows the new price
+            // instead of the copy it rendered before this edit.
+            router.refresh();
         } catch (error) {
             console.error('Error:', error);
             toast.error(error instanceof Error ? error.message : 'Failed to update product');
@@ -432,9 +455,38 @@ export default function EditProductPage() {
                                         </span>
                                     )}
                                 </div>
+                                {discountRemovalPending && (
+                                    <p className="mt-2 inline-flex items-start gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5">
+                                        <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-px" />
+                                        <span>
+                                            Discount will end when you click <strong>Update Product</strong>.
+                                            It is still live on the website until then.
+                                        </span>
+                                    </p>
+                                )}
                                 {mrpNum <= 0 && (
                                     <p className="mt-1.5 text-xs text-gray-400">Set an MRP first to apply a discount</p>
                                 )}
+
+                                {/* Hold this saree at full price during festival sales */}
+                                <label className="mt-3 flex items-start gap-2.5 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.exclude_from_sales}
+                                        onChange={e =>
+                                            setFormData(prev => ({ ...prev, exclude_from_sales: e.target.checked }))
+                                        }
+                                        className="mt-0.5 w-4 h-4 rounded border-gray-300 accent-amber-600 cursor-pointer flex-shrink-0"
+                                    />
+                                    <span>
+                                        <span className="block text-sm font-medium text-gray-700">
+                                            Exclude from bulk sale
+                                        </span>
+                                        <span className="block text-xs text-gray-500 mt-0.5">
+                                            Bulk sales skip this saree. Any individual discount set above still applies.
+                                        </span>
+                                    </span>
+                                </label>
                             </>
                         )}
                     </div>
@@ -796,12 +848,12 @@ export default function EditProductPage() {
                                     onClick={removeDiscount}
                                     className="px-4 py-3 border-2 border-red-200 text-red-600 rounded-xl font-semibold text-sm hover:bg-red-50 transition-colors whitespace-nowrap"
                                 >
-                                    Remove
+                                    End discount
                                 </button>
                             )}
                             <button
                                 type="button"
-                                onClick={() => setShowDiscountDialog(false)}
+                                onClick={cancelDiscountDialog}
                                 className="flex-1 py-3 border-2 border-gray-200 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
                             >
                                 Cancel

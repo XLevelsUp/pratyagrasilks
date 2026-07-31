@@ -123,10 +123,10 @@ export default function ProductDetailClient({ product, productId }: ProductDetai
                         <div className="flex items-baseline gap-4 flex-wrap mb-8">
                             {hasDiscount(product) ? (
                                 <>
-                                    <p className="text-3xl font-semibold text-textPrimary">
+                                    <p className="text-4xl font-bold text-accent-700 tracking-tight">
                                         {formatPrice(getEffectivePrice(product))}
                                     </p>
-                                    <p className="text-xl text-gray-400 line-through">
+                                    <p className="text-lg text-gray-400 line-through font-normal">
                                         {formatPrice(product.price)}
                                     </p>
                                     <span className="bg-accent-700 text-white text-[11px] font-bold tracking-[0.12em] uppercase px-2.5 py-1 rounded-full">
