@@ -13,7 +13,7 @@ import { deleteProduct } from '@/lib/actions/product.actions';
 import BulkQrWrapper from '@/components/admin/BulkQrWrapper';
 import PrinterCalibration from '@/components/admin/PrinterCalibration';
 import ResponsiveDataTable, { Column } from '@/components/admin/ResponsiveDataTable';
-import { hasDiscount, getEffectivePrice, getDiscountPercent } from '@/lib/utils/discount';
+import { hasDiscount, getEffectivePrice } from '@/lib/utils/discount';
 import BulkDiscountDialog from '@/components/admin/BulkDiscountDialog';
 import { getActiveCampaign } from '@/lib/actions/campaign.actions';
 import { DiscountCampaign, isCampaignLive, isCampaignScheduled, getFinalPrice, hasAnyDiscount, getFinalDiscountPercent, getCampaignPrice } from '@/lib/utils/campaign';
@@ -66,6 +66,7 @@ export default function AdminProductsPage() {
             setCampaign(await getActiveCampaign());
         } catch (err) {
             console.error('Failed to load campaign:', err);
+            toast.error(err instanceof Error ? err.message : 'Could not load the sale campaign');
         }
     };
 
@@ -106,9 +107,9 @@ export default function AdminProductsPage() {
         if (stockFilter === 'sold_out')  query = query.eq('stock_quantity', 0);
         if (listingFilter === 'online')   query = query.eq('is_online', true);
         if (listingFilter === 'pos_only') query = query.eq('is_online', false);
-        if (offerFilter === 'discounted')  query = query.not('sale_price', 'is', null);
-        if (offerFilter === 'no_discount') query = query.is('sale_price', null);
-        if (offerFilter === 'excluded')    query = query.eq('exclude_from_sales', true);
+        // 'discounted' and 'on_sale' are resolved client-side against the live
+        // campaign — which discount wins isn't knowable from a SQL column.
+        if (offerFilter === 'excluded') query = query.eq('exclude_from_sales', true);
 
         const { data, error } = await query;
 
@@ -164,6 +165,23 @@ export default function AdminProductsPage() {
             maximumFractionDigits: 0,
         }).format(price);
 
+    /**
+     * Which discount is actually pricing this product. A saree can carry both
+     * its own discount and a campaign band; only the deeper one applies, so the
+     * row names whichever is setting the price.
+     */
+    const discountSource = (product: Product): string | null => {
+        const own = hasDiscount(product) ? getEffectivePrice(product) : null;
+        const bulk = getCampaignPrice(product, campaign);
+
+        // Ties go to the sale: when both routes land on the same price, the
+        // campaign is the one actively setting it, and it's what ends on 15 Aug.
+        if (own !== null && bulk !== null) return bulk <= own ? 'bulk sale' : 'individual';
+        if (bulk !== null) return 'bulk sale';
+        if (own !== null) return 'individual';
+        return null;
+    };
+
     const filteredProducts = products.filter((product) => {
         const searchLower = searchTerm.toLowerCase();
         const matchesSearch =
@@ -171,13 +189,16 @@ export default function AdminProductsPage() {
             product.sku.toLowerCase().includes(searchLower) ||
             product.category.toLowerCase().includes(searchLower);
 
-        // Campaign pricing is computed, not stored, so "on sale" can't be a DB
-        // filter — it has to be evaluated here against the live campaign.
-        if (offerFilter === 'on_sale') {
-            return matchesSearch && getCampaignPrice(product, campaign) !== null;
-        }
+        if (!matchesSearch) return false;
 
-        return matchesSearch;
+        // Offer filters follow the price actually charged, so they agree with the
+        // tag on each row. A saree carrying both discounts appears only under the
+        // one that wins — never in both lists.
+        if (offerFilter === 'discounted')  return discountSource(product) === 'individual' && hasDiscount(product);
+        if (offerFilter === 'on_sale')     return discountSource(product) === 'bulk sale' && getCampaignPrice(product, campaign) !== null;
+        if (offerFilter === 'no_discount') return !hasAnyDiscount(product, campaign);
+
+        return true;
     });
 
     const allSelected = filteredProducts.length > 0 && filteredProducts.every(p => selectedIds.has(p.id));
@@ -293,8 +314,11 @@ export default function AdminProductsPage() {
             key: 'price',
             header: 'Price',
             className: 'whitespace-nowrap',
-            render: (product) => (
-                hasAnyDiscount(product, campaign) ? (
+            render: (product) => {
+                if (!hasAnyDiscount(product, campaign)) {
+                    return <span className="text-gray-900 font-medium">{formatPrice(product.price)}</span>;
+                }
+                return (
                     <span className="flex flex-col gap-0.5">
                         <span className="flex items-baseline gap-1.5">
                             <span className="text-xs text-gray-400 line-through">{formatPrice(product.price)}</span>
@@ -302,13 +326,13 @@ export default function AdminProductsPage() {
                         </span>
                         <span className="inline-flex w-fit items-center px-1.5 py-0.5 text-[10px] font-bold text-green-700 bg-green-50 border border-green-200 rounded">
                             {getFinalDiscountPercent(product, campaign)}% OFF
-                            {!hasDiscount(product) && <span className="ml-1 font-normal">· bulk sale</span>}
+                            {discountSource(product) && (
+                                <span className="ml-1 font-normal">· {discountSource(product)}</span>
+                            )}
                         </span>
                     </span>
-                ) : (
-                    <span className="text-gray-900 font-medium">{formatPrice(product.price)}</span>
-                )
-            ),
+                );
+            },
         },
         {
             key: 'stock',
@@ -414,6 +438,9 @@ export default function AdminProductsPage() {
                         <span className="text-lg font-bold text-amber-700">{formatPrice(getFinalPrice(product, campaign))}</span>
                         <span className="px-1.5 py-0.5 text-[10px] font-bold text-green-700 bg-green-50 border border-green-200 rounded">
                             {getFinalDiscountPercent(product, campaign)}% OFF
+                            {discountSource(product) && (
+                                <span className="ml-1 font-normal">· {discountSource(product)}</span>
+                            )}
                         </span>
                     </span>
                 ) : (
