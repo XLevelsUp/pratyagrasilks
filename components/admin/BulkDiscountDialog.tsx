@@ -19,6 +19,7 @@ interface TargetProduct {
     price: number;
     category: string;
     is_online?: boolean;
+    in_stock?: boolean;
     exclude_from_sales?: boolean;
     purchase_price?: number | null;
     purchase_tax_percent?: number | null;
@@ -104,7 +105,8 @@ export default function BulkDiscountDialog({
 
     // Live preview — the admin's check against a typo before the sale goes public
     const preview = useMemo(() => {
-        const online = products.filter(p => p.is_online !== false);
+        // Sold sarees can't be bought at a sale price, so they never count
+        const online = products.filter(p => p.is_online !== false && p.in_stock !== false);
         const matched: { product: TargetProduct; salePrice: number; belowCost: boolean }[] = [];
 
         for (const product of online) {
@@ -115,6 +117,7 @@ export default function BulkDiscountDialog({
                     price: product.price,
                     category: product.category,
                     isOnline: true,
+                    inStock: true,
                     excludeFromSales: product.exclude_from_sales ?? false,
                 })) continue;
                 const candidate = calculateSalePrice(product.price, band.discountType, band.discountValue);

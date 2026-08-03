@@ -41,8 +41,9 @@ export async function getActiveCampaign(): Promise<DiscountCampaign | null> {
         .maybeSingle();
 
     if (error) {
-        console.error('Error fetching campaign:', error);
-        return null;
+        // Surfaced rather than swallowed — a silent null makes every product
+        // look undiscounted, indistinguishable from "no sale is running".
+        throw new Error(`Could not load the sale campaign: ${error.message}`);
     }
     return data ? mapCampaign(data) : null;
 }

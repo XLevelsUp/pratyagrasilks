@@ -20,6 +20,8 @@ export interface CampaignApplicable {
     is_online?: boolean;
     excludeFromSales?: boolean;
     exclude_from_sales?: boolean;
+    inStock?: boolean;
+    in_stock?: boolean;
 }
 
 /** Returns the product with salePrice set to the best available offer. */

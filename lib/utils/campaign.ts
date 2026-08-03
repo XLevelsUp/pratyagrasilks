@@ -46,6 +46,8 @@ export interface CampaignTarget {
     /** Held at full price — festival sales skip it. */
     excludeFromSales?: boolean;
     exclude_from_sales?: boolean;
+    inStock?: boolean;
+    in_stock?: boolean;
 }
 
 /**
@@ -95,6 +97,11 @@ export function bandMatches(band: CampaignBand, product: CampaignTarget): boolea
 
     // Admin has pinned this saree at full price
     if (product.excludeFromSales ?? product.exclude_from_sales ?? false) return false;
+
+    // A sold saree can't be bought at the sale price, so advertising one is
+    // misleading — it stays at MRP with no badge.
+    const inStock = product.inStock ?? product.in_stock ?? true;
+    if (!inStock) return false;
 
     if (band.minPrice != null && product.price < band.minPrice) return false;
     if (band.maxPrice != null && product.price > band.maxPrice) return false;
