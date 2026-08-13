@@ -23,6 +23,15 @@ import {
 // Never prerender or cache — this mutates external state.
 export const dynamic = 'force-dynamic';
 
+// POST is the same drain, so product saves can trigger it on demand instead of
+// waiting for the next scheduled run. Vercel's Hobby plan allows only one cron
+// per day, so without this an admin edit would take up to 24h to reach
+// WhatsApp. Creates and sales still wait for the cron — see the note in
+// triggerMetaCatalogSync().
+export async function POST(request: Request) {
+    return GET(request);
+}
+
 /** Rows claimed per run. Keeps the function well inside its time limit. */
 const DRAIN_LIMIT = 200;
 
