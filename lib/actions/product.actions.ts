@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { Product } from '@/lib/types';
 import { revalidatePath } from 'next/cache';
 import { getCallerRole, assertAdminOnly } from '@/lib/actions/role-guard';
+import { triggerMetaCatalogSync } from '@/lib/trigger-meta-sync';
 
 /**
  * Fetches the 8 most recently added products ordered by created_at DESC
@@ -124,6 +125,10 @@ export async function deleteProduct(id: string): Promise<void> {
     revalidatePath('/');
     revalidatePath('/collection');
     revalidatePath(`/product/${id}`);
+
+    // Not awaited — the products trigger has already queued the removal, so
+    // Meta latency must not delay the response.
+    triggerMetaCatalogSync();
 }
 
 export async function updateProduct(id: string, data: ProductUpdateInput): Promise<void> {
@@ -189,4 +194,7 @@ export async function updateProduct(id: string, data: ProductUpdateInput): Promi
     revalidatePath('/collection');
     revalidatePath(`/product/${id}`);
     if (patch.category) revalidatePath(`/silk/${patch.category}`);
+
+    // Not awaited — see deleteProduct above.
+    triggerMetaCatalogSync();
 }
