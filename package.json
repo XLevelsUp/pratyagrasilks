@@ -28,6 +28,7 @@
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.67.0",
     "react-hot-toast": "^2.6.0",
+    "recharts": "^3.10.1",
     "resend": "^6.10.0",
     "sharp": "^0.34.5",
     "vaul": "^1.1.2",

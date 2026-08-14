@@ -16,6 +16,7 @@ import {
     Building2,
     Menu,
     X,
+    BarChart3,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/context/AuthContext';
@@ -34,6 +35,7 @@ const ADMIN_NAV: NavItem[] = [
     { name: 'Products',   href: '/admin/products',      icon: Package        },
     { name: 'Vendors',    href: '/admin/vendors',        icon: Building2      },
     { name: 'Customers',  href: '/admin/customers',     icon: Users          },
+    { name: 'Analytics',  href: '/admin/analytics',     icon: BarChart3      },
 ];
 
 const CASHIER_NAV: NavItem[] = [
