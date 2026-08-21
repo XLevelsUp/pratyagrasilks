@@ -13,6 +13,7 @@ import CartSidebar from "@/components/Cart/CartSidebar";
 import { Analytics } from "@vercel/analytics/react";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import GoogleTagManager from "@/components/GoogleTagManager";
+import MicrosoftClarity from "@/components/MicrosoftClarity";
 import MetaPixel from "@/components/MetaPixel";
 import { Toaster } from "react-hot-toast";
 import OrganizationSchema from "@/components/seo/OrganizationSchema";
@@ -110,6 +111,7 @@ export default function RootLayout({
         <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
             <head>
                 <GoogleTagManager />
+                <MicrosoftClarity />
             </head>
             <body className="antialiased"> {/* fixed: vertical scroll restored — removed hide-scrollbar from body */}
                 <noscript>
