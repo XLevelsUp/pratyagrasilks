@@ -49,9 +49,11 @@
     "vitest": "^4.1.10"
   },
   "browserslist": [
-    ">0.3%",
-    "not ie 11",
-    "not dead",
-    "not op_mini all"
+    "chrome >= 93",
+    "edge >= 93",
+    "firefox >= 93",
+    "safari >= 15.4",
+    "ios_saf >= 15.4",
+    "not dead"
   ]
 }

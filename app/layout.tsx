@@ -109,10 +109,6 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
-            <head>
-                <GoogleTagManager />
-                <MicrosoftClarity />
-            </head>
             <body className="antialiased"> {/* fixed: vertical scroll restored — removed hide-scrollbar from body */}
                 <noscript>
                     <iframe
@@ -145,6 +141,8 @@ export default function RootLayout({
                     <FloatingButtons />
                 </AuthProvider>
                 <GoogleAnalytics />
+                <GoogleTagManager />
+                <MicrosoftClarity />
                 <MetaPixel />
                 <Analytics />
                 <Toaster position="top-right" />

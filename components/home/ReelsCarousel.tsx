@@ -4,6 +4,14 @@ import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import type { InstagramReel } from '@/lib/instagram';
 
+// Routes the active reel's video/poster through our own cache proxy so a
+// repeat visit is served from the CDN edge instead of re-downloading the
+// full asset from Instagram every time (their signed URLs carry no cache
+// headers of their own). Falls back transparently to the raw URL server-side
+// if the fetch fails — see app/api/reel-media/[id]/route.ts.
+const proxiedReelUrl = (reelId: string, sourceUrl: string, type: 'video' | 'poster') =>
+    `/api/reel-media/${reelId}?type=${type}&url=${encodeURIComponent(sourceUrl)}`;
+
 // Cover-flow style carousel: the active reel sits centre and autoplays
 // (muted — required for browser autoplay policies); clicking a side card,
 // a dot, or an arrow slides that reel to the centre and plays it. Index 0
@@ -103,8 +111,8 @@ export default function ReelsCarousel({ reels }: { reels: InstagramReel[] }) {
                                     <video
                                         ref={videoRef}
                                         key={reel.id}
-                                        src={reel.mediaUrl}
-                                        poster={reel.thumbnailUrl}
+                                        src={proxiedReelUrl(reel.id, reel.mediaUrl, 'video')}
+                                        poster={proxiedReelUrl(reel.id, reel.thumbnailUrl, 'poster')}
                                         autoPlay
                                         muted
                                         loop
@@ -126,7 +134,7 @@ export default function ReelsCarousel({ reels }: { reels: InstagramReel[] }) {
                                         type="button"
                                         onClick={() => setMuted((m) => !m)}
                                         aria-label={muted ? 'Unmute reel' : 'Mute reel'}
-                                        className="absolute top-3 right-3 flex items-center justify-center w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 transition-colors"
+                                        className="absolute top-3 right-3 flex items-center justify-center w-11 h-11 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 transition-colors"
                                     >
                                         {muted ? (
                                             <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4" aria-hidden="true">
@@ -144,7 +152,7 @@ export default function ReelsCarousel({ reels }: { reels: InstagramReel[] }) {
                                         href={reel.permalink}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-sm text-white text-xs font-medium hover:bg-black/70 transition-colors"
+                                        className="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-1.5 min-h-11 rounded-full bg-black/50 backdrop-blur-sm text-white text-xs font-medium hover:bg-black/70 transition-colors"
                                     >
                                         <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5" aria-hidden="true">
                                             <path d="M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.85.07s-3.58-.01-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.64-.07-4.85s.01-3.58.07-4.85C2.38 3.92 3.9 2.38 7.15 2.23 8.42 2.17 8.8 2.16 12 2.16zM12 0C8.74 0 8.33.01 7.05.07 2.7.27.27 2.69.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.2 4.36 2.62 6.78 6.98 6.98C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c4.35-.2 6.78-2.62 6.98-6.98.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95C23.73 2.7 21.31.27 16.95.07 15.67.01 15.26 0 12 0zm0 5.84A6.16 6.16 0 105.84 12 6.16 6.16 0 0012 5.84zm0 10.15A3.99 3.99 0 1116 12a3.99 3.99 0 01-4 3.99zm6.4-11.85a1.44 1.44 0 11-1.44 1.44 1.44 1.44 0 011.44-1.44z" />
@@ -209,8 +217,8 @@ export default function ReelsCarousel({ reels }: { reels: InstagramReel[] }) {
                 </button>
             </div>
 
-            {/* Dot indicators */}
-            <div className="flex items-center justify-center gap-2.5 mt-8">
+            {/* Dot indicators — 44px tap target around each visible dot, per WCAG target-size guidance */}
+            <div className="flex items-center justify-center mt-8">
                 {reels.map((reel, index) => (
                     <button
                         key={reel.id}
@@ -218,12 +226,16 @@ export default function ReelsCarousel({ reels }: { reels: InstagramReel[] }) {
                         onClick={() => goTo(index)}
                         aria-label={`Go to reel ${index + 1}`}
                         aria-current={index === active}
-                        className={`h-2 rounded-full transition-all duration-300 ${
-                            index === active
-                                ? 'w-7 bg-accent'
-                                : 'w-2 bg-primary/20 hover:bg-primary/40'
-                        }`}
-                    />
+                        className="flex items-center justify-center w-11 h-11 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-full"
+                    >
+                        <span
+                            className={`block h-2 rounded-full transition-all duration-300 ${
+                                index === active
+                                    ? 'w-7 bg-accent'
+                                    : 'w-2 bg-primary/20 hover:bg-primary/40'
+                            }`}
+                        />
+                    </button>
                 ))}
             </div>
         </div>
