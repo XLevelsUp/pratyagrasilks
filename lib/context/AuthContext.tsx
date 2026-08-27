@@ -1,8 +1,7 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { createClient } from '@/lib/supabase/client';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import type { User, Session, SupabaseClient } from '@supabase/supabase-js';
 
 interface AuthContextType {
     user: User | null;
@@ -21,32 +20,56 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [session, setSession] = useState<Session | null>(null);
     const [loading, setLoading] = useState(true);
-    const supabase = createClient();
+
+    // The Supabase SDK (~43KB) is dynamically imported instead of bundled
+    // eagerly, so it downloads after first paint instead of blocking it —
+    // every page mounts AuthProvider, including ones with no auth-gated UI.
+    // getClient() lazily creates and caches a single instance so every
+    // caller (the effect below, and the action functions) shares one client.
+    const clientRef = useRef<SupabaseClient | null>(null);
+    const getClient = async () => {
+        if (!clientRef.current) {
+            const { createClient } = await import('@/lib/supabase/client');
+            clientRef.current = createClient();
+        }
+        return clientRef.current;
+    };
 
     useEffect(() => {
-        // Get initial session
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-            setUser(session?.user ?? null);
-            setLoading(false);
+        let unsubscribe: (() => void) | undefined;
+        let cancelled = false;
+
+        getClient().then((supabase) => {
+            if (cancelled) return;
+
+            supabase.auth.getSession().then(({ data: { session } }) => {
+                setSession(session);
+                setUser(session?.user ?? null);
+                setLoading(false);
+            });
+
+            const {
+                data: { subscription },
+            } = supabase.auth.onAuthStateChange((_event, session) => {
+                setSession(session);
+                setUser(session?.user ?? null);
+                setLoading(false);
+            });
+
+            unsubscribe = () => subscription.unsubscribe();
         });
 
-        // Listen for auth changes
-        const {
-            data: { subscription },
-        } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session);
-            setUser(session?.user ?? null);
-            setLoading(false);
-        });
-
-        return () => subscription.unsubscribe();
+        return () => {
+            cancelled = true;
+            unsubscribe?.();
+        };
     }, []);
 
     const signUp = async (email: string, password: string, fullName: string) => {
         if (password.length > 20) {
             return { error: new Error('Password must not exceed 20 characters.') };
         }
+        const supabase = await getClient();
         const { error } = await supabase.auth.signUp({
             email,
             password,
@@ -63,6 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (password.length > 20) {
             return { error: new Error('Password must not exceed 20 characters.') };
         }
+        const supabase = await getClient();
         const { error } = await supabase.auth.signInWithPassword({
             email,
             password,
@@ -72,6 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const signInWithGoogle = async (redirectPath?: string) => {
         const next = redirectPath || '/';
+        const supabase = await getClient();
         const { error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
@@ -82,10 +107,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const signOut = async () => {
+        const supabase = await getClient();
         await supabase.auth.signOut();
     };
 
     const refreshUser = async () => {
+        const supabase = await getClient();
         const { data: { user } } = await supabase.auth.getUser();
         setUser(user);
     };
