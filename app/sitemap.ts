@@ -1,7 +1,8 @@
 import type { MetadataRoute } from 'next'
 import { silkCategories } from '@/lib/seo-config'
+import { getPosts } from '@/lib/actions/blog.actions'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://pratyagrasilks.com'
   const now = new Date() // Updates to current build date automatically
 
@@ -23,6 +24,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/collection`,
       lastModified: now,
       changeFrequency: 'daily',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: now,
+      changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
@@ -76,5 +83,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // but search engines won't prioritize them. When sold, they return
   // HTTP 410 Gone status to properly signal permanent removal.
 
-  return [...staticPages, ...categoryPages]
+  // Blog posts — always-live-on-save, so every row here is publicly visible
+  let blogPages: MetadataRoute.Sitemap = []
+  try {
+    const { posts } = await getPosts({ limit: 500, offset: 0 })
+    blogPages = posts.map(post => ({
+      url: `${baseUrl}/blog/${post.slug}`,
+      lastModified: post.updatedAt,
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    }))
+  } catch {
+    // Sitemap generation should never fail the build over a transient DB error
+  }
+
+  return [...staticPages, ...categoryPages, ...blogPages]
 }

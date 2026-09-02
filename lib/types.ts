@@ -79,3 +79,111 @@ export interface WishlistItem {
     product: Product;
     createdAt: Date;
 }
+
+// ── Blog ─────────────────────────────────────────────────────────────────
+
+export interface BlogCategory {
+    slug: string;
+    name: string;
+    sortOrder: number;
+}
+
+export type ImageDisplayMode = 'cover' | 'contain';
+
+export interface BlogSubsection {
+    id: string;
+    sectionId: string;
+    sortOrder: number;
+    heading: string | null;
+    bodyHtml: string;
+}
+
+export interface BlogSection {
+    id: string;
+    postId: string;
+    sortOrder: number;
+    blockType: 'section' | 'callout';
+    heading: string | null;
+    bodyHtml: string;
+    secondImageUrl?: string | null;
+    secondImageAlt?: string | null;
+    secondImageMode: ImageDisplayMode;
+    subsections: BlogSubsection[];
+}
+
+export interface BlogQnA {
+    id: string;
+    postId: string;
+    sortOrder: number;
+    question: string;
+    answer: string;
+}
+
+export interface BlogCtaButton {
+    id: string;
+    postId: string;
+    sortOrder: number;
+    label: string;
+    url: string;
+}
+
+export interface BlogComment {
+    id: string;
+    postId: string;
+    name: string;
+    email: string;
+    message: string;
+    status: 'pending' | 'approved' | 'rejected';
+    createdAt: Date;
+}
+
+export interface BlogPost {
+    id: string;
+    slug: string;
+    title: string;
+    featuredImageUrl?: string | null;
+    featuredImageAlt?: string | null;
+    featuredImageMode: ImageDisplayMode;
+    introHtml: string;
+    categorySlug: string | null;
+    category?: BlogCategory;
+    author: string;
+    tags: string[];
+    readingTimeMinutes: number;
+    publishedAt: Date;
+    metaDescription: string | null;
+    ctaIntroText: string | null;
+    sections: BlogSection[];
+    qna: BlogQnA[];
+    ctaButtons: BlogCtaButton[];
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+/** Shape submitted from the admin post form — nested arrays are replaced wholesale on save. */
+export interface BlogPostInput {
+    slug: string;
+    title: string;
+    featuredImageUrl?: string | null;
+    featuredImageAlt?: string | null;
+    featuredImageMode: ImageDisplayMode;
+    introHtml: string;
+    categorySlug: string | null;
+    author: string;
+    tags: string[];
+    readingTimeMinutes: number;
+    publishedAt: string; // ISO date from the form's date input
+    metaDescription: string | null;
+    ctaIntroText: string | null;
+    sections: Array<{
+        blockType: 'section' | 'callout';
+        heading: string | null;
+        bodyHtml: string;
+        secondImageUrl?: string | null;
+        secondImageAlt?: string | null;
+        secondImageMode: ImageDisplayMode;
+        subsections: Array<{ heading: string | null; bodyHtml: string }>;
+    }>;
+    qna: Array<{ question: string; answer: string }>;
+    ctaButtons: Array<{ label: string; url: string }>;
+}

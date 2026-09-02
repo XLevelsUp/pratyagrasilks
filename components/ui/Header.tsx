@@ -116,6 +116,12 @@ export default function Header({ variant = 'solid' }: HeaderProps) {
                             About
                         </Link>
                         <Link
+                            href="/blog"
+                            className={`${navLinkClass} transition-colors font-medium`}
+                        >
+                            Blog
+                        </Link>
+                        <Link
                             href="/contact"
                             className={`${navLinkClass} transition-colors font-medium`}
                         >
@@ -281,6 +287,13 @@ export default function Header({ variant = 'solid' }: HeaderProps) {
                                 onClick={() => setIsMobileMenuOpen(false)}
                             >
                                 About
+                            </Link>
+                            <Link
+                                href="/blog"
+                                className="hover:text-primary transition-colors font-medium px-2 py-2"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                                Blog
                             </Link>
                             <Link
                                 href="/contact"

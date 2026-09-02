@@ -22,3 +22,14 @@ export async function assertAdminOnly(role: UserRole | null, action: string): Pr
         throw new Error(`Role '${role}' is not authorised to ${action}.`);
     }
 }
+
+/** Throws if the caller's role is not one of `allowed`. For actions shared by multiple roles (e.g. blog CRUD: ADMIN + MARKETING). */
+export async function assertRoleIn(
+    role: UserRole | null,
+    allowed: UserRole[],
+    action: string,
+): Promise<void> {
+    if (role === null || !allowed.includes(role)) {
+        throw new Error(`Role '${role}' is not authorised to ${action}.`);
+    }
+}
