@@ -14,7 +14,7 @@ import {
   CheckCircle,
   AlertCircle,
 } from 'lucide-react';
-import Input from '@/components/ui/Input';
+import Input from '@pratyagra/ui/Input';
 
 const PHONE_REGEX = /^(\+[1-9]\d{7,14}|\d{10})$/;
 const MAX_PASSWORD_LENGTH = 20;

@@ -13,6 +13,7 @@
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@pratyagra/core": "workspace:*",
+    "@pratyagra/ui": "workspace:*",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.105.4",
     "@tiptap/extension-link": "^3.31.0",

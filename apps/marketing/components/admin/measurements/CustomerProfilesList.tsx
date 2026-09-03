@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Pencil, Printer, Ruler, Trash2 } from 'lucide-react';
-import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import ConfirmDialog from '@pratyagra/ui/ConfirmDialog';
 import MeasurementSheetPrint from '@/components/admin/measurements/MeasurementSheetPrint';
 import { fieldsByGroup, MEASUREMENT_COUNT, MeasurementKey } from '@/lib/constants/measurements';
 import { MeasurementProfile } from '@/lib/validations/measurement.schema';

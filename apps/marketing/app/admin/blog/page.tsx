@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { getPosts, deletePost, getPendingComments } from '@/lib/actions/blog-admin.actions';
 import { BlogPost } from '@pratyagra/core/types';
 import { isSupabaseImage } from '@pratyagra/core/utils/image';
-import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import ConfirmDialog from '@pratyagra/ui/ConfirmDialog';
 import toast from 'react-hot-toast';
 
 export default function AdminBlogPage() {

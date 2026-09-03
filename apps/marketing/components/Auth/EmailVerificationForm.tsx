@@ -2,7 +2,7 @@
 
 import React, { useRef } from 'react';
 import { useState } from 'react';
-import EmailInput, { EmailInputHandle } from '@/components/ui/EmailInput';
+import EmailInput, { EmailInputHandle } from '@pratyagra/ui/EmailInput';
 
 interface EmailVerificationFormProps {
     onSuccess?: (email: string) => void;

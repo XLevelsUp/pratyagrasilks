@@ -8,7 +8,7 @@ import Image from 'next/image';
 import { User, Mail, Phone, Calendar, Package, Plus, MapPin, Loader2, ArrowLeft } from 'lucide-react';
 import AddressCard, { Address } from '@/components/profile/AddressCard';
 import AddressModal from '@/components/profile/AddressModal';
-import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import ConfirmDialog from '@pratyagra/ui/ConfirmDialog';
 
 export default function AddressesPage() {
     const { user, loading, signOut } = useAuth();

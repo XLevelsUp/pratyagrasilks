@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import toast from 'react-hot-toast';
-import Input from '@/components/ui/Input';
-import EmailInput from '@/components/ui/EmailInput';
+import Input from '@pratyagra/ui/Input';
+import EmailInput from '@pratyagra/ui/EmailInput';
 import { contactFormSchema } from '@pratyagra/core/validations/form.schemas';
 
 export default function ContactPage() {

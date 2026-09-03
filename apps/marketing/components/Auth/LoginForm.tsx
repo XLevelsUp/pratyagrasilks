@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/context/AuthContext';
 import Link from 'next/link';
-import EmailInput from '@/components/ui/EmailInput';
-import PasswordInput from '@/components/ui/PasswordInput';
+import EmailInput from '@pratyagra/ui/EmailInput';
+import PasswordInput from '@pratyagra/ui/PasswordInput';
 
 const MAX_PASSWORD_LENGTH = 20;
 

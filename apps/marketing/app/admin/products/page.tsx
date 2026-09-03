@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { isSupabaseImage } from '@pratyagra/core/utils/image';
-import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import ConfirmDialog from '@pratyagra/ui/ConfirmDialog';
 import { useAdmin } from '@/lib/hooks/useAdmin';
 import { deleteProduct } from '@/lib/actions/product.actions';
 import BulkQrWrapper from '@/components/admin/BulkQrWrapper';

@@ -7,7 +7,7 @@ import { ArrowLeft, Save, Youtube, Calculator, Tag, X, AlertTriangle } from 'luc
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import OptimizedUploader from '@/components/admin/OptimizedUploader';
-import ColorFamilyPicker from '@/components/ui/ColorFamilyPicker';
+import ColorFamilyPicker from '@pratyagra/ui/ColorFamilyPicker';
 import QrLabel from '@/components/admin/QrLabel';
 import { isValidYouTubeUrl, getYouTubeThumbnailUrl } from '@pratyagra/core/utils/youtube';
 import { calculateMrp } from '@/lib/utils/pricing';

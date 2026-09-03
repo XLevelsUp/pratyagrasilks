@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { shippingAddressSchema, ShippingAddress, COUNTRIES, COUNTRY_STATES, formatPhoneNumber } from '@/lib/validations/checkout';
 import { useState, useEffect } from 'react';
-import Input from '@/components/ui/Input';
+import Input from '@pratyagra/ui/Input';
 import { Check, MapPin, Pencil, Loader2 } from 'lucide-react';
 import type { Address } from '@/components/profile/AddressCard';
 

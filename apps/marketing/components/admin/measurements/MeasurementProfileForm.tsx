@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
 import { Loader2, Ruler } from 'lucide-react';
-import Input from '@/components/ui/Input';
+import Input from '@pratyagra/ui/Input';
 import { fieldsByGroup, MEASUREMENT_FIELDS, MeasurementKey } from '@/lib/constants/measurements';
 import {
     measurementProfileSchema,

@@ -9,7 +9,7 @@ import CartBadge from "@/components/Cart/CartBadge";
 import WishlistBadge from "@/components/Wishlist/WishlistBadge";
 import { User, LogOut, Package, Heart, ChevronDown } from "lucide-react";
 import { silkCategories } from "@/lib/seo-config";
-import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import ConfirmDialog from "@pratyagra/ui/ConfirmDialog";
 import useScrolled from "@/hooks/useScrolled";
 
 interface HeaderProps {

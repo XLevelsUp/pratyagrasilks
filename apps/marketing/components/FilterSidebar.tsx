@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Drawer } from 'vaul';
 import { ChevronDown, Search, SlidersHorizontal } from 'lucide-react';
-import ColorFamilyPicker from '@/components/ui/ColorFamilyPicker';
+import ColorFamilyPicker from '@pratyagra/ui/ColorFamilyPicker';
 
 export interface FilterState {
     category: string;

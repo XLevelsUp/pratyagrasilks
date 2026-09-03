@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { getVendors, deleteVendor, VendorType } from '@/lib/actions/vendor.actions';
 import { Vendor } from '@pratyagra/core/types';
 import { useAdmin } from '@/lib/hooks/useAdmin';
-import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import ConfirmDialog from '@pratyagra/ui/ConfirmDialog';
 import toast from 'react-hot-toast';
 
 const TYPE_STYLES: Record<VendorType, string> = {

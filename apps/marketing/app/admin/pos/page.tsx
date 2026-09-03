@@ -13,7 +13,7 @@ import { lookupOrCreateCustomer, getCustomerByPhone } from '@/lib/actions/crm.ac
 import type { PosActionItem, PosCustomer } from '@pratyagra/core/types';
 import PosReceipt, { PosReceiptData } from '@/components/admin/PosReceipt';
 import TestBillPrint from '@/components/admin/TestBillPrint';
-import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import ConfirmDialog from '@pratyagra/ui/ConfirmDialog';
 import { hasDiscount, getEffectivePrice, getDiscountPercent } from '@pratyagra/core/utils/discount';
 
 interface PosCartItem {

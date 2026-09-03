@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
 import { Loader2, Pencil, UserPlus, X } from 'lucide-react';
-import Input from '@/components/ui/Input';
+import Input from '@pratyagra/ui/Input';
 import {
     walkInCustomerSchema,
     WalkInCustomerFormValues,
