@@ -17,6 +17,8 @@ import {
     Menu,
     X,
     BarChart3,
+    Newspaper,
+    MessageSquare,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/context/AuthContext';
@@ -35,6 +37,7 @@ const ADMIN_NAV: NavItem[] = [
     { name: 'Products',   href: '/admin/products',      icon: Package        },
     { name: 'Vendors',    href: '/admin/vendors',        icon: Building2      },
     { name: 'Customers',  href: '/admin/customers',     icon: Users          },
+    { name: 'Blog',       href: '/admin/blog',          icon: Newspaper      },
     { name: 'Analytics',  href: '/admin/analytics',     icon: BarChart3      },
 ];
 
@@ -46,9 +49,15 @@ const CASHIER_NAV: NavItem[] = [
     { name: 'Customers',  href: '/admin/customers',       icon: Users        },
 ];
 
+const MARKETING_NAV: NavItem[] = [
+    { name: 'Blog',     href: '/admin/blog',          icon: Newspaper     },
+    { name: 'Comments', href: '/admin/blog/comments', icon: MessageSquare },
+];
+
 function navForRole(role: UserRole | null): NavItem[] {
-    if (role === 'ADMIN')   return ADMIN_NAV;
-    if (role === 'CASHIER') return CASHIER_NAV;
+    if (role === 'ADMIN')      return ADMIN_NAV;
+    if (role === 'CASHIER')    return CASHIER_NAV;
+    if (role === 'MARKETING')  return MARKETING_NAV;
     return [];
 }
 
@@ -59,14 +68,20 @@ interface NavLinksProps {
 }
 
 function NavLinks({ navigation, pathname, onLinkClick }: NavLinksProps) {
+    // Only the single best (longest-matching) href lights up — otherwise a
+    // parent route like "/admin/blog" and a sibling like "/admin/blog/comments"
+    // would both highlight at once when viewing the sibling.
+    const matches = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+    const activeHref = navigation
+        .map((item) => item.href)
+        .filter(matches)
+        .sort((a, b) => b.length - a.length)[0];
+
     return (
         <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
             {navigation.map((item) => {
                 const Icon = item.icon;
-                const isActive =
-                    item.href === '/admin'
-                        ? pathname === '/admin'
-                        : pathname.startsWith(item.href);
+                const isActive = item.href === activeHref;
 
                 return (
                     <Link
@@ -112,7 +127,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (!role) return null;
 
     const navigation = navForRole(role);
-    const panelLabel = role === 'ADMIN' ? 'Admin Panel' : 'Cashier Panel';
+    const panelLabel = role === 'ADMIN' ? 'Admin Panel' : role === 'MARKETING' ? 'Marketing Panel' : 'Cashier Panel';
 
     const sidebarFooter = (
         <div className="p-4 border-t border-gray-800 flex-shrink-0">

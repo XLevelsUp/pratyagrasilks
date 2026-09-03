@@ -73,3 +73,13 @@ export const shippingAddressSchema = z.object({
 });
 
 export type ShippingAddress = z.infer<typeof shippingAddressSchema>;
+
+// ── Blog Comment ──────────────────────────────────────────────────────────────
+
+export const blogCommentSchema = z.object({
+    name: fullNameField,
+    email: emailField,
+    message: z.string().trim().min(3, 'Comment must be at least 3 characters').max(2000, 'Comment must not exceed 2000 characters'),
+});
+
+export type BlogCommentFormData = z.infer<typeof blogCommentSchema>;

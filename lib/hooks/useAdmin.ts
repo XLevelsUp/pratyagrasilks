@@ -73,6 +73,18 @@ export function useAdmin(): UseAdminReturn {
                     }
                 }
 
+                // ── MARKETING guard — blog + comment moderation only ──────────────
+                if (userRole === 'MARKETING') {
+                    const MARKETING_ALLOWED =
+                        pathname === '/admin/blog' ||
+                        pathname.startsWith('/admin/blog/');
+
+                    if (!MARKETING_ALLOWED) {
+                        router.push('/admin/blog');
+                        return;
+                    }
+                }
+
                 setRole(userRole);
             } catch {
                 router.push('/');
