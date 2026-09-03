@@ -5,8 +5,8 @@ import { Plus, Search, Newspaper, Edit, Eye, Trash2, MessageSquare } from 'lucid
 import Link from 'next/link';
 import Image from 'next/image';
 import { getPosts, deletePost, getPendingComments } from '@/lib/actions/blog-admin.actions';
-import { BlogPost } from '@/lib/types';
-import { isSupabaseImage } from '@/lib/utils/image';
+import { BlogPost } from '@pratyagra/core/types';
+import { isSupabaseImage } from '@pratyagra/core/utils/image';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import toast from 'react-hot-toast';
 

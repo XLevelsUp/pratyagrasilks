@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    // Workspace packages ship raw TS/TSX and are compiled with this app's SWC
+    // config. Without this, Next treats node_modules as pre-compiled: the TSX
+    // fails to parse, and 'use client' directives are not honoured.
+    transpilePackages: ['@pratyagra/core'],
     async headers() {
         return [
             {

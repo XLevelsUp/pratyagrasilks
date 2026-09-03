@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Plus, Search, Building2, PackagePlus, Edit, Phone, User, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { getVendors, deleteVendor, VendorType } from '@/lib/actions/vendor.actions';
-import { Vendor } from '@/lib/types';
+import { Vendor } from '@pratyagra/core/types';
 import { useAdmin } from '@/lib/hooks/useAdmin';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import toast from 'react-hot-toast';

@@ -8,9 +8,9 @@ import Image from 'next/image';
 import { useEffect } from 'react';
 import { ShoppingCart, Trash2, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Product } from '@/lib/types';
+import { Product } from '@pratyagra/core/types';
 import toast from 'react-hot-toast';
-import { hasDiscount, getEffectivePrice } from '@/lib/utils/discount';
+import { hasDiscount, getEffectivePrice } from '@pratyagra/core/utils/discount';
 
 export default function WishlistPage() {
     const { items, loading, removeFromWishlist } = useWishlist();

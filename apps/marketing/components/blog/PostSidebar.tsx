@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Calendar, Clock, Share2, MessageSquare } from 'lucide-react';
 import toast from 'react-hot-toast';
-import type { BlogPost } from '@/lib/types';
+import type { BlogPost } from '@pratyagra/core/types';
 
 interface PostSidebarProps {
     post: BlogPost;

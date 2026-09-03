@@ -1,6 +1,6 @@
 'use client';
 
-import { COLOR_FAMILIES, LIGHT_COLOR_IDS } from '@/lib/constants/colors';
+import { COLOR_FAMILIES, LIGHT_COLOR_IDS } from '@pratyagra/core/constants/colors';
 
 interface ColorFamilyPickerProps {
     value: string[];

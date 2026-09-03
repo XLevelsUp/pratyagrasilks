@@ -17,7 +17,7 @@ import type {
     BlogQnA,
     BlogCtaButton,
     BlogComment,
-} from '@/lib/types';
+} from '../types';
 
 /** Post with its category, sections (+subsections), Q&A and CTA buttons. */
 export const POST_SELECT = `

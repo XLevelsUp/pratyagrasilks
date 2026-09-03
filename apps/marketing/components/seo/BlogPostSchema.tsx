@@ -1,5 +1,5 @@
 import { siteMetadata } from '@/lib/seo/config';
-import type { BlogPost } from '@/lib/types';
+import type { BlogPost } from '@pratyagra/core/types';
 
 export default function BlogPostSchema({ post }: { post: BlogPost }) {
     const schema = {

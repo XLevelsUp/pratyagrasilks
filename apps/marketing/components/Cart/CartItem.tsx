@@ -4,7 +4,7 @@ import { CartItem } from '@/lib/context/CartContext';
 import Image from 'next/image';
 import Link from 'next/link';
 import { X } from 'lucide-react';
-import { hasDiscount, getEffectivePrice } from '@/lib/utils/discount';
+import { hasDiscount, getEffectivePrice } from '@pratyagra/core/utils/discount';
 
 interface CartItemComponentProps {
     item: CartItem;

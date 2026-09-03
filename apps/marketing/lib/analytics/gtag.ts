@@ -1,7 +1,7 @@
 // GA4 Ecommerce Event Tracking Helper Functions
 // Follows official GA4 Items array schema
 
-import { Product } from '@/lib/types';
+import { Product } from '@pratyagra/core/types';
 
 // Declare gtag function for TypeScript
 declare global {

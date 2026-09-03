@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getActiveCampaignPublic } from '@/lib/data/public-products';
-import { applyCampaignToProducts } from '@/lib/utils/applyCampaign';
+import { applyCampaignToProducts } from '@pratyagra/core/utils/applyCampaign';
 
 // Ensure this route is always treated as dynamic (uses cookies / auth)
 export const dynamic = 'force-dynamic';

@@ -13,7 +13,7 @@ import { trackBeginCheckout } from '@/lib/analytics/gtag';
 import EmailVerificationForm from '@/components/Auth/EmailVerificationForm';
 import { useAuth } from '@/lib/context/AuthContext';
 import { Address } from '@/components/profile/AddressCard';
-import { getEffectivePrice } from '@/lib/utils/discount';
+import { getEffectivePrice } from '@pratyagra/core/utils/discount';
 
 interface ShippingZone {
     id: string;

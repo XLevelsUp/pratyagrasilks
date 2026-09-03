@@ -5,7 +5,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import YouTubeSlide from '@/components/products/YouTubeSlide';
-import { getYouTubeThumbnailUrl } from '@/lib/utils/youtube';
+import { getYouTubeThumbnailUrl } from '@pratyagra/core/utils/youtube';
 
 interface ProductGalleryProps {
     images: string[];

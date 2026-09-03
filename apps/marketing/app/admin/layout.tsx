@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/context/AuthContext';
-import type { UserRole } from '@/lib/constants/roles';
+import type { UserRole } from '@pratyagra/core/constants/roles';
 
 type NavItem = {
     name: string;

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Script from 'next/script';
 import toast from 'react-hot-toast';
 import { ShieldCheck } from 'lucide-react';
-import { getEffectivePrice } from '@/lib/utils/discount';
+import { getEffectivePrice } from '@pratyagra/core/utils/discount';
 
 declare global {
     interface Window {

@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
-import { Product } from '@/lib/types';
-import { DiscountCampaign } from '@/lib/utils/campaign';
-import { applyCampaignToProducts } from '@/lib/utils/applyCampaign';
+import { Product } from '@pratyagra/core/types';
+import { DiscountCampaign } from '@pratyagra/core/utils/campaign';
+import { applyCampaignToProducts } from '@pratyagra/core/utils/applyCampaign';
 
 // Cookie-free anon client for public catalog data. Using this (instead of the
 // cookie-bound server client) keeps pages that only read public data eligible

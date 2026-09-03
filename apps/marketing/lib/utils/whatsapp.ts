@@ -1,4 +1,4 @@
-import type { PosActionItem, PosCustomer } from '@/lib/types';
+import type { PosActionItem, PosCustomer } from '@pratyagra/core/types';
 
 export interface WhatsAppReceiptParams {
     orderNumber: string;

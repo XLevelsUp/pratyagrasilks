@@ -2,7 +2,7 @@
 
 import { useCart } from '@/lib/context/CartContext';
 import { Lock } from 'lucide-react';
-import { hasDiscount, getEffectivePrice } from '@/lib/utils/discount';
+import { hasDiscount, getEffectivePrice } from '@pratyagra/core/utils/discount';
 
 interface Props {
     shippingCost: number;

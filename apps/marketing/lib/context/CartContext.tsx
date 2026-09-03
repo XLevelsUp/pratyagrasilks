@@ -1,9 +1,9 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { Product } from '@/lib/types';
+import { Product } from '@pratyagra/core/types';
 import { useAuth } from './AuthContext';
-import { getEffectivePrice } from '@/lib/utils/discount';
+import { getEffectivePrice } from '@pratyagra/core/utils/discount';
 
 export interface CartItem {
     id: string;

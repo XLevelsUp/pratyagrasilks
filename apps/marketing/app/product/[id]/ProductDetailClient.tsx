@@ -1,6 +1,6 @@
 'use client';
 
-import { Product } from '@/lib/types';
+import { Product } from '@pratyagra/core/types';
 import Link from 'next/link';
 import ProductGallery from '@/components/products/ProductGallery';
 import ProductCard from '@/components/ProductCard';
@@ -10,9 +10,9 @@ import { useState, useEffect } from 'react';
 import { ShoppingCart, Check, MessageCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { trackViewItem, trackAddToCart } from '@/lib/analytics/gtag';
-import { COLOR_FAMILIES, LIGHT_COLOR_IDS } from '@/lib/constants/colors';
+import { COLOR_FAMILIES, LIGHT_COLOR_IDS } from '@pratyagra/core/constants/colors';
 import { siteMetadata } from '@/lib/seo/config';
-import { hasDiscount, getEffectivePrice, getDiscountPercent, getDiscountSavings } from '@/lib/utils/discount';
+import { hasDiscount, getEffectivePrice, getDiscountPercent, getDiscountSavings } from '@pratyagra/core/utils/discount';
 
 interface ProductDetailClientProps {
     product: Product;

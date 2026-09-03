@@ -4,9 +4,9 @@ import { useState, useRef } from 'react';
 import { Upload, X, CheckCircle2 } from 'lucide-react';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
-import { isSupabaseImage } from '@/lib/utils/image';
+import { isSupabaseImage } from '@pratyagra/core/utils/image';
 import toast from 'react-hot-toast';
-import type { ImageDisplayMode } from '@/lib/types';
+import type { ImageDisplayMode } from '@pratyagra/core/types';
 
 interface BlogImageUploaderProps {
     imageUrl: string | null | undefined;

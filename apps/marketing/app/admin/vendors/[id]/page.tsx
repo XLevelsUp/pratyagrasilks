@@ -19,7 +19,7 @@ import Image from 'next/image';
 import { getVendorById, VendorType } from '@/lib/actions/vendor.actions';
 import { getProductsByVendor, VendorProduct } from '@/lib/actions/product.actions';
 import { getVendorDocSignedUrl } from '@/lib/supabase/storage-utils';
-import { Vendor } from '@/lib/types';
+import { Vendor } from '@pratyagra/core/types';
 import { useAdmin } from '@/lib/hooks/useAdmin';
 
 const TYPE_STYLES: Record<VendorType, string> = {

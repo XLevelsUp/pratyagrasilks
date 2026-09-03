@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import ProductCard from '@/components/ProductCard';
 import FilterSidebar, { FilterState } from '@/components/FilterSidebar';
-import { Product } from '@/lib/types';
+import { Product } from '@pratyagra/core/types';
 
 export default function CollectionClient() {
     const searchParams = useSearchParams();

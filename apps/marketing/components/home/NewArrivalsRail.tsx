@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
-import type { Product } from '@/lib/types';
+import type { Product } from '@pratyagra/core/types';
 
 interface NewArrivalsRailProps {
     products: Product[];

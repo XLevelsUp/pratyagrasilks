@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { MessageSquare } from 'lucide-react';
 import toast from 'react-hot-toast';
-import type { BlogComment } from '@/lib/types';
+import type { BlogComment } from '@pratyagra/core/types';
 
 interface CommentSectionProps {
     postId: string;

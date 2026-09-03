@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
 import { createClient } from '@supabase/supabase-js';
-import { shippingAddressSchema } from '@/lib/validations/form.schemas';
+import { shippingAddressSchema } from '@pratyagra/core/validations/form.schemas';
 import { sendSaleWhatsAppNotification } from '@/lib/utils/whatsapp';
 import { getActiveCampaignPublic } from '@/lib/data/public-products';
-import { getFinalPrice } from '@/lib/utils/campaign';
+import { getFinalPrice } from '@pratyagra/core/utils/campaign';
 
 export const dynamic = 'force-dynamic';
 

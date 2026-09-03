@@ -2,7 +2,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { normalizeToE164 } from '@/lib/utils/phone';
-import type { PosCustomer } from '@/lib/types';
+import type { PosCustomer } from '@pratyagra/core/types';
 
 export interface CustomerLookupResult {
     success: boolean;

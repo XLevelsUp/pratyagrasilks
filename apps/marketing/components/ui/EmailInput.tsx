@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { emailField } from '@/lib/validations/form.schemas';
+import { emailField } from '@pratyagra/core/validations/form.schemas';
 
 interface EmailInputProps {
     id?: string;

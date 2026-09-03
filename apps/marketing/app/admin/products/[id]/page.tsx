@@ -9,12 +9,12 @@ import toast from 'react-hot-toast';
 import OptimizedUploader from '@/components/admin/OptimizedUploader';
 import ColorFamilyPicker from '@/components/ui/ColorFamilyPicker';
 import QrLabel from '@/components/admin/QrLabel';
-import { isValidYouTubeUrl, getYouTubeThumbnailUrl } from '@/lib/utils/youtube';
+import { isValidYouTubeUrl, getYouTubeThumbnailUrl } from '@pratyagra/core/utils/youtube';
 import { calculateMrp } from '@/lib/utils/pricing';
-import { calculateSalePrice, DiscountType } from '@/lib/utils/discount';
+import { calculateSalePrice, DiscountType } from '@pratyagra/core/utils/discount';
 import Image from 'next/image';
 import { getVendors } from '@/lib/actions/vendor.actions';
-import { Vendor } from '@/lib/types';
+import { Vendor } from '@pratyagra/core/types';
 import { useAdmin } from '@/lib/hooks/useAdmin';
 import { updateProduct } from '@/lib/actions/product.actions';
 

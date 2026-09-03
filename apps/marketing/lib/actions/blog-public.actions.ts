@@ -15,8 +15,8 @@
 import 'server-only';
 
 import { createClient } from '@/lib/supabase/server';
-import { mapCategoryRow, mapCommentRow, mapPostRow, POST_SELECT } from '@/lib/blog/mappers';
-import type { BlogPost, BlogCategory, BlogComment } from '@/lib/types';
+import { mapCategoryRow, mapCommentRow, mapPostRow, POST_SELECT } from '@pratyagra/core/blog/mappers';
+import type { BlogPost, BlogCategory, BlogComment } from '@pratyagra/core/types';
 
 export async function getCategories(): Promise<BlogCategory[]> {
     const supabase = createClient();

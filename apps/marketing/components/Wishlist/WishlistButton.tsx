@@ -1,6 +1,6 @@
 'use client';
 
-import { Product } from '@/lib/types';
+import { Product } from '@pratyagra/core/types';
 import { useWishlist } from '@/lib/context/WishlistContext';
 import { Heart } from 'lucide-react';
 import { useState } from 'react';

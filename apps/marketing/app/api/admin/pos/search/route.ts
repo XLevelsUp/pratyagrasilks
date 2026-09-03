@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { createClient } from '@/lib/supabase/server';
 import { getActiveCampaignPublic } from '@/lib/data/public-products';
-import { applyCampaignToProduct, applyCampaignToProducts } from '@/lib/utils/applyCampaign';
+import { applyCampaignToProduct, applyCampaignToProducts } from '@pratyagra/core/utils/applyCampaign';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function transformProduct(product: Record<string, any>) {

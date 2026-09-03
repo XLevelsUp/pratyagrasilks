@@ -4,17 +4,17 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { isSupabaseImage } from '@/lib/utils/image';
+import { isSupabaseImage } from '@pratyagra/core/utils/image';
 import { Search, Trash2, CreditCard, X, ShoppingCart, Banknote, Smartphone, CheckCircle2, Loader2, User, Tag, RotateCcw } from 'lucide-react';
-import { Product } from '@/lib/types';
+import { Product } from '@pratyagra/core/types';
 import { useQrScanner } from '@/hooks/useQrScanner';
 import { processOfflineSale } from '@/lib/actions/pos.actions';
 import { lookupOrCreateCustomer, getCustomerByPhone } from '@/lib/actions/crm.actions';
-import type { PosActionItem, PosCustomer } from '@/lib/types';
+import type { PosActionItem, PosCustomer } from '@pratyagra/core/types';
 import PosReceipt, { PosReceiptData } from '@/components/admin/PosReceipt';
 import TestBillPrint from '@/components/admin/TestBillPrint';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
-import { hasDiscount, getEffectivePrice, getDiscountPercent } from '@/lib/utils/discount';
+import { hasDiscount, getEffectivePrice, getDiscountPercent } from '@pratyagra/core/utils/discount';
 
 interface PosCartItem {
     product: Product;

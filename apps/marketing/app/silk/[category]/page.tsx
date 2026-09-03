@@ -3,9 +3,9 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getCategoryBySlug, generateCollectionSchema, silkCategories } from '@/lib/seo-config';
 import ProductCard from '@/components/ProductCard';
-import { Product } from '@/lib/types';
+import { Product } from '@pratyagra/core/types';
 import { getActiveCampaignPublic } from '@/lib/data/public-products';
-import { applyCampaignToProducts } from '@/lib/utils/applyCampaign';
+import { applyCampaignToProducts } from '@pratyagra/core/utils/applyCampaign';
 
 interface CategoryPageProps {
     params: {

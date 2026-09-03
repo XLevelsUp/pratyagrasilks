@@ -1,7 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { Vendor } from '@/lib/types';
+import { Vendor } from '@pratyagra/core/types';
 import { revalidatePath } from 'next/cache';
 import { getCallerRole, assertAdminOnly } from '@/lib/actions/role-guard';
 

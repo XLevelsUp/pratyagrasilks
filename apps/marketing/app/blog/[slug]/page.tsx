@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { getPostBySlug, getApprovedComments } from '@/lib/actions/blog-public.actions';
 import { siteMetadata } from '@/lib/seo/config';
-import { isSupabaseImage } from '@/lib/utils/image';
+import { isSupabaseImage } from '@pratyagra/core/utils/image';
 import BlogPostSchema from '@/components/seo/BlogPostSchema';
 import PostBody from '@/components/blog/PostBody';
 import PostSidebar from '@/components/blog/PostSidebar';

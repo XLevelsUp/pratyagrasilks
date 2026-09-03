@@ -1,7 +1,7 @@
 'use server';
 
 import { createClient } from '@supabase/supabase-js';
-import type { PosActionItem } from '@/lib/types';
+import type { PosActionItem } from '@pratyagra/core/types';
 
 export interface PosOrderResult {
     success: boolean;

@@ -1,8 +1,8 @@
-import { Product } from '@/lib/types';
+import { Product } from '@pratyagra/core/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import WishlistButton from '@/components/Wishlist/WishlistButton';
-import { hasDiscount, getEffectivePrice, getDiscountPercent } from '@/lib/utils/discount';
+import { hasDiscount, getEffectivePrice, getDiscountPercent } from '@pratyagra/core/utils/discount';
 
 interface ProductCardProps {
     product: Product;

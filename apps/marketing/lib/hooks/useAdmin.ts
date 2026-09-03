@@ -4,7 +4,7 @@ import { useAuth } from '@/lib/context/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { type UserRole, ADMIN_LEVEL_ROLES } from '@/lib/constants/roles';
+import { type UserRole, ADMIN_LEVEL_ROLES } from '@pratyagra/core/constants/roles';
 
 interface UseAdminReturn {
     isAdmin: boolean;

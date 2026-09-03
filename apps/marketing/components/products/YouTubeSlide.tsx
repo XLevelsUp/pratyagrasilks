@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Play } from 'lucide-react';
-import { getYouTubeEmbedUrl, getYouTubeThumbnailUrl } from '@/lib/utils/youtube';
+import { getYouTubeEmbedUrl, getYouTubeThumbnailUrl } from '@pratyagra/core/utils/youtube';
 
 interface YouTubeSlideProps {
     url: string;

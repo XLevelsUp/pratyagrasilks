@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { getCallerRole } from '@/lib/actions/role-guard';
-import type { DiscountCampaign, CampaignBand } from '@/lib/utils/campaign';
+import type { DiscountCampaign, CampaignBand } from '@pratyagra/core/utils/campaign';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function mapCampaign(row: any): DiscountCampaign {

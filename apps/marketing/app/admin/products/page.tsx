@@ -6,17 +6,17 @@ import { Search, Plus, Edit, Trash2, Package, Printer, Tag } from 'lucide-react'
 import Link from 'next/link';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
-import { isSupabaseImage } from '@/lib/utils/image';
+import { isSupabaseImage } from '@pratyagra/core/utils/image';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { useAdmin } from '@/lib/hooks/useAdmin';
 import { deleteProduct } from '@/lib/actions/product.actions';
 import BulkQrWrapper from '@/components/admin/BulkQrWrapper';
 import PrinterCalibration from '@/components/admin/PrinterCalibration';
 import ResponsiveDataTable, { Column } from '@/components/admin/ResponsiveDataTable';
-import { hasDiscount, getEffectivePrice } from '@/lib/utils/discount';
+import { hasDiscount, getEffectivePrice } from '@pratyagra/core/utils/discount';
 import BulkDiscountDialog from '@/components/admin/BulkDiscountDialog';
 import { getActiveCampaign } from '@/lib/actions/campaign.actions';
-import { DiscountCampaign, isCampaignLive, isCampaignScheduled, getFinalPrice, hasAnyDiscount, getFinalDiscountPercent, getCampaignPrice } from '@/lib/utils/campaign';
+import { DiscountCampaign, isCampaignLive, isCampaignScheduled, getFinalPrice, hasAnyDiscount, getFinalDiscountPercent, getCampaignPrice } from '@pratyagra/core/utils/campaign';
 
 interface Product {
     id: string;

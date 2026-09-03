@@ -10,8 +10,8 @@ import {
     bandMatches,
     isCampaignLive,
     isCampaignScheduled,
-} from '@/lib/utils/campaign';
-import { calculateSalePrice, DiscountType } from '@/lib/utils/discount';
+} from '@pratyagra/core/utils/campaign';
+import { calculateSalePrice, DiscountType } from '@pratyagra/core/utils/discount';
 
 interface TargetProduct {
     id: string;

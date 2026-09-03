@@ -1,7 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { type UserRole } from '@/lib/constants/roles';
+import { type UserRole } from '@pratyagra/core/constants/roles';
 
 /** Returns the UserRole of the currently authenticated caller, or null if unauthenticated. */
 export async function getCallerRole(): Promise<UserRole | null> {

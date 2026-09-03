@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { MessageSquare, Check, X, Trash2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { getPendingComments, approveComment, rejectComment, deleteComment } from '@/lib/actions/blog-admin.actions';
-import { BlogComment } from '@/lib/types';
+import { BlogComment } from '@pratyagra/core/types';
 import toast from 'react-hot-toast';
 
 const STATUS_STYLES: Record<BlogComment['status'], string> = {

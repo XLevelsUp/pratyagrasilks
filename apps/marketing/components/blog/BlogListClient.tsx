@@ -5,8 +5,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Calendar, Clock, ArrowRight } from 'lucide-react';
-import { isSupabaseImage } from '@/lib/utils/image';
-import type { BlogPost, BlogCategory } from '@/lib/types';
+import { isSupabaseImage } from '@pratyagra/core/utils/image';
+import type { BlogPost, BlogCategory } from '@pratyagra/core/types';
 
 const PAGE_SIZE = 9;
 

@@ -1,4 +1,4 @@
-export { shippingAddressSchema, type ShippingAddress } from './form.schemas';
+export { shippingAddressSchema, type ShippingAddress } from '@pratyagra/core/validations/form.schemas';
 
 // Flexible postal code validation based on country
 const postalCodeRegex = {

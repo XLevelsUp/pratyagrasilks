@@ -1,8 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Lightbulb } from 'lucide-react';
-import { isSupabaseImage } from '@/lib/utils/image';
-import type { BlogPost } from '@/lib/types';
+import { isSupabaseImage } from '@pratyagra/core/utils/image';
+import type { BlogPost } from '@pratyagra/core/types';
 
 // Renders the fixed post structure as distinct blocks — never a single HTML
 // blob — so each part (section, callout, sub-section, Q&A, CTA) keeps its

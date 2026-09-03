@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@pratyagra/core": "workspace:*",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.105.4",
     "@tiptap/extension-link": "^3.31.0",
@@ -40,6 +41,7 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
+    "@pratyagra/config": "workspace:*",
     "@tailwindcss/typography": "^0.5.20",
     "@types/node": "^20.11.30",
     "@types/react": "^18.2.67",

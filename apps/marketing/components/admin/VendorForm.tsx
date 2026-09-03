@@ -7,7 +7,7 @@ import Link from 'next/link';
 import toast from 'react-hot-toast';
 import VendorDocUploader from '@/components/admin/VendorDocUploader';
 import { createVendor, updateVendor, VendorType } from '@/lib/actions/vendor.actions';
-import { Vendor } from '@/lib/types';
+import { Vendor } from '@pratyagra/core/types';
 
 const VENDOR_TYPES: { value: VendorType; label: string }[] = [
     { value: 'Artisan',    label: 'Artisan (Direct weaver / craftsperson)' },

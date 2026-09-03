@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { blogCommentSchema } from '@/lib/validations/form.schemas';
+import { blogCommentSchema } from '@pratyagra/core/validations/form.schemas';
 
 // Public comment submission — anon INSERT is allowed by RLS ("Anyone can
 // submit a comment"), and a BEFORE INSERT trigger on blog_comments forces

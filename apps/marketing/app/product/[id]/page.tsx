@@ -1,12 +1,12 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { Product } from '@/lib/types';
+import { Product } from '@pratyagra/core/types';
 import { siteMetadata } from '@/lib/seo/config';
 import ProductDetailClient from './ProductDetailClient';
-import { hasDiscount, getEffectivePrice } from '@/lib/utils/discount';
+import { hasDiscount, getEffectivePrice } from '@pratyagra/core/utils/discount';
 import { getActiveCampaignPublic } from '@/lib/data/public-products';
-import { applyCampaignToProduct } from '@/lib/utils/applyCampaign';
+import { applyCampaignToProduct } from '@pratyagra/core/utils/applyCampaign';
 
 async function getProduct(id: string): Promise<Product | null> {
     const supabase = createClient();

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { emailField, fullNameField } from '@/lib/validations/form.schemas';
+import { emailField, fullNameField } from '@pratyagra/core/validations/form.schemas';
 import { normalizeToE164 } from '@/lib/utils/phone';
 
 /**

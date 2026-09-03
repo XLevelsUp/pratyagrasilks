@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { Product, WishlistItem } from '@/lib/types';
+import { Product, WishlistItem } from '@pratyagra/core/types';
 import { useAuth } from './AuthContext';
 import { useRouter } from 'next/navigation';
 

@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { getCallerRole } from '@/lib/actions/role-guard';
-import { isAdminLevelRole } from '@/lib/constants/roles';
+import { isAdminLevelRole } from '@pratyagra/core/constants/roles';
 import { MEASUREMENT_FIELDS } from '@/lib/constants/measurements';
 import {
     measurementProfileSchema,
