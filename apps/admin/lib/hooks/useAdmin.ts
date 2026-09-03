@@ -14,7 +14,7 @@ interface UseAdminReturn {
 }
 
 export function useAdmin(): UseAdminReturn {
-    const { user, loading: authLoading } = useAuth();
+    const { user, loading: authLoading, signOut } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
     const [role, setRole] = useState<UserRole | null>(null);
@@ -24,9 +24,19 @@ export function useAdmin(): UseAdminReturn {
         async function checkRole() {
             if (authLoading) return;
 
+            // '/login', not '/auth/login' — that route belongs to the
+            // storefront app and does not exist on the admin host.
             if (!user) {
-                router.push('/auth/login');
+                router.push('/login');
                 return;
+            }
+
+            // A non-admin must NOT be bounced to '/': on this host '/'
+            // redirects to '/admin', which lands back here and loops forever.
+            // Sign the session out so the login page can state why.
+            async function rejectNonAdmin() {
+                await signOut();
+                router.push('/login?error=forbidden');
             }
 
             try {
@@ -38,14 +48,16 @@ export function useAdmin(): UseAdminReturn {
                     .single();
 
                 if (error || !data) {
-                    router.push('/');
+                    await rejectNonAdmin();
                     return;
                 }
 
                 const userRole = data.role as UserRole;
 
+                // Defence in depth — middleware already enforces this at the
+                // edge before any admin JS ships.
                 if (!ADMIN_LEVEL_ROLES.includes(userRole)) {
-                    router.push('/');
+                    await rejectNonAdmin();
                     return;
                 }
 
@@ -87,14 +99,15 @@ export function useAdmin(): UseAdminReturn {
 
                 setRole(userRole);
             } catch {
-                router.push('/');
+                // Same loop hazard as above — never bounce to '/' here.
+                await rejectNonAdmin();
             } finally {
                 setLoading(false);
             }
         }
 
         checkRole();
-    }, [user, authLoading, router, pathname]);
+    }, [user, authLoading, router, pathname, signOut]);
 
     return {
         isAdmin: role === 'ADMIN',

@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 
 import { createClient } from '@pratyagra/auth/server';
-import { getActiveCampaignPublic } from '@/lib/data/public-products';
+import { getActiveCampaignPublic } from '@/lib/data/campaign-read';
 import { applyCampaignToProduct, applyCampaignToProducts } from '@pratyagra/core/utils/applyCampaign';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

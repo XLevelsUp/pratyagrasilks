@@ -30,6 +30,10 @@ type NavItem = {
     icon: React.ElementType;
 };
 
+// The storefront is a separate deployment on a separate origin.
+const STOREFRONT_URL =
+    process.env.NEXT_PUBLIC_STOREFRONT_URL ?? 'https://pratyagrasilks.com';
+
 const ADMIN_NAV: NavItem[] = [
     { name: 'Dashboard',  href: '/admin',              icon: LayoutDashboard },
     { name: 'Orders',     href: '/admin/orders',        icon: ShoppingBag    },
@@ -112,7 +116,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     const handleSignOut = async () => {
         await signOut();
-        router.push('/');
+        // '/login', not '/' — '/' redirects to '/admin' on this host, which
+        // middleware then bounces straight back to the login page.
+        router.push('/login');
     };
 
     if (loading) {
@@ -132,14 +138,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const sidebarFooter = (
         <div className="p-4 border-t border-gray-800 flex-shrink-0">
             {role === 'ADMIN' && (
-                <Link
-                    href="/"
+                /* Plain anchor, not next/link: the storefront is a different
+                   origin now, and Link would try to client-navigate within
+                   the admin app. */
+                <a
+                    href={STOREFRONT_URL}
                     onClick={() => setDrawerOpen(false)}
                     className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors mb-2 min-h-[44px]"
                 >
                     <Settings className="w-5 h-5 flex-shrink-0" />
                     Back to Store
-                </Link>
+                </a>
             )}
             <button
                 onClick={handleSignOut}

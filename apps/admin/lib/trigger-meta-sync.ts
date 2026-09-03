@@ -32,7 +32,7 @@ export function triggerMetaCatalogSync(): void {
     // Vercel exposes the deployment host; fall back to localhost in dev.
     const base = process.env.VERCEL_URL
         ? `https://${process.env.VERCEL_URL}`
-        : (process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000');
+        : (process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3210');
 
     void fetch(`${base}/api/cron/meta-catalog-sync`, {
         method: 'POST',
