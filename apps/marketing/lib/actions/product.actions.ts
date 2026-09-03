@@ -1,9 +1,9 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@pratyagra/auth/server';
 import { Product } from '@pratyagra/core/types';
 import { revalidatePath } from 'next/cache';
-import { getCallerRole, assertAdminOnly } from '@/lib/actions/role-guard';
+import { getCallerRole, assertAdminOnly } from '@pratyagra/auth/role-guard';
 import { triggerMetaCatalogSync } from '@/lib/trigger-meta-sync';
 
 /**

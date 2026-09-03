@@ -1,9 +1,9 @@
 'use client';
 
-import { useAuth } from '@/lib/context/AuthContext';
+import { useAuth } from '@pratyagra/auth/context';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@pratyagra/auth/client';
 import { type UserRole, ADMIN_LEVEL_ROLES } from '@pratyagra/core/constants/roles';
 
 interface UseAdminReturn {

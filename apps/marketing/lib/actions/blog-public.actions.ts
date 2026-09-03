@@ -14,7 +14,7 @@
 
 import 'server-only';
 
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@pratyagra/auth/server';
 import { mapCategoryRow, mapCommentRow, mapPostRow, POST_SELECT } from '@pratyagra/core/blog/mappers';
 import type { BlogPost, BlogCategory, BlogComment } from '@pratyagra/core/types';
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@pratyagra/auth/client';
 import { Search, Filter, Eye, Package, Printer, Download } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import Link from 'next/link';

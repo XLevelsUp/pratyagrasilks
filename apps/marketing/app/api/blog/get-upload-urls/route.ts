@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { getCallerRole, assertRoleIn } from '@/lib/actions/role-guard';
+import { createClient } from '@pratyagra/auth/server';
+import { getCallerRole, assertRoleIn } from '@pratyagra/auth/role-guard';
 
 export async function POST(req: NextRequest) {
     const supabase = createClient();

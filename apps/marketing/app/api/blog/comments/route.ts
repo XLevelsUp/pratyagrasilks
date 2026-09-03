@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@pratyagra/auth/server';
 import { blogCommentSchema } from '@pratyagra/core/validations/form.schemas';
 
 // Public comment submission — anon INSERT is allowed by RLS ("Anyone can

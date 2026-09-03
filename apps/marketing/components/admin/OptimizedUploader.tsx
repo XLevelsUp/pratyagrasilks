@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { Upload, X, GripVertical, Link as LinkIcon, CheckCircle2 } from 'lucide-react';
 import Image from 'next/image';
 import { isSupabaseImage } from '@pratyagra/core/utils/image';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@pratyagra/auth/client';
 import toast from 'react-hot-toast';
 
 interface OptimizedUploaderProps {

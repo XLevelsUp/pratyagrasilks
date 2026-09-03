@@ -29,7 +29,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const clientRef = useRef<SupabaseClient | null>(null);
     const getClient = async () => {
         if (!clientRef.current) {
-            const { createClient } = await import('@/lib/supabase/client');
+            // Relative, not a '@pratyagra/auth/client' self-reference: the
+            // package's own exports map would resolve it, but that adds a
+            // failure surface for no benefit.
+            const { createClient } = await import('./client');
             clientRef.current = createClient();
         }
         return clientRef.current;

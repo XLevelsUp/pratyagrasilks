@@ -1,3 +1,11 @@
+// Cookie-bound Supabase client for Server Components, route handlers and
+// server actions. `server-only` is load-bearing here: next/headers works fine
+// inside a transpiled workspace package, but if a client component ever
+// reaches this module transitively the build fails with a confusing
+// "you're importing a component that needs next/headers". This makes the
+// violation explicit and greppable instead.
+import 'server-only'
+
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 

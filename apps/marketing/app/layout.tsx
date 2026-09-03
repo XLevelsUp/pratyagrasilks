@@ -7,7 +7,7 @@ import Footer from "@/components/ui/Footer";
 import ReelsSlot from "@/components/ui/ReelsSlot";
 import InstagramReels from "@/components/home/InstagramReels";
 import { CartProvider } from "@/lib/context/CartContext";
-import { AuthProvider } from "@/lib/context/AuthContext";
+import { AuthProvider } from "@pratyagra/auth/context";
 import { WishlistProvider } from "@/lib/context/WishlistContext";
 import CartSidebar from "@/components/Cart/CartSidebar";
 import { Analytics } from "@vercel/analytics/react";

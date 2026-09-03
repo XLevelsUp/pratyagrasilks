@@ -21,7 +21,7 @@ import {
     MessageSquare,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/context/AuthContext';
+import { useAuth } from '@pratyagra/auth/context';
 import type { UserRole } from '@pratyagra/core/constants/roles';
 
 type NavItem = {

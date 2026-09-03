@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@pratyagra/auth/client';
 import { Search, Plus, Edit, Trash2, Package, Printer, Tag } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';

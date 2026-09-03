@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useAuth } from '@/lib/context/AuthContext';
+import { useAuth } from '@pratyagra/auth/context';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';

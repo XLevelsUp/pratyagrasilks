@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@pratyagra/auth/server';
 import { processImage } from '@/lib/services/image.service';
 
 interface ProcessResult {

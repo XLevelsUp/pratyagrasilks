@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Product, WishlistItem } from '@pratyagra/core/types';
-import { useAuth } from './AuthContext';
+import { useAuth } from '@pratyagra/auth/context';
 import { useRouter } from 'next/navigation';
 
 interface WishlistContextType {

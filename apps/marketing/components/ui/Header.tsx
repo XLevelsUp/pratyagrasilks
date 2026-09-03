@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import { useAuth } from "@/lib/context/AuthContext";
+import { useAuth } from "@pratyagra/auth/context";
 import { useRouter } from "next/navigation";
 import CartBadge from "@/components/Cart/CartBadge";
 import WishlistBadge from "@/components/Wishlist/WishlistBadge";

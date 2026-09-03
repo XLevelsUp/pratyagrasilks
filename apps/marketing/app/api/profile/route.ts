@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@pratyagra/auth/server';
 
 // ── GET /api/profile ──────────────────────────────────────────────────────────
 export async function GET() {

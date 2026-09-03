@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@pratyagra/auth/server';
 import { processImage } from '@/lib/services/image.service';
-import { getCallerRole, assertRoleIn } from '@/lib/actions/role-guard';
+import { getCallerRole, assertRoleIn } from '@pratyagra/auth/role-guard';
 
 interface ProcessResult {
     path: string;

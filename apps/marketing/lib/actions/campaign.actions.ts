@@ -1,8 +1,8 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@pratyagra/auth/server';
 import { revalidatePath } from 'next/cache';
-import { getCallerRole } from '@/lib/actions/role-guard';
+import { getCallerRole } from '@pratyagra/auth/role-guard';
 import type { DiscountCampaign, CampaignBand } from '@pratyagra/core/utils/campaign';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

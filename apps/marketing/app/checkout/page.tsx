@@ -11,7 +11,7 @@ import { ArrowLeft, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { trackBeginCheckout } from '@/lib/analytics/gtag';
 import EmailVerificationForm from '@/components/Auth/EmailVerificationForm';
-import { useAuth } from '@/lib/context/AuthContext';
+import { useAuth } from '@pratyagra/auth/context';
 import { Address } from '@/components/profile/AddressCard';
 import { getEffectivePrice } from '@pratyagra/core/utils/discount';
 

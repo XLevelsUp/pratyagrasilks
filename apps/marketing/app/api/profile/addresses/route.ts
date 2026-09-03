@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@pratyagra/auth/server';
 
 // ── GET /api/profile/addresses ────────────────────────────────────────────────
 // List all addresses for the logged-in user, ordered by default status first

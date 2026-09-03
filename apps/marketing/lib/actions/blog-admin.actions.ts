@@ -12,9 +12,9 @@
  * Action crossing a deployment boundary.
  */
 
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@pratyagra/auth/server';
 import { revalidatePath } from 'next/cache';
-import { getCallerRole, assertRoleIn } from '@/lib/actions/role-guard';
+import { getCallerRole, assertRoleIn } from '@pratyagra/auth/role-guard';
 import { mapCategoryRow, mapCommentRow, mapPostRow, POST_SELECT } from '@pratyagra/core/blog/mappers';
 import type { BlogPost, BlogPostInput, BlogCategory, BlogComment } from '@pratyagra/core/types';
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { createClient as createServerClient } from '@/lib/supabase/server';
+import { createClient as createServerClient } from '@pratyagra/auth/server';
 import { contactFormSchema } from '@pratyagra/core/validations/form.schemas';
 
 // Service-role client — bypasses RLS for public contact form submissions

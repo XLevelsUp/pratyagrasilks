@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@pratyagra/auth/server';
 import Link from 'next/link';
 import { CheckCircle, Package, Truck, ArrowRight, Download } from 'lucide-react';
 import ConfettiEffect from '@/components/ui/ConfettiEffect';

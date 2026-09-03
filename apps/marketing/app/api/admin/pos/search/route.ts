@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@pratyagra/auth/server';
 import { getActiveCampaignPublic } from '@/lib/data/public-products';
 import { applyCampaignToProduct, applyCampaignToProducts } from '@pratyagra/core/utils/applyCampaign';
 

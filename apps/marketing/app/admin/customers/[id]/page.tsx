@@ -5,7 +5,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Loader2, Mail, Pencil, Phone, Ruler } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@pratyagra/auth/client';
 import { useAdmin } from '@/lib/hooks/useAdmin';
 import CustomerFormModal from '@/components/admin/customers/CustomerFormModal';
 import MeasurementProfileForm from '@/components/admin/measurements/MeasurementProfileForm';

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '@/lib/context/AuthContext';
+import { useAuth } from '@pratyagra/auth/context';
 import Link from 'next/link';
 import EmailInput from '@pratyagra/ui/EmailInput';
 import PasswordInput from '@pratyagra/ui/PasswordInput';

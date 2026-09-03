@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { Upload, X, CheckCircle2 } from 'lucide-react';
 import Image from 'next/image';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@pratyagra/auth/client';
 import { isSupabaseImage } from '@pratyagra/core/utils/image';
 import toast from 'react-hot-toast';
 import type { ImageDisplayMode } from '@pratyagra/core/types';

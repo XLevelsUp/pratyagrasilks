@@ -1,8 +1,8 @@
 'use server';
 
 import { createClient } from '@supabase/supabase-js';
-import { getCallerRole } from './role-guard';
-import { assertAdminOnly } from './role-guard';
+import { getCallerRole } from '@pratyagra/auth/role-guard';
+import { assertAdminOnly } from '@pratyagra/auth/role-guard';
 
 export interface DateRangeInput {
     from: string; // YYYY-MM-DD

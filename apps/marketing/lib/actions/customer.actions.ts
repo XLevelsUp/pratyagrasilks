@@ -1,8 +1,8 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { createClient } from '@/lib/supabase/server';
-import { getCallerRole } from '@/lib/actions/role-guard';
+import { createClient } from '@pratyagra/auth/server';
+import { getCallerRole } from '@pratyagra/auth/role-guard';
 import { isAdminLevelRole } from '@pratyagra/core/constants/roles';
 import { walkInCustomerSchema } from '@/lib/validations/walkInCustomer.schema';
 

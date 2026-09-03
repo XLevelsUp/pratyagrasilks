@@ -2,7 +2,7 @@
 
 import { useWishlist } from '@/lib/context/WishlistContext';
 import { useCart } from '@/lib/context/CartContext';
-import { useAuth } from '@/lib/context/AuthContext';
+import { useAuth } from '@pratyagra/auth/context';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect } from 'react';

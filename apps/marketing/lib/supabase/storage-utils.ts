@@ -1,4 +1,4 @@
-import { createClient } from './client';
+import { createClient } from '@pratyagra/auth/client';
 
 /**
  * Upload a product image to Supabase Storage

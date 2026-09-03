@@ -3,7 +3,7 @@
 import { Suspense, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@pratyagra/auth/client';
 import { ArrowLeft, Save, Youtube, Calculator, Tag, X, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';

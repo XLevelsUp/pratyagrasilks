@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // Ensure this route is always treated as dynamic
 export const dynamic = 'force-dynamic';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@pratyagra/auth/server';
 
 export async function POST(request: NextRequest) {
     try {

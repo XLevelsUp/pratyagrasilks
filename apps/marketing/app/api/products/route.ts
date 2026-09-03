@@ -4,7 +4,7 @@ import { applyCampaignToProducts } from '@pratyagra/core/utils/applyCampaign';
 
 // Ensure this route is always treated as dynamic (uses cookies / auth)
 export const dynamic = 'force-dynamic';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@pratyagra/auth/server';
 
 export async function GET(request: NextRequest) {
     try {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@pratyagra/auth/server';
 
 // ── PUT /api/profile/password ─────────────────────────────────────────────────
 export async function PUT(req: NextRequest) {

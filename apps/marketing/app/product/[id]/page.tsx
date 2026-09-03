@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@pratyagra/auth/server';
 import { Product } from '@pratyagra/core/types';
 import { siteMetadata } from '@/lib/seo/config';
 import ProductDetailClient from './ProductDetailClient';
