@@ -1,0 +1,45 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["**/.env.*local", ".npmrc", ".nvmrc"],
+  "globalEnv": ["NODE_ENV", "VERCEL_ENV", "VERCEL_URL", "CI"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**"],
+      "env": [
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "NEXT_PUBLIC_SITE_URL",
+        "NEXT_PUBLIC_RAZORPAY_KEY_ID",
+        "NEXT_PUBLIC_CLARITY_PROJECT_ID",
+        "RAZORPAY_KEY_ID",
+        "RAZORPAY_KEY_SECRET",
+        "RESEND_API_KEY",
+        "RESEND_FROM_EMAIL",
+        "INSTAGRAM_ACCESS_TOKEN",
+        "INSTAGRAM_COLLECTION_ACCESS_TOKEN",
+        "CRON_SECRET",
+        "META_CATALOG_ID",
+        "META_CATALOG_TOKEN",
+        "META_CATALOG_DRY_RUN",
+        "WHATSAPP_PHONE_ID",
+        "WHATSAPP_API_TOKEN",
+        "WHATSAPP_SALES_RECIPIENT_NUMBER",
+        "WHATSAPP_SALE_TEMPLATE_NAME",
+        "WHATSAPP_TEST_NUMBER"
+      ]
+    },
+    "lint": {
+      "dependsOn": ["^build"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build", "build"]
+    },
+    "test": {},
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}
