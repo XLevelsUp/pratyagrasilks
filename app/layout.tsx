@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
-import ConditionalHeader from "@/components/ui/ConditionalHeader";
-import ConditionalFooter from "@/components/ui/ConditionalFooter";
-import ConditionalReels from "@/components/ui/ConditionalReels";
+import SiteHeader from "@/components/ui/SiteHeader";
+import Footer from "@/components/ui/Footer";
+import ReelsSlot from "@/components/ui/ReelsSlot";
 import InstagramReels from "@/components/home/InstagramReels";
 import { CartProvider } from "@/lib/context/CartContext";
 import { AuthProvider } from "@/lib/context/AuthContext";
@@ -123,18 +123,18 @@ export default function RootLayout({
                 <AuthProvider>
                     <WishlistProvider>
                         <CartProvider>
-                            <ConditionalHeader />
+                            <SiteHeader />
                             <main className="min-h-screen">{children}</main>
                             {/* Instagram reels — every page above the footer, except
-                                admin and the homepage (which has its own placement
-                                below the Silk Showcase). Suspense streams it in so
-                                no page waits on the Instagram API. */}
-                            <ConditionalReels>
+                                the homepage (which has its own placement below the
+                                Silk Showcase) and /collection. Suspense streams it in
+                                so no page waits on the Instagram API. */}
+                            <ReelsSlot>
                                 <Suspense fallback={null}>
                                     <InstagramReels />
                                 </Suspense>
-                            </ConditionalReels>
-                            <ConditionalFooter />
+                            </ReelsSlot>
+                            <Footer />
                             <CartSidebar />
                         </CartProvider>
                     </WishlistProvider>

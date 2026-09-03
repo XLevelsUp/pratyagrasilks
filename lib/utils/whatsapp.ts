@@ -1,5 +1,4 @@
-import type { PosActionItem } from '@/lib/actions/pos.actions';
-import type { PosCustomer } from '@/lib/actions/crm.actions';
+import type { PosActionItem, PosCustomer } from '@/lib/types';
 
 export interface WhatsAppReceiptParams {
     orderNumber: string;

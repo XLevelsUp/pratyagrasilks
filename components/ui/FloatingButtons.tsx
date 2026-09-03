@@ -3,26 +3,21 @@
 import React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/context/AuthContext';
-import { usePathname } from 'next/navigation';
 
 const FloatingButtons = () => {
   const { user } = useAuth();
-  const pathname = usePathname();
   const phoneNumber = '+917358866646';
   const message = "Hi, I'm interested in Pratyagra Silks products.";
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
     message,
   )}`;
 
-  const isAdminPage = pathname.startsWith('/admin');
-
-  if (isAdminPage) return null;
-
   return (
     <div className='fixed bottom-5 right-5 z-[9999] flex flex-col items-end gap-3'>
 
-      {/* Admin Panel Button — only visible to logged-in users, hidden on admin pages */}
-      {user && !isAdminPage && (
+      {/* Admin Panel Button — only visible to logged-in users. /admin is
+          301-redirected to the admin app's own host. */}
+      {user && (
         <div className='group flex items-center justify-center'>
           {/* Tooltip */}
           <div className='absolute right-[calc(100%+16px)] px-3 py-1.5 bg-white text-gray-800 text-sm font-medium rounded-full shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap border border-gray-100'>

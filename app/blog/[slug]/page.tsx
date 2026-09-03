@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
-import { getPostBySlug, getApprovedComments } from '@/lib/actions/blog.actions';
+import { getPostBySlug, getApprovedComments } from '@/lib/actions/blog-public.actions';
 import { siteMetadata } from '@/lib/seo/config';
 import { isSupabaseImage } from '@/lib/utils/image';
 import BlogPostSchema from '@/components/seo/BlogPostSchema';

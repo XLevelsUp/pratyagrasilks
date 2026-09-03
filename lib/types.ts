@@ -187,3 +187,30 @@ export interface BlogPostInput {
     qna: Array<{ question: string; answer: string }>;
     ctaButtons: Array<{ label: string; url: string }>;
 }
+
+// ── Point of sale ────────────────────────────────────────────────────────────
+// These live here rather than beside their server actions because the public
+// order flow (lib/utils/whatsapp.ts) needs their shape too. Keeping them in a
+// 'use server' module made the storefront type-depend on admin POS code.
+
+/** One line on a POS sale, as submitted to processOfflineSale(). */
+export interface PosActionItem {
+    productId: string;
+    name: string;
+    sku: string;
+    quantity: number;
+    unitPrice: number;
+}
+
+/** Customer record as resolved by the POS counter lookup. */
+export interface PosCustomer {
+    id: string;
+    email: string | null;
+    phone: string | null;
+    full_name: string;
+    source: 'ONLINE' | 'POS' | 'BOTH';
+    total_spent: number;
+    total_orders: number;
+    last_purchase: string | null;
+    created_at: string;
+}

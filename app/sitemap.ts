@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { silkCategories } from '@/lib/seo-config'
-import { getPosts } from '@/lib/actions/blog.actions'
+import { getPosts } from '@/lib/actions/blog-public.actions'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://pratyagrasilks.com'

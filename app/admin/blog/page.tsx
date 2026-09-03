@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Plus, Search, Newspaper, Edit, Eye, Trash2, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getPosts, deletePost, getPendingComments } from '@/lib/actions/blog.actions';
+import { getPosts, deletePost, getPendingComments } from '@/lib/actions/blog-admin.actions';
 import { BlogPost } from '@/lib/types';
 import { isSupabaseImage } from '@/lib/utils/image';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Save, Plus, Trash2, GripVertical, X } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { createPost, updatePost, getCategories } from '@/lib/actions/blog.actions';
+import { createPost, updatePost, getCategories } from '@/lib/actions/blog-admin.actions';
 import type { BlogPost, BlogPostInput, BlogCategory, ImageDisplayMode } from '@/lib/types';
 import BlogImageUploader from './BlogImageUploader';
 import RichTextEditor from './RichTextEditor';

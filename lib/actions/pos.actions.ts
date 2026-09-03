@@ -1,14 +1,7 @@
 'use server';
 
 import { createClient } from '@supabase/supabase-js';
-
-export interface PosActionItem {
-    productId: string;
-    name: string;
-    sku: string;
-    quantity: number;
-    unitPrice: number;
-}
+import type { PosActionItem } from '@/lib/types';
 
 export interface PosOrderResult {
     success: boolean;

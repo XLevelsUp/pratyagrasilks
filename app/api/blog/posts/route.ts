@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getPosts } from '@/lib/actions/blog.actions';
+import { getPosts } from '@/lib/actions/blog-public.actions';
 
 // Public read, used by the client-side "Load More" button on /blog — the
 // initial page of posts is server-rendered directly via getPosts() in

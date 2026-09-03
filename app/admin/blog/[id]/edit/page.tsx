@@ -1,4 +1,4 @@
-import { getPostById } from '@/lib/actions/blog.actions';
+import { getPostById } from '@/lib/actions/blog-admin.actions';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';

@@ -2,18 +2,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { normalizeToE164 } from '@/lib/utils/phone';
-
-export interface PosCustomer {
-    id: string;
-    email: string | null;
-    phone: string | null;
-    full_name: string;
-    source: 'ONLINE' | 'POS' | 'BOTH';
-    total_spent: number;
-    total_orders: number;
-    last_purchase: string | null;
-    created_at: string;
-}
+import type { PosCustomer } from '@/lib/types';
 
 export interface CustomerLookupResult {
     success: boolean;

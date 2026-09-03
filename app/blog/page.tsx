@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { getPosts, getCategories } from '@/lib/actions/blog.actions';
+import { getPosts, getCategories } from '@/lib/actions/blog-public.actions';
 import { siteMetadata } from '@/lib/seo/config';
 import BlogListClient from '@/components/blog/BlogListClient';
 
