@@ -1,3 +1,6 @@
+// The admin portal is a separate deployment on its own subdomain.
+const ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL ?? 'https://admin.pratyagrasilks.com';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     // Workspace packages ship raw TS/TSX and are compiled with this app's SWC
@@ -7,8 +10,10 @@ const nextConfig = {
     async headers() {
         return [
             {
-                // Transactional and private routes — strongest noindex signal
-                source: '/(cart|checkout|orders|profile|auth|admin)(.*)',
+                // Transactional and private routes — strongest noindex signal.
+                // 'admin' is no longer listed: those URLs 301 to the admin
+                // host, which noindexes every response at the header level.
+                source: '/(cart|checkout|orders|profile|auth)(.*)',
                 headers: [
                     { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
                 ],
@@ -17,6 +22,22 @@ const nextConfig = {
     },
     async redirects() {
         return [
+            // The admin portal moved to its own deployment and origin. These
+            // use statusCode: 301 rather than `permanent: true` — Next emits
+            // 308 for `permanent`, and 301 is what was specified.
+            // Declared here rather than in vercel.json so `next dev` exercises
+            // them too, and because redirects run ahead of middleware: /admin/*
+            // never pays for the bot check or a Supabase round trip.
+            {
+                source: '/admin',
+                destination: `${ADMIN_URL}/admin`,
+                statusCode: 301,
+            },
+            {
+                source: '/admin/:path*',
+                destination: `${ADMIN_URL}/admin/:path*`,
+                statusCode: 301,
+            },
             {
                 source: '/x',
                 destination: 'https://x.com/PratyagraSilks',

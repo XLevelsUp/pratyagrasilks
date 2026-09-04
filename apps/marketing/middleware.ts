@@ -3,10 +3,11 @@ import { createEdgeClient } from '@pratyagra/auth/middleware';
 
 const BLOCKED_BOTS = ['Bytespider', 'SemrushBot', 'AhrefsBot', 'MJ12bot', 'DotBot'];
 
-// /admin still appears here while the admin routes live in this app; it is
-// removed when they move to the admin app, which gets its own middleware
-// with edge role enforcement.
-const PROTECTED_PATHS = ['/admin', '/orders'];
+// Customer order history. /admin is gone — it lives on the admin host now,
+// behind that app's own middleware, which additionally enforces role at the
+// edge. /profile is deliberately left unprotected, matching pre-split
+// behaviour; changing it would be a behaviour change, not a refactor.
+const PROTECTED_PATHS = ['/orders'];
 
 function isProtectedPath(pathname: string): boolean {
     return PROTECTED_PATHS.some(p => pathname === p || pathname.startsWith(`${p}/`));
