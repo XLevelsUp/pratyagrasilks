@@ -23,6 +23,10 @@ import {
 // Never prerender or cache — this mutates external state.
 export const dynamic = 'force-dynamic';
 
+// Drains up to DRAIN_LIMIT rows through sequential Meta API batches, which
+// does not reliably fit in the 10s default.
+export const maxDuration = 60;
+
 // POST is the same drain, so product saves can trigger it on demand instead of
 // waiting for the next scheduled run. Vercel's Hobby plan allows only one cron
 // per day, so without this an admin edit would take up to 24h to reach
