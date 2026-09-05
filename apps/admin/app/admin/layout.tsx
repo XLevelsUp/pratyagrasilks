@@ -23,16 +23,13 @@ import {
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@pratyagra/auth/context';
 import type { UserRole } from '@pratyagra/core/constants/roles';
+import { STOREFRONT_URL } from '@/lib/constants/urls';
 
 type NavItem = {
     name: string;
     href: string;
     icon: React.ElementType;
 };
-
-// The storefront is a separate deployment on a separate origin.
-const STOREFRONT_URL =
-    process.env.NEXT_PUBLIC_STOREFRONT_URL ?? 'https://pratyagrasilks.com';
 
 const ADMIN_NAV: NavItem[] = [
     { name: 'Dashboard',  href: '/admin',              icon: LayoutDashboard },

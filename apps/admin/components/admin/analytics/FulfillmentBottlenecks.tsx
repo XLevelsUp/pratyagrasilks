@@ -52,7 +52,7 @@ export default function FulfillmentBottlenecks({ data }: FulfillmentBottlenecksP
                         {data.map((order) => (
                             <tr key={order.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                    <Link href={`/orders/${order.id}`} className="text-amber-600 hover:text-amber-700 font-medium">
+                                    <Link href={`/admin/orders/${order.id}`} className="text-amber-600 hover:text-amber-700 font-medium">
                                         #{order.orderNumber}
                                     </Link>
                                 </td>

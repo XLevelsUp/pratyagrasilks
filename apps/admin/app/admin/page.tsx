@@ -215,7 +215,7 @@ export default function AdminDashboard() {
                                 <tr key={order.id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <Link
-                                            href={`/orders/${order.id}`}
+                                            href={`/admin/orders/${order.id}`}
                                             className="text-amber-600 hover:text-amber-700 font-medium"
                                         >
                                             #{order.order_number}

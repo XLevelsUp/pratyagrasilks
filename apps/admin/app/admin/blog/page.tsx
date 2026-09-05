@@ -5,6 +5,7 @@ import { Plus, Search, Newspaper, Edit, Eye, Trash2, MessageSquare } from 'lucid
 import Link from 'next/link';
 import Image from 'next/image';
 import { getPosts, deletePost, getPendingComments } from '@/lib/actions/blog-admin.actions';
+import { STOREFRONT_URL } from '@/lib/constants/urls';
 import { BlogPost } from '@pratyagra/core/types';
 import { isSupabaseImage } from '@pratyagra/core/utils/image';
 import ConfirmDialog from '@pratyagra/ui/ConfirmDialog';
@@ -196,14 +197,17 @@ export default function AdminBlogPage() {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center gap-3">
-                                                <Link
-                                                    href={`/blog/${post.slug}`}
+                                                {/* Cross-origin: the published post lives on the
+                                                    storefront, so a plain anchor, not next/link. */}
+                                                <a
+                                                    href={`${STOREFRONT_URL}/blog/${post.slug}`}
                                                     target="_blank"
+                                                    rel="noopener noreferrer"
                                                     className="text-gray-500 hover:text-gray-700"
                                                     title="View live"
                                                 >
                                                     <Eye className="w-4 h-4" />
-                                                </Link>
+                                                </a>
                                                 <Link
                                                     href={`/admin/blog/${post.id}/edit`}
                                                     className="text-amber-600 hover:text-amber-700"
