@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   PRATYAGRA SILKS — Design Token System
+   Brand: Purple (#550c72) + Amber accent
+   Context: Luxury Silk Sarees
+   ============================================================ */
+
+:root {
+  /* Page surface */
+  --background: #fbf6f0;
+  /* Original warm silk parchment */
+  --foreground: #221D10;
+  /* Deep walnut — primary text */
+
+  /* Purple — primary brand */
+  --color-primary: #550c72;
+  --color-primary-hover: #8430AB;
+  --color-primary-active: #720C5C;
+  --color-primary-foreground: #FFFFFF;
+  --color-primary-subtle: #F5EEF8;
+
+  /* Amber — accent / CTA */
+  --color-accent: #D97706;
+  --color-accent-hover: #B45309;
+  --color-accent-foreground: #FFFFFF;
+  --color-accent-subtle: #FFFBEB;
+  --color-accent-body: #92400E;
+  /* body-size text, meets 4.5:1 on white */
+
+  /* Silk backdrop */
+  --color-secondary: #FDE3C9;
+  /* original peach cream */
+}
+
+/* Dark mode intentionally mirrors light — brand requirement */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #fbf6f0;
+    --foreground: #221D10;
+  }
+}
+
+/* fixed: vertical scroll restored — html always scrollable, no layout shift from scrollbar */
+html {
+  overflow-y: scroll;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  /* No overflow-y here on purpose: html's overflow-y:scroll above already
+     keeps the scrollbar always visible. Giving body its own overflow value
+     too creates a second scroll container, which breaks position:sticky
+     for any descendant (e.g. the blog post sidebar). */
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* .hide-scrollbar only applied to specific inner scroll containers, NOT body/html */
+/* fixed: removed global scrollbar hide that was suppressing native page scrollbar */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE/Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+/* ── Silk shimmer utility ── */
+/* Applied to product card image wrappers for a luxury iridescence feel */
+@layer utilities {
+  .silk-shimmer {
+    background: linear-gradient(135deg,
+        var(--color-primary-subtle) 0%,
+        #ffffff 40%,
+        var(--color-accent-subtle) 100%);
+  }
+}
+
+/* ── Order success page animations ── */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    transform: scale(0);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}

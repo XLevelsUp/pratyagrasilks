@@ -1,0 +1,16 @@
+import { createClient } from '@pratyagra/auth/server';
+import { NextResponse } from 'next/server';
+
+export async function GET(request: Request) {
+    const requestUrl = new URL(request.url);
+    const code = requestUrl.searchParams.get('code');
+    const next = requestUrl.searchParams.get('next') || '/';
+
+    if (code) {
+        const supabase = createClient();
+        await supabase.auth.exchangeCodeForSession(code);
+    }
+
+    // Redirect to next or home page
+    return NextResponse.redirect(new URL(next, request.url));
+}

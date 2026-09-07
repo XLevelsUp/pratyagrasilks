@@ -1,0 +1,35 @@
+{
+  "name": "@pratyagra/auth",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./client": "./src/client.ts",
+    "./server": "./src/server.ts",
+    "./context": "./src/context.tsx",
+    "./role-guard": "./src/role-guard.ts",
+    "./middleware": "./src/middleware.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@pratyagra/core": "workspace:*",
+    "@supabase/ssr": "^0.10.3",
+    "@supabase/supabase-js": "^2.105.4",
+    "server-only": "^0.0.1"
+  },
+  "peerDependencies": {
+    "next": "14.2.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@pratyagra/config": "workspace:*",
+    "@types/react": "^18.2.67",
+    "next": "14.2.3",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "typescript": "^5.4.2"
+  }
+}

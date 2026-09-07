@@ -1,20 +1,25 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Patterns are deliberately UNANCHORED (no leading slash) so they match inside
+# apps/* and packages/* as well as the repo root.
 
 # dependencies
-/node_modules
-/.pnp
+node_modules/
+.pnp
 .pnp.js
 .yarn/install-state.gz
 
 # testing
-/coverage
+coverage/
 
 # next.js
-/.next/
-/out/
+.next/
+out/
 
 # production
-/build
+build/
+
+# turborepo
+.turbo/
 
 # misc
 .DS_Store
