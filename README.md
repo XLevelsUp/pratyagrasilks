@@ -122,20 +122,38 @@ bearer token rather than a session cookie; the route performs its own
 
 Two Vercel projects from this one repository.
 
+Install and build commands live in each app's `vercel.json`, which takes
+precedence over the dashboard. That is deliberate: a project carried over from
+the pre-monorepo setup still had `npm install` pinned as its Install Command,
+and npm cannot parse the `workspace:*` protocol, so every build failed with
+`EUNSUPPORTEDPROTOCOL`. Keeping the commands in the repo makes them reviewable
+and immune to stale dashboard overrides.
+
+These must still be set in the dashboard — there is no `vercel.json` equivalent,
+and **Root Directory has to be set first or `apps/<app>/vercel.json` is never
+read**:
+
 | Setting | `pratyagra-marketing` | `pratyagra-admin` |
 | --- | --- | --- |
 | Root Directory | `apps/marketing` | `apps/admin` |
 | Include files outside Root Directory | on | on |
 | Node.js | 22.x | 22.x |
-| Build Command | `cd ../.. && pnpm turbo run build --filter=@pratyagra/marketing` | `cd ../.. && pnpm turbo run build --filter=@pratyagra/admin` |
 | Ignored Build Step | `npx turbo-ignore @pratyagra/marketing --fallback=HEAD^` | `npx turbo-ignore @pratyagra/admin --fallback=HEAD^` |
 | Domains | pratyagrasilks.com, www | admin.pratyagrasilks.com |
-| Crons | — | `apps/admin/vercel.json` |
+
+Leave Install Command and Build Command **empty** in the dashboard so the
+`vercel.json` values apply. Crons come from `apps/admin/vercel.json`.
 
 "Include files outside Root Directory" is required so each build can see
 `packages/*` and the root lockfile. `--fallback=HEAD^` matters on the first run
 after enabling `turbo-ignore`, which otherwise has no prior deployment to diff
 against and skips the build.
+
+`pnpm install --frozen-lockfile` needs no `cd ../..`: run from a workspace
+member, pnpm walks up to `pnpm-workspace.yaml` and installs the whole
+workspace. The build command does need it, so turbo resolves `turbo.json` at
+the root; output still lands in `apps/<app>/.next`, which is Vercel's default
+output directory relative to the Root Directory.
 
 Environment variables are per-project; see each app's `.env.example`. Note that
 `SUPABASE_SERVICE_ROLE_KEY` is needed by **both** — the storefront uses it for
