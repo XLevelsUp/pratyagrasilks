@@ -209,34 +209,61 @@ export default function OptimizedUploader({
         updateImages(newImages);
     };
 
-    const handleDragStart = (index: number) => {
-        setDraggedIndex(index);
+    // ── Reordering ───────────────────────────────────────────────────────────
+    // Pointer Events, not the HTML5 drag-and-drop API. HTML5 DnD never fires
+    // dragstart/dragover/drop from touch input, so reordering was silently
+    // desktop-mouse-only. Pointer events unify mouse, touch and pen in one
+    // code path.
+    //
+    // The drag starts from the grip handle rather than the whole tile: the
+    // handle carries `touch-action: none` so the browser yields the gesture to
+    // us instead of scrolling, and scoping that to a small handle keeps the
+    // rest of the grid scrollable on a phone.
+
+    const dragPointerId = useRef<number | null>(null);
+
+    const moveImage = (from: number, to: number) => {
+        if (from === to) return;
+        const newImages = [...images];
+        const [moved] = newImages.splice(from, 1);
+        newImages.splice(to, 0, moved);
+        updateImages(newImages);
     };
 
-    const handleDragOver = (e: React.DragEvent, index: number) => {
+    const handlePointerDown = (e: React.PointerEvent<HTMLElement>, index: number) => {
+        // Ignore secondary mouse buttons; touch and pen report button 0.
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
         e.preventDefault();
+        dragPointerId.current = e.pointerId;
+        // Capture so we keep receiving moves even once the finger leaves the
+        // handle — without this the drag dies on the first pixel of movement.
+        e.currentTarget.setPointerCapture(e.pointerId);
+        setDraggedIndex(index);
         setDragOverIndex(index);
     };
 
-    const handleDragLeave = () => {
-        setDragOverIndex(null);
-    };
-
-    const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    const handlePointerMove = (e: React.PointerEvent<HTMLElement>) => {
+        if (dragPointerId.current !== e.pointerId || draggedIndex === null) return;
         e.preventDefault();
-
-        if (draggedIndex === null) return;
-
-        const newImages = [...images];
-        const [draggedImage] = newImages.splice(draggedIndex, 1);
-        newImages.splice(dropIndex, 0, draggedImage);
-
-        updateImages(newImages);
-        setDraggedIndex(null);
-        setDragOverIndex(null);
+        // Pointer capture routes events to the handle, so the tile under the
+        // finger has to be hit-tested explicitly.
+        const tile = document
+            .elementFromPoint(e.clientX, e.clientY)
+            ?.closest('[data-image-index]');
+        if (!tile) return;
+        const index = Number(tile.getAttribute('data-image-index'));
+        if (!Number.isNaN(index)) setDragOverIndex(index);
     };
 
-    const handleDragEnd = () => {
+    const endDrag = (e: React.PointerEvent<HTMLElement>, commit: boolean) => {
+        if (dragPointerId.current !== e.pointerId) return;
+        if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+            e.currentTarget.releasePointerCapture(e.pointerId);
+        }
+        dragPointerId.current = null;
+        if (commit && draggedIndex !== null && dragOverIndex !== null) {
+            moveImage(draggedIndex, dragOverIndex);
+        }
         setDraggedIndex(null);
         setDragOverIndex(null);
     };
@@ -349,13 +376,8 @@ export default function OptimizedUploader({
                         {images.map((url, index) => (
                             <div
                                 key={index}
-                                draggable
-                                onDragStart={() => handleDragStart(index)}
-                                onDragOver={(e) => handleDragOver(e, index)}
-                                onDragLeave={handleDragLeave}
-                                onDrop={(e) => handleDrop(e, index)}
-                                onDragEnd={handleDragEnd}
-                                className={`relative group cursor-move transition-all ${draggedIndex === index ? 'opacity-50 scale-95' : ''
+                                data-image-index={index}
+                                className={`relative group transition-all ${draggedIndex === index ? 'opacity-50 scale-95' : ''
                                     } ${dragOverIndex === index && draggedIndex !== index
                                         ? 'ring-2 ring-amber-500 scale-105'
                                         : ''
@@ -366,8 +388,22 @@ export default function OptimizedUploader({
                                     {index + 1}
                                 </div>
 
-                                {/* Drag Handle */}
-                                <div className="absolute top-1 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 rounded px-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                {/* Drag handle — the only drag affordance.
+                                    touch-none is load-bearing: it stops the
+                                    browser claiming the gesture as a scroll.
+                                    Visible by default so it is reachable on
+                                    touch; hover-reveal is re-applied only on
+                                    devices that actually have hover. */}
+                                <div
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-label={`Reorder image ${index + 1}`}
+                                    onPointerDown={(e) => handlePointerDown(e, index)}
+                                    onPointerMove={handlePointerMove}
+                                    onPointerUp={(e) => endDrag(e, true)}
+                                    onPointerCancel={(e) => endDrag(e, false)}
+                                    className="absolute top-1 left-1/2 -translate-x-1/2 touch-none cursor-grab active:cursor-grabbing bg-black/60 rounded px-2 py-1 z-10 transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100"
+                                >
                                     <GripVertical className="w-4 h-4 text-white" />
                                 </div>
 
@@ -386,7 +422,8 @@ export default function OptimizedUploader({
                                 {/* Remove Button */}
                                 <button
                                     onClick={() => removeImage(index)}
-                                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                    aria-label={`Remove image ${index + 1}`}
+                                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 z-10 transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100"
                                     type="button"
                                 >
                                     <X className="w-4 h-4" />
@@ -395,7 +432,7 @@ export default function OptimizedUploader({
                         ))}
                     </div>
                     <p className="text-xs text-gray-500 mt-2">
-                        💡 Drag images to reorder them
+                        💡 Drag the handle at the top of an image to reorder
                     </p>
                 </div>
             )}
