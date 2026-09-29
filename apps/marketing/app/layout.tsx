@@ -94,7 +94,9 @@ export const metadata: Metadata = {
     },
     verification: {
         other: {
-            "p:domain_verify": "d71a5f24c0280eaaae286631f0425917",
+            ...(process.env.PINTEREST_DOMAIN_VERIFY
+                ? { "p:domain_verify": process.env.PINTEREST_DOMAIN_VERIFY }
+                : {}),
         },
     },
     alternates: {
