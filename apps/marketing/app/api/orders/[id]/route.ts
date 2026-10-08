@@ -1,8 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { createClient as createSessionClient } from '@pratyagra/auth/server';
 
 // Ensure this route is always treated as dynamic
 export const dynamic = 'force-dynamic';
+
+const GUEST_CONFIRMATION_WINDOW_MS = 60 * 60 * 1000;
+
+async function canViewOrder(order: { customer_id: string; payment_verified_at: string | null }): Promise<boolean> {
+    const { data: { user } } = await createSessionClient().auth.getUser();
+    if (user && user.id === order.customer_id) return true;
+
+    if (order.payment_verified_at) {
+        const paidAgo = Date.now() - new Date(order.payment_verified_at).getTime();
+        if (paidAgo >= 0 && paidAgo < GUEST_CONFIRMATION_WINDOW_MS) return true;
+    }
+    return false;
+}
 
 export async function GET(
     request: NextRequest,
@@ -23,6 +37,16 @@ export async function GET(
             .single();
 
         if (orderError || !order) {
+            return NextResponse.json(
+                { error: 'Order not found' },
+                { status: 404 }
+            );
+        }
+
+        // The response carries the customer's name, email, phone and address,
+        // so only the owner may read it — or a guest during the brief window
+        // after paying, when the confirmation page loads it without a session.
+        if (!(await canViewOrder(order))) {
             return NextResponse.json(
                 { error: 'Order not found' },
                 { status: 404 }

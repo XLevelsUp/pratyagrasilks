@@ -280,6 +280,9 @@ importers:
 
   packages/core:
     dependencies:
+      libphonenumber-js:
+        specifier: ^1.12.41
+        version: 1.12.41
       zod:
         specifier: ^4.1.13
         version: 4.1.13

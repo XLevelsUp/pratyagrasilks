@@ -1,23 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
-import { createClient } from '@supabase/supabase-js';
 import { shippingAddressSchema } from '@pratyagra/core/validations/form.schemas';
-import { sendSaleWhatsAppNotification } from '@/lib/utils/whatsapp';
-import { getActiveCampaignPublic } from '@/lib/data/public-products';
-import { getFinalPrice } from '@pratyagra/core/utils/campaign';
+import { computeShipping, createPendingOrder, getServiceClient, OrderError } from '@/lib/orders/service';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
-    const supabaseAdmin = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!,
-        { auth: { autoRefreshToken: false, persistSession: false } }
-    );
-    
+    const supabaseAdmin = getServiceClient();
+
     try {
         const body = await req.json();
-        const { shippingAddress, items, shippingCost = 0, shippingZoneId, estimatedDeliveryDays, selectedAddressId } = body;
+        // shippingCost from the client is ignored — shipping is computed server-side.
+        const { shippingAddress, items, selectedAddressId } = body;
 
         // ── 1. Validate request shape ────────────────────────────────────────────
         if (!shippingAddress || !items || items.length === 0) {
@@ -35,190 +29,31 @@ export async function POST(req: NextRequest) {
         }
         const validatedAddress = parsed.data;
 
-        // ── 2. Re-fetch prices from DB to prevent price tampering ────────────────
-        const productIds: string[] = items.map((i: any) => i.productId);
-        const { data: products, error: productErr } = await supabaseAdmin
-            .from('products')
-            .select('id, name, price, sale_price, exclude_from_sales, category, is_online, in_stock, sku')
-            .in('id', productIds);
-
-        if (productErr || !products || products.length !== items.length) {
-            return NextResponse.json({ error: 'Could not verify product details' }, { status: 400 });
-        }
-
-        const outOfStock = products.filter((p) => !p.in_stock);
-        if (outOfStock.length > 0) {
-            return NextResponse.json(
-                { error: `Out of stock: ${outOfStock.map((p) => p.name).join(', ')}` },
-                { status: 409 }
-            );
-        }
-
-        // Create a product lookup map
-        const productMap = new Map(products.map((p) => [p.id, p]));
-
-        // ── 3. Server-side total calculation ─────────────────────────────────────
-        // Prices resolve from the DB and the live campaign, never from the client,
-        // so a tampered cart cannot invent its own offer or revive an ended sale.
-        const campaign = await getActiveCampaignPublic();
-        const priceFor = (p: any) => getFinalPrice(p, campaign);
-
-        const subtotal = items.reduce((sum: number, item: any) => {
-            const p = productMap.get(item.productId);
-            return sum + (p ? priceFor(p) : 0);
-        }, 0);
-        const totalAmount = subtotal + shippingCost;
-
-        // ── 4. Persist customer ───────────────────────────────────────────────────
-        let customerId: string;
-        const { data: existingCustomer } = await supabaseAdmin
-            .from('customers')
-            .select('id')
-            .eq('email', validatedAddress.email)
-            .single();
-
-        if (existingCustomer) {
-            customerId = existingCustomer.id;
-            // Keep name current in case it was entered differently before
-            await supabaseAdmin
-                .from('customers')
-                .update({ full_name: validatedAddress.fullName, phone: validatedAddress.phone })
-                .eq('id', customerId);
-        } else {
-            const { data: newCustomer, error: custErr } = await supabaseAdmin
-                .from('customers')
-                .insert({
-                    email: validatedAddress.email,
-                    full_name: validatedAddress.fullName,
-                    phone: validatedAddress.phone,
-                })
-                .select()
-                .single();
-
-            if (custErr || !newCustomer) {
-                return NextResponse.json({ error: 'Failed to create customer' }, { status: 500 });
-            }
-            customerId = newCustomer.id;
-        }
-
-        // ── 5. Persist shipping address ───────────────────────────────────────────
-        let shippingAddressId: string;
-
-        if (selectedAddressId) {
-            // Verify that this address exists and belongs to the customer ID
-            const { data: address, error: addrErr } = await supabaseAdmin
-                .from('addresses')
-                .select('id')
-                .eq('id', selectedAddressId)
-                .eq('customer_id', customerId)
-                .single();
-
-            if (addrErr || !address) {
-                return NextResponse.json({ error: 'Selected address not found or invalid' }, { status: 400 });
-            }
-            shippingAddressId = address.id;
-        } else {
-            // Insert new address
-            const { data: address, error: addrErr } = await supabaseAdmin
-                .from('addresses')
-                .insert({
-                    customer_id: customerId,
-                    full_name: validatedAddress.fullName,
-                    address_line1: validatedAddress.addressLine1,
-                    address_line2: validatedAddress.addressLine2 || '',
-                    city: validatedAddress.city,
-                    state: validatedAddress.state || '',
-                    postal_code: validatedAddress.postalCode,
-                    country: validatedAddress.country || 'India',
-                    phone: validatedAddress.phone,
-                    is_default: false,
-                })
-                .select()
-                .single();
-
-            if (addrErr || !address) {
-                return NextResponse.json({ error: 'Failed to save address' }, { status: 500 });
-            }
-            shippingAddressId = address.id;
-        }
-
-        // ── 6. Create pending order in Supabase ───────────────────────────────────
-        const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).slice(2, 9).toUpperCase()}`;
-
-        const { data: order, error: orderErr } = await supabaseAdmin
-            .from('orders')
-            .insert({
-                customer_id: customerId,
-                order_number: orderNumber,
-                total_amount: totalAmount,
-                shipping_cost: shippingCost,
-                shipping_address_id: shippingAddressId,
-                status: 'pending',
-                payment_method: 'razorpay',
-                payment_status: 'pending',
-                ...(shippingZoneId && { shipping_zone_id: shippingZoneId }),
-                ...(estimatedDeliveryDays && { estimated_delivery_days: estimatedDeliveryDays }),
-            })
-            .select()
-            .single();
-
-        if (orderErr || !order) {
-            return NextResponse.json({ error: 'Failed to create order' }, { status: 500 });
-        }
-
-        // ── 7. Create order items (triggers stock deduction via DB trigger) ───────
-        const orderItems = items.map((item: any) => {
-            const p = productMap.get(item.productId)!;
-            return {
-                order_id: order.id,
-                product_id: p.id,
-                product_name: p.name,
-                product_sku: p.sku,
-                quantity: 1,
-                unit_price: priceFor(p),
-                total_price: priceFor(p),
-            };
+        // ── 2. Shipping + pending order (prices re-fetched from DB) ──────────────
+        const shipping = await computeShipping(supabaseAdmin, {
+            country: validatedAddress.country,
+            state: validatedAddress.state,
         });
 
-        const { error: itemsErr } = await supabaseAdmin.from('order_items').insert(orderItems);
+        const order = await createPendingOrder(supabaseAdmin, {
+            address: validatedAddress,
+            productIds: items.map((i: { productId: string }) => i.productId),
+            shipping,
+            selectedAddressId,
+        });
 
-        if (itemsErr) {
-            // Rollback: delete the order
-            await supabaseAdmin.from('orders').delete().eq('id', order.id);
-            return NextResponse.json({ error: 'Failed to save order items' }, { status: 500 });
-        }
-
-        // Internal WhatsApp sale alert — fires as soon as address + items are confirmed,
-        // regardless of whether the Razorpay payment that follows succeeds or fails.
-        (async () => {
-            try {
-                const itemsSummary = orderItems
-                    .map((oi: { quantity: number; product_name: string }) => `${oi.quantity}x ${oi.product_name}`)
-                    .join(', ');
-                await sendSaleWhatsAppNotification({
-                    orderId: orderNumber,
-                    customerName: validatedAddress.fullName,
-                    totalAmount: new Intl.NumberFormat('en-IN').format(totalAmount),
-                    items: itemsSummary,
-                });
-                console.log(`[/api/order/create] WhatsApp sale alert sent for ${orderNumber}`);
-            } catch (waErr) {
-                console.error('[/api/order/create] WhatsApp send failed (non-fatal):', waErr);
-            }
-        })();
-
-        // ── 8. Create Razorpay order ──────────────────────────────────────────────
+        // ── 3. Create Razorpay order ──────────────────────────────────────────────
         const razorpay = new Razorpay({
             key_id: process.env.RAZORPAY_KEY_ID!,
             key_secret: process.env.RAZORPAY_KEY_SECRET!,
         });
 
         const rzpOrder = await razorpay.orders.create({
-            amount: Math.round(totalAmount * 100), // paise
+            amount: Math.round(order.totalAmount * 100), // paise
             currency: 'INR',
             receipt: order.id.slice(0, 40), // Razorpay receipt max 40 chars
             notes: {
-                order_number: orderNumber,
+                order_number: order.orderNumber,
                 db_order_id: order.id,
             },
         });
@@ -235,9 +70,12 @@ export async function POST(req: NextRequest) {
             amount: rzpOrder.amount,
             currency: rzpOrder.currency,
             dbOrderId: order.id,
-            orderNumber,
+            orderNumber: order.orderNumber,
         });
     } catch (err) {
+        if (err instanceof OrderError) {
+            return NextResponse.json({ error: err.message }, { status: err.status });
+        }
         console.error('[/api/order/create]', err);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }

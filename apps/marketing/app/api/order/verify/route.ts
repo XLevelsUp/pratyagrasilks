@@ -1,17 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { createClient } from '@supabase/supabase-js';
-import { sendOrderConfirmation } from '@/lib/mail/sender';
-import type { OrderEmailData } from '@/lib/mail/templates';
+import { getServiceClient, markOrderPaid, OrderError } from '@/lib/orders/service';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
-    const supabaseAdmin = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!,
-        { auth: { autoRefreshToken: false, persistSession: false } }
-    );
+    const supabaseAdmin = getServiceClient();
 
     try {
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = await req.json();
@@ -34,7 +28,7 @@ export async function POST(req: NextRequest) {
         // ── 2. Look up the order by Razorpay order ID ────────────────────────────
         const { data: order, error: findErr } = await supabaseAdmin
             .from('orders')
-            .select('id, order_number, payment_status, customer_id, shipping_address_id, subtotal, total_amount, shipping_cost, estimated_delivery_days')
+            .select('id')
             .eq('razorpay_order_id', razorpay_order_id)
             .single();
 
@@ -42,97 +36,25 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Order not found' }, { status: 404 });
         }
 
-        // ── 3. Idempotency guard ──────────────────────────────────────────────────
-        if (order.payment_status === 'completed') {
-            return NextResponse.json({
-                success: true,
-                message: 'Already verified',
-                orderId: order.id,
-                orderNumber: order.order_number,
-            });
-        }
-
-        // ── 4. Mark order as paid ─────────────────────────────────────────────────
-        const { error: updateErr } = await supabaseAdmin
-            .from('orders')
-            .update({
-                status: 'processing',
-                payment_status: 'completed',
-                razorpay_payment_id,
-                razorpay_signature,
-                payment_verified_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-            })
-            .eq('id', order.id);
-
-        if (updateErr) {
-            console.error('[/api/order/verify] DB update failed', updateErr);
-            return NextResponse.json({ error: 'Failed to update order status' }, { status: 500 });
-        }
-
-        console.log(`[/api/order/verify] Payment verified — order ${order.order_number}`);
-
-        // ── 5. Send confirmation email (non-blocking) ─────────────────────────────
+        // ── 3. Mark paid (idempotent) + confirmation email ───────────────────────
         // Note: the internal WhatsApp sale alert fires earlier, in /api/order/create,
         // as soon as the address + items are confirmed — not gated on payment success.
-        void (async () => {
-            const { data: customer } = await supabaseAdmin
-                .from('customers')
-                .select('full_name, email')
-                .eq('id', order.customer_id)
-                .single();
-
-            if (!customer?.email) return;
-
-            const { data: items } = await supabaseAdmin
-                .from('order_items')
-                .select('product_name, product_sku, quantity, unit_price, total_price')
-                .eq('order_id', order.id);
-
-            const { data: address } = await supabaseAdmin
-                .from('addresses')
-                .select('full_name, address_line1, address_line2, city, state, postal_code')
-                .eq('id', order.shipping_address_id)
-                .single();
-
-            try {
-                const emailData: OrderEmailData = {
-                    orderNumber: order.order_number,
-                    customerName: address?.full_name || customer.full_name || 'Valued Customer',
-                    customerEmail: customer.email,
-                    items: (items ?? []).map((i) => ({
-                        name: i.product_name,
-                        sku: i.product_sku,
-                        quantity: i.quantity,
-                        unitPrice: i.unit_price,
-                        totalPrice: i.total_price,
-                    })),
-                    subtotal: order.subtotal ?? order.total_amount,
-                    shippingCharge: order.shipping_cost ?? 0,
-                    totalAmount: order.total_amount,
-                    shippingAddress: address ? {
-                        line1: address.address_line1,
-                        line2: address.address_line2,
-                        city: address.city,
-                        state: address.state,
-                        pincode: address.postal_code,
-                    } : { line1: '', city: '', state: '', pincode: '' },
-                    estimatedDelivery: order.estimated_delivery_days ?? null,
-                };
-
-                await sendOrderConfirmation(customer.email, emailData);
-                console.log(`[/api/order/verify] Confirmation email sent → ${customer.email}`);
-            } catch (emailErr) {
-                console.error('[/api/order/verify] Email send failed (non-fatal):', emailErr);
-            }
-        })();
+        const { alreadyPaid, orderNumber } = await markOrderPaid(supabaseAdmin, {
+            orderId: order.id,
+            paymentId: razorpay_payment_id,
+            signature: razorpay_signature,
+        });
 
         return NextResponse.json({
             success: true,
+            ...(alreadyPaid && { message: 'Already verified' }),
             orderId: order.id,
-            orderNumber: order.order_number,
+            orderNumber,
         });
     } catch (err) {
+        if (err instanceof OrderError) {
+            return NextResponse.json({ error: err.message }, { status: err.status });
+        }
         console.error('[/api/order/verify]', err);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
